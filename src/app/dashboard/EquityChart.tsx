@@ -78,7 +78,7 @@ export function EquityChart({ trades }: { trades: Trade[] }) {
                                 contentStyle={{ backgroundColor: '#000', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
                                 itemStyle={{ color: '#ccf381', fontWeight: 'bold' }}
                                 labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
-                                formatter={(value: number) => [`$${value.toFixed(2)}`, 'Equity']}
+                                formatter={(value: any) => [`$${Number(value).toFixed(2)}`, 'Equity']}
                                 labelFormatter={(label) => `Trade #${label}`}
                                 cursor={{ stroke: '#ccf381', strokeWidth: 1, strokeDasharray: '5 5' }}
                             />

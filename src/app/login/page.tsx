@@ -6,11 +6,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { login, loginWithOAuth } from '../auth/actions'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginContent() {
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
     const [error, setError] = useState<string | null>(null)
@@ -109,5 +109,17 @@ export default function LoginPage() {
                 </CardFooter>
             </Card>
         </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-gray-950">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     )
 }
