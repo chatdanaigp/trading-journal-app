@@ -56,7 +56,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                                 itemStyle={{ color: '#ccf381' }}
-                                formatter={(val: number) => [`$${val.toFixed(2)}`, 'Equity']}
+                                formatter={(val: any) => [`$${Number(val).toFixed(2)}`, 'Equity']}
                             />
                             <Area type="monotone" dataKey="profit" stroke="#ccf381" strokeWidth={3} fillOpacity={1} fill="url(#colorProfitAnalytics)" />
                         </AreaChart>
