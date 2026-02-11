@@ -60,7 +60,7 @@ export default async function LeaderboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 items-end">
                     {/* Rank 2 */}
                     {leaderboard?.[1] && (
-                        <Card key={leaderboard[1].user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
+                        <Card key={leaderboard[1].out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥈</div>
                             <CardHeader className="text-center pt-10 pb-2">
                                 {leaderboard[1].avatar_url && (
@@ -94,7 +94,7 @@ export default async function LeaderboardPage() {
 
                     {/* Rank 1 (Champion) */}
                     {leaderboard?.[0] && (
-                        <Card key={leaderboard[0].user_id} className="border-[#ccf381] bg-[#1a1a1a]/80 backdrop-blur-md relative scale-110 z-10 shadow-[0_0_50px_rgba(204,243,129,0.15)] group hover:-translate-y-3 transition-transform duration-300">
+                        <Card key={leaderboard[0].out_user_id} className="border-[#ccf381] bg-[#1a1a1a]/80 backdrop-blur-md relative scale-110 z-10 shadow-[0_0_50px_rgba(204,243,129,0.15)] group hover:-translate-y-3 transition-transform duration-300">
                             <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-7xl drop-shadow-[0_0_20px_rgba(255,215,0,0.5)]">👑</div>
                             <div className="absolute inset-0 bg-gradient-to-b from-[#ccf381]/10 to-transparent pointer-events-none rounded-xl" />
                             <CardHeader className="text-center pt-12 pb-2">
@@ -129,7 +129,7 @@ export default async function LeaderboardPage() {
 
                     {/* Rank 3 */}
                     {leaderboard?.[2] && (
-                        <Card key={leaderboard[2].user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
+                        <Card key={leaderboard[2].out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥉</div>
                             <CardHeader className="text-center pt-10 pb-2">
                                 {leaderboard[2].avatar_url && (
@@ -182,10 +182,10 @@ export default async function LeaderboardPage() {
                             <tbody className="divide-y divide-[#222]">
                                 {leaderboard?.map((trader: any, index: number) => {
                                     const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate)
-                                    const isCurrentUser = trader.user_id === user.id
+                                    const isCurrentUser = trader.out_user_id === user.id
                                     return (
                                         <tr
-                                            key={trader.user_id}
+                                            key={trader.out_user_id}
                                             className={`hover:bg-[#ccf381]/5 transition-colors group ${isCurrentUser ? 'bg-[#ccf381]/10 border-l-4 border-l-[#ccf381]' : ''}`}
                                         >
                                             <td className="p-4 font-mono text-gray-500 group-hover:text-[#ccf381] font-bold">

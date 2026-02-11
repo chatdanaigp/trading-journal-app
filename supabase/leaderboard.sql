@@ -1,9 +1,9 @@
 -- Enhanced Leaderboard Function with Comprehensive Stats
--- This function returns all users with their complete trading statistics
+-- Fixed: Renamed return column to avoid "user_id is ambiguous" error
 
 CREATE OR REPLACE FUNCTION get_leaderboard()
 RETURNS TABLE (
-  user_id uuid,
+  out_user_id uuid,
   username text,
   full_name text,
   avatar_url text,
@@ -68,27 +68,27 @@ BEGIN
   streak_calc AS (
     SELECT
       us.id,
-      -- Current Streak (simplified: last 5 trades)
+      -- Current Streak (last consecutive wins/losses)
       (
         SELECT COUNT(*)
         FROM (
-          SELECT profit,
-                 CASE WHEN profit > 0 THEN 'win' ELSE 'loss' END as result
-          FROM trades
-          WHERE user_id = us.id
-          ORDER BY created_at DESC
+          SELECT tr.profit,
+                 CASE WHEN tr.profit > 0 THEN 'win' ELSE 'loss' END as result
+          FROM trades tr
+          WHERE tr.user_id = us.id
+          ORDER BY tr.created_at DESC
           LIMIT 5
         ) recent
         WHERE result = (
-          SELECT CASE WHEN profit > 0 THEN 'win' ELSE 'loss' END
-          FROM trades
-          WHERE user_id = us.id
-          ORDER BY created_at DESC
+          SELECT CASE WHEN tr2.profit > 0 THEN 'win' ELSE 'loss' END
+          FROM trades tr2
+          WHERE tr2.user_id = us.id
+          ORDER BY tr2.created_at DESC
           LIMIT 1
         )
       )::integer AS current_streak,
       
-      -- Longest Win Streak (simplified approximation)
+      -- Longest Win Streak
       (
         SELECT MAX(streak_count)
         FROM (
@@ -96,13 +96,13 @@ BEGIN
             COUNT(*) as streak_count
           FROM (
             SELECT 
-              profit,
-              SUM(CASE WHEN profit <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY created_at) as grp
-            FROM trades
-            WHERE user_id = us.id
+              tr3.profit,
+              SUM(CASE WHEN tr3.profit <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY tr3.created_at) as grp
+            FROM trades tr3
+            WHERE tr3.user_id = us.id
           ) grouped
-          WHERE profit > 0
-          GROUP BY grp
+          WHERE grouped.profit > 0
+          GROUP BY grouped.grp
         ) streaks
       )::integer AS longest_win_streak
       
@@ -125,6 +125,6 @@ BEGIN
   FROM user_stats us
   LEFT JOIN streak_calc sc ON us.id = sc.id
   WHERE us.total_trades > 0  -- Only show users who have traded
-  ORDER BY us.net_profit DESC;  -- Removed LIMIT 10
+  ORDER BY us.net_profit DESC;
 END;
 $$;
