@@ -4,9 +4,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { useEffect, useState } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 export function Sidebar() {
     const pathname = usePathname()
+    const [user, setUser] = useState<User | null>(null)
+    const supabase = createClient()
+
+    useEffect(() => {
+        async function getUser() {
+            const { data: { user } } = await supabase.auth.getUser()
+            setUser(user)
+        }
+        getUser()
+    }, [])
 
     const links = [
         { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -20,15 +33,40 @@ export function Sidebar() {
         { name: 'Help', href: '#', icon: HelpCircle }, // Placeholder
     ]
 
+    // Extract Discord user data
+    const discordAvatar = user?.user_metadata?.avatar_url
+    const discordName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Trader'
+
     return (
         <div className="w-64 h-screen bg-[#0d0d0d] border-r border-[#1f1f1f] flex flex-col p-6 fixed left-0 top-0 overflow-y-auto">
             {/* Logo */}
-            <div className="flex items-center gap-3 mb-10 px-2">
+            <div className="flex items-center gap-3 mb-8 px-2">
                 <div className="w-8 h-8 rounded-lg bg-[#ccf381] flex items-center justify-center text-black font-bold">
                     TJ
                 </div>
                 <h1 className="text-xl font-bold text-white tracking-tight">TradingJ.</h1>
             </div>
+
+            {/* User Profile */}
+            {user && (
+                <div className="mb-6 p-3 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] flex items-center gap-3">
+                    {discordAvatar ? (
+                        <img
+                            src={discordAvatar}
+                            alt={discordName}
+                            className="w-10 h-10 rounded-full border-2 border-[#5865F2]"
+                        />
+                    ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#5865F2] to-[#4752C4] border-2 border-[#5865F2] flex items-center justify-center text-white font-bold">
+                            {discordName.charAt(0).toUpperCase()}
+                        </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white truncate">{discordName}</p>
+                        <p className="text-xs text-gray-500">Discord Account</p>
+                    </div>
+                </div>
+            )}
 
             {/* Menu Label */}
             <div className="text-xs font-bold text-gray-500 mb-4 px-2 tracking-wider">DASHBOARD</div>
@@ -75,15 +113,6 @@ export function Sidebar() {
                         <span>Log Out</span>
                     </button>
                 </form>
-            </div>
-
-            {/* User Profile Mini (Optional) */}
-            <div className="mt-8 pt-6 border-t border-[#1f1f1f] flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border border-gray-500" />
-                <div>
-                    <p className="text-sm font-bold text-white">Trader</p>
-                    <p className="text-xs text-gray-500">Pro Plan</p>
-                </div>
             </div>
         </div>
     )
