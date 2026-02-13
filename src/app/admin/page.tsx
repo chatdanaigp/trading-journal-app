@@ -23,9 +23,11 @@ export default async function AdminPage() {
                 <div className="text-center space-y-4">
                     <h1 className="text-4xl font-bold text-red-500">403 Forbidden</h1>
                     <p className="text-gray-400">You do not have permission to view this page.</p>
-                    <p className="text-sm text-gray-500">
-                        (Dev Note: Go to Supabase &rarr; Table Editor &rarr; profiles &rarr; set your username to 'admin')
-                    </p>
+                    <div className="text-xs text-gray-600 mt-4 space-y-1 bg-gray-900 p-4 rounded-lg">
+                        <p>User ID: {user.id}</p>
+                        <p>Email: {user.email}</p>
+                        <p>Profile username: {profile?.username || 'NULL'}</p>
+                    </div>
                 </div>
             </div>
         )
