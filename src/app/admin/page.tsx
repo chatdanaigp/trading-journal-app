@@ -23,27 +23,16 @@ export default async function AdminPage() {
                 <div className="text-center space-y-4">
                     <h1 className="text-4xl font-bold text-red-500">403 Forbidden</h1>
                     <p className="text-gray-400">You do not have permission to view this page.</p>
-                    <div className="text-xs text-gray-600 mt-4 space-y-1 bg-gray-900 p-4 rounded-lg">
-                        <p>User ID: {user.id}</p>
-                        <p>Email: {user.email}</p>
-                        <p>Profile username: {profile?.username || 'NULL'}</p>
-                    </div>
+                    <p className="text-sm text-gray-500">
+                        (Dev Note: Go to Supabase &rarr; Table Editor &rarr; profiles &rarr; set your username to 'admin')
+                    </p>
                 </div>
             </div>
         )
     }
 
-    // Fetch ALL trades from everyone
-    const { data: trades, error } = await supabase
-        .from('trades')
-        .select(`
-      *,
-      profiles (
-        full_name,
-        username
-      )
-    `)
-        .order('created_at', { ascending: false })
+    // Fetch ALL trades from everyone using the secure RPC function
+    const { data: trades, error } = await supabase.rpc('get_all_trades_admin')
 
     if (error) {
         console.error('Error fetching all trades:', error)
@@ -70,18 +59,18 @@ export default async function AdminPage() {
 
                 <div className="grid gap-4">
                     {trades?.map((trade: any) => (
-                        <Card key={trade.id} className="bg-[#1a1a1a]/60 backdrop-blur-md border-[#333] hover:border-[#ccf381]/50 transition-all duration-300 group hover:shadow-[0_0_20px_rgba(204,243,129,0.1)]">
+                        <Card key={trade.trade_id} className="bg-[#1a1a1a]/60 backdrop-blur-md border-[#333] hover:border-[#ccf381]/50 transition-all duration-300 group hover:shadow-[0_0_20px_rgba(204,243,129,0.1)]">
                             <CardContent className="p-5 flex items-center justify-between">
                                 <div className="flex items-center space-x-5">
                                     {/* User Avatar Placeholder */}
                                     <div className="h-12 w-12 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center text-[#ccf381] font-black text-lg shadow-[0_0_10px_rgba(204,243,129,0.1)]">
-                                        {trade.profiles?.full_name?.[0] || 'U'}
+                                        {trade.trader_full_name?.[0] || 'U'}
                                     </div>
 
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <p className="font-bold text-lg text-white group-hover:text-[#ccf381] transition-colors">{trade.profiles?.full_name || 'Unknown User'}</p>
-                                            <span className="text-xs text-gray-500 bg-[#0d0d0d] px-2 py-0.5 rounded border border-[#333]">@{trade.profiles?.username || 'user'}</span>
+                                            <p className="font-bold text-lg text-white group-hover:text-[#ccf381] transition-colors">{trade.trader_full_name || 'Unknown User'}</p>
+                                            <span className="text-xs text-gray-500 bg-[#0d0d0d] px-2 py-0.5 rounded border border-[#333]">@{trade.trader_username || 'user'}</span>
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
                                             <span className={`text-xs font-black px-2 py-0.5 rounded uppercase ${trade.type === 'BUY' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
