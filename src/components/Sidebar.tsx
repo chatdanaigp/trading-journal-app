@@ -25,7 +25,7 @@ export function Sidebar() {
         { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
         { name: 'Analytics', href: '/analytics', icon: BarChart3 },
         { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-        { name: 'Journal', href: '#', icon: Wallet }, // Placeholder
+        { name: 'Journal', href: '/journal', icon: Wallet },
     ]
 
     const lowerLinks = [
