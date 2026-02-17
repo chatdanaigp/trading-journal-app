@@ -1,6 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { isAdmin, getAllUsers } from './actions'
+import { UserCard } from './components/UserCard'
+import { Card, CardContent } from '@/components/ui/card'
+import { Shield, ShieldAlert, Users, BarChart3, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -10,94 +14,193 @@ export default async function AdminPage() {
         redirect('/login')
     }
 
-    // Check if user is admin
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single()
+    // Secure admin check
+    const authorized = await isAdmin()
 
-    if (profile?.username !== 'admin') {
+    if (!authorized) {
         return (
-            <div className="flex h-screen items-center justify-center bg-gray-950 text-white">
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl font-bold text-red-500">403 Forbidden</h1>
-                    <p className="text-gray-400">You do not have permission to view this page.</p>
-                    <p className="text-sm text-gray-500">
-                        (Dev Note: Go to Supabase &rarr; Table Editor &rarr; profiles &rarr; set your username to 'admin')
+            <div className="flex h-screen items-center justify-center bg-[#050505] text-white">
+                <div className="text-center space-y-4 max-w-md mx-auto p-8">
+                    <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+                        <ShieldAlert className="w-8 h-8 text-red-400" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-red-400">Access Denied</h1>
+                    <p className="text-gray-500">You do not have permission to access the admin panel.</p>
+                    <p className="text-xs text-gray-600 bg-[#1a1a1a] rounded-xl p-3 border border-white/5">
+                        If you believe this is an error, contact your administrator to add your User ID to the <code className="text-[#ccf381]">ADMIN_USER_IDS</code> environment variable.
                     </p>
+                    <Link
+                        href="/dashboard"
+                        className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 text-[#ccf381] text-sm font-bold hover:bg-[#ccf381]/20 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Dashboard
+                    </Link>
                 </div>
             </div>
         )
     }
 
-    // Fetch ALL trades from everyone using the secure RPC function
-    const { data: trades, error } = await supabase.rpc('get_all_trades_admin')
+    // Fetch data
+    const users = await getAllUsers()
 
-    if (error) {
-        console.error('Error fetching all trades:', error)
+    // Fetch ALL trades
+    const { data: trades, error: tradesError } = await supabase.rpc('get_all_trades_admin')
+    if (tradesError) {
+        console.error('Error fetching trades:', tradesError)
     }
 
-    return (
-        <div className="min-h-screen bg-[#050505] text-white p-6 relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
-            <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
+    const totalUsers = users.length
+    const totalTrades = trades?.length || 0
+    const totalProfit = users.reduce((sum, u) => sum + u.totalProfit, 0)
 
-            <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-                <div className="flex justify-between items-end border-b border-[#333] pb-6">
-                    <div>
-                        <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                            Admin <span className="text-[#ccf381]">Nexus</span>
-                        </h1>
-                        <p className="text-gray-400 mt-1">Monitoring global trade activity</p>
+    return (
+        <div className="min-h-screen bg-[#050505] text-white p-8 relative overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-[#ccf381] blur-[150px] opacity-5 rounded-full pointer-events-none" />
+            <div className="absolute bottom-10 left-10 w-[200px] h-[200px] bg-red-500 blur-[150px] opacity-5 rounded-full pointer-events-none" />
+
+            <div className="max-w-[1400px] mx-auto space-y-8 relative z-10">
+                {/* Header */}
+                <div className="flex justify-between items-end border-b border-white/5 pb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center shadow-lg shadow-[#ccf381]/5">
+                            <Shield className="w-6 h-6 text-[#ccf381]" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">
+                                Admin <span className="text-[#ccf381]">Panel</span>
+                            </h1>
+                            <p className="text-gray-500 text-sm">Manage users and monitor platform activity</p>
+                        </div>
                     </div>
-                    <a href="/dashboard" className="text-sm font-bold text-[#ccf381] hover:text-[#b0d16a] transition-colors flex items-center gap-2 px-4 py-2 rounded-full border border-[#ccf381]/20 hover:bg-[#ccf381]/10">
-                        ← Back to My Dashboard
-                    </a>
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a1a] border border-white/5 text-sm text-gray-400 hover:text-white hover:border-white/10 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Dashboard
+                    </Link>
                 </div>
 
-                <div className="grid gap-4">
-                    {trades?.map((trade: any) => (
-                        <Card key={trade.trade_id} className="bg-[#1a1a1a]/60 backdrop-blur-md border-[#333] hover:border-[#ccf381]/50 transition-all duration-300 group hover:shadow-[0_0_20px_rgba(204,243,129,0.1)]">
-                            <CardContent className="p-5 flex items-center justify-between">
-                                <div className="flex items-center space-x-5">
-                                    {/* User Avatar Placeholder */}
-                                    <div className="h-12 w-12 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center text-[#ccf381] font-black text-lg shadow-[0_0_10px_rgba(204,243,129,0.1)]">
-                                        {trade.trader_full_name?.[0] || 'U'}
-                                    </div>
-
-                                    <div>
-                                        <div className="flex items-center gap-3">
-                                            <p className="font-bold text-lg text-white group-hover:text-[#ccf381] transition-colors">{trade.trader_full_name || 'Unknown User'}</p>
-                                            <span className="text-xs text-gray-500 bg-[#0d0d0d] px-2 py-0.5 rounded border border-[#333]">@{trade.trader_username || 'user'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className={`text-xs font-black px-2 py-0.5 rounded uppercase ${trade.type === 'BUY' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
-                                                {trade.type}
-                                            </span>
-                                            <span className="text-sm font-bold text-gray-300">{trade.symbol}</span>
-                                        </div>
-                                    </div>
+                {/* Stats Row */}
+                <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-12 md:col-span-4">
+                        <Card className="relative overflow-hidden group border-0 shadow-2xl">
+                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
+                            <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
+                            <CardContent className="p-6 relative z-10 flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                                    <Users className="w-6 h-6 text-purple-400" />
                                 </div>
-
-                                <div className="text-right">
-                                    <p className={`text-xl font-black ${trade.profit >= 0 ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
-                                        {trade.profit ? (trade.profit > 0 ? `+$${trade.profit.toLocaleString()}` : `$${trade.profit.toLocaleString()}`) : '-'}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1 font-mono">
-                                        {new Date(trade.created_at).toLocaleDateString()} • {new Date(trade.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                    {trade.screenshot_url && (
-                                        <a href={trade.screenshot_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ccf381] hover:underline block mt-2 hover:text-white transition-colors">
-                                            📷 View Screenshot ↗
-                                        </a>
-                                    )}
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Users</p>
+                                    <h3 className="text-3xl font-bold text-white">{totalUsers}</h3>
                                 </div>
                             </CardContent>
                         </Card>
-                    ))}
+                    </div>
+                    <div className="col-span-12 md:col-span-4">
+                        <Card className="relative overflow-hidden group border-0 shadow-2xl">
+                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
+                            <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
+                            <CardContent className="p-6 relative z-10 flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                    <BarChart3 className="w-6 h-6 text-blue-400" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Trades</p>
+                                    <h3 className="text-3xl font-bold text-white">{totalTrades}</h3>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className="col-span-12 md:col-span-4">
+                        <Card className="relative overflow-hidden group border-0 shadow-2xl">
+                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
+                            <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
+                            <CardContent className="p-6 relative z-10 flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${totalProfit >= 0 ? 'bg-[#ccf381]/10 border border-[#ccf381]/20' : 'bg-red-500/10 border border-red-500/20'}`}>
+                                    <span className="text-xl font-bold">{totalProfit >= 0 ? '💰' : '📉'}</span>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Platform P&L</p>
+                                    <h3 className={`text-3xl font-bold ${totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                        {totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()}
+                                    </h3>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
+
+                {/* User Management */}
+                <div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
+                        <h2 className="text-xl font-bold text-white">User Management</h2>
+                        <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} users</span>
+                    </div>
+                    <div className="space-y-3">
+                        {users.map((user) => (
+                            <UserCard key={user.id} user={user} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Trade Activity */}
+                {trades && trades.length > 0 && (
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
+                            <h2 className="text-xl font-bold text-white">Recent Trades</h2>
+                            <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalTrades} trades</span>
+                        </div>
+                        <Card className="relative overflow-hidden border-0 shadow-2xl">
+                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1d1d1d] via-[#0d0d0d] to-[#000000] z-0" />
+                            <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none z-20" />
+                            <CardContent className="relative z-10 p-0">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="border-b border-white/5 text-gray-500 text-[10px] uppercase tracking-wider">
+                                            <th className="text-left p-4 font-medium">Trader</th>
+                                            <th className="text-left p-4 font-medium">Symbol</th>
+                                            <th className="text-left p-4 font-medium">Type</th>
+                                            <th className="text-right p-4 font-medium">Profit</th>
+                                            <th className="text-right p-4 font-medium">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {trades.slice(0, 20).map((trade: any) => (
+                                            <tr key={trade.trade_id} className="hover:bg-white/[0.02] transition-colors">
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-7 h-7 rounded-lg bg-[#ccf381]/5 border border-[#ccf381]/10 flex items-center justify-center text-[#ccf381] text-xs font-bold">
+                                                            {(trade.trader_full_name || 'U')[0]}
+                                                        </div>
+                                                        <span className="text-white font-medium text-xs">{trade.trader_full_name || 'Unknown'}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 text-white font-bold">{trade.symbol}</td>
+                                                <td className="p-4">
+                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                                        {trade.type}
+                                                    </span>
+                                                </td>
+                                                <td className={`p-4 text-right font-bold ${trade.profit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                                    {trade.profit ? `${trade.profit > 0 ? '+' : ''}$${trade.profit.toLocaleString()}` : '-'}
+                                                </td>
+                                                <td className="p-4 text-right text-gray-500 text-xs">
+                                                    {new Date(trade.created_at).toLocaleDateString()}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
             </div>
         </div>
     )
