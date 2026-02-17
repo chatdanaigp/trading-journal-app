@@ -9,7 +9,6 @@ SECURITY DEFINER
 AS $$
 DECLARE
   admin_ids uuid[] := ARRAY[
-    '29014188-6bc8-41de-ba4e-6b4f04255a7c'::uuid,
     '2df9465c-d83c-4302-a6ca-18880514482f'::uuid
   ];
 BEGIN
