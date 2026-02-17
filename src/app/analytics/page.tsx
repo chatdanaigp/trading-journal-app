@@ -24,16 +24,15 @@ export default async function AnalyticsPage() {
                     <p className="text-gray-500">Deep dive into your trading performance.</p>
                 </div>
 
-                {/* Date Range Picker Placeholder - Could be implemented later */}
                 <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
                     All Time View
                 </div>
             </div>
 
-            {/* KPI Grid */}
+            {/* Row 1: Hero KPIs (Bento 4 + 8 split) */}
             <KPIGrid stats={data.stats} />
 
-            {/* Visualizations */}
+            {/* Row 2+: Charts (Bento layout) */}
             <AnalyticsCharts data={data} />
         </div>
     )
