@@ -2,11 +2,9 @@
 
 import { useState } from 'react'
 import { updateProfileGoals } from './actions'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 
 export function GoalSettings({ initialPortSize, initialGoalPercent }: { initialPortSize: number, initialGoalPercent: number }) {
     const [portSize, setPortSize] = useState(initialPortSize)
@@ -24,54 +22,80 @@ export function GoalSettings({ initialPortSize, initialGoalPercent }: { initialP
     if (!isOpen) {
         return (
             <div className="flex justify-end">
-                <Button
-                    variant="ghost"
-                    size="sm"
+                <button
                     onClick={() => setIsOpen(true)}
-                    className="text-xs text-gray-500 hover:text-white"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 text-[#ccf381] text-xs font-bold hover:bg-[#ccf381]/20 hover:border-[#ccf381]/30 transition-all group shadow-lg shadow-[#ccf381]/5"
                 >
-                    ⚙️ Goal Settings
-                </Button>
+                    <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
+                    Set Goals
+                    <Target className="w-3.5 h-3.5 opacity-50" />
+                </button>
             </div>
         )
     }
 
     return (
-        <Card className="bg-gray-900 border-gray-800 mb-6">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Target Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="port-size" className="text-xs text-gray-500">Port Size ($)</Label>
-                        <Input
-                            id="port-size"
-                            type="number"
-                            value={portSize}
-                            onChange={(e) => setPortSize(Number(e.target.value))}
-                            className="bg-gray-950 border-gray-800 h-8 text-sm"
-                        />
+        <div className="bg-[#151515] rounded-xl border border-white/10 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center">
+                        <Target className="w-3.5 h-3.5 text-[#ccf381]" />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="goal-percent" className="text-xs text-gray-500">Goal (%)</Label>
-                        <Input
-                            id="goal-percent"
-                            type="number"
-                            value={goalPercent}
-                            onChange={(e) => setGoalPercent(Number(e.target.value))}
-                            className="bg-gray-950 border-gray-800 h-8 text-sm"
-                        />
-                    </div>
+                    <span className="text-sm font-bold text-white">Goal Settings</span>
                 </div>
+                <button
+                    onClick={() => setIsOpen(false)}
+                    className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                    <X className="w-3.5 h-3.5" />
+                </button>
+            </div>
 
-                <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} className="h-7 text-xs">Cancel</Button>
-                    <Button onClick={handleSave} disabled={isLoading} size="sm" className="h-7 text-xs bg-indigo-600 hover:bg-indigo-700">
-                        {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Save Goals'}
-                    </Button>
+            {/* Inputs */}
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label htmlFor="port-size" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" /> Port Size
+                    </Label>
+                    <Input
+                        id="port-size"
+                        type="number"
+                        value={portSize}
+                        onChange={(e) => setPortSize(Number(e.target.value))}
+                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                    />
                 </div>
-            </CardContent>
-        </Card>
+                <div className="space-y-1.5">
+                    <Label htmlFor="goal-percent" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                        <Percent className="w-3 h-3" /> Profit Goal
+                    </Label>
+                    <Input
+                        id="goal-percent"
+                        type="number"
+                        value={goalPercent}
+                        onChange={(e) => setGoalPercent(Number(e.target.value))}
+                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                    />
+                </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2">
+                <button
+                    onClick={() => setIsOpen(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button
+                    onClick={handleSave}
+                    disabled={isLoading}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#ccf381] text-black text-xs font-bold hover:bg-[#d4f78e] transition-all disabled:opacity-50 shadow-lg shadow-[#ccf381]/10"
+                >
+                    {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : '✓ Save Goals'}
+                </button>
+            </div>
+        </div>
     )
 }
