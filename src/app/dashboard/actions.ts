@@ -96,6 +96,52 @@ export async function createTrade(formData: FormData) {
     return { success: true }
 }
 
+export async function updateTrade(formData: FormData) {
+    const supabase = await createClient()
+
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        redirect('/login')
+    }
+
+    const tradeId = formData.get('tradeId') as string
+    const symbol = formData.get('symbol') as string
+    const type = formData.get('type') as string
+    const lotSize = formData.get('lotSize')
+    const entryPrice = formData.get('entryPrice')
+
+    // Optional fields
+    const exitPrice = formData.get('exitPrice')
+    const profit = formData.get('profit')
+    const notes = formData.get('notes') as string
+
+    // We are not handling screenshot updates in this version for simplicity, 
+    // but we could add it later.
+
+    const { error } = await supabase
+        .from('trades')
+        .update({
+            symbol: symbol.toUpperCase(),
+            type,
+            lot_size: Number(lotSize),
+            entry_price: Number(entryPrice),
+            exit_price: exitPrice ? Number(exitPrice) : null,
+            profit: profit ? Number(profit) : null,
+            notes: notes
+        })
+        .eq('id', tradeId)
+        .eq('user_id', user.id) // Ensure user owns the trade
+
+    if (error) {
+        console.error('Supabase Error:', error)
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+
 export async function getTrades() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
