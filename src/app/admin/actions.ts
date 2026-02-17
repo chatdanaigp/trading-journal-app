@@ -24,49 +24,33 @@ export async function isAdmin(): Promise<boolean> {
     return profile?.username === 'admin'
 }
 
-// Get all users with their profiles and trade stats
+// Get all users with their trade stats via SECURITY DEFINER function
 export async function getAllUsers() {
     const supabase = await createClient()
 
     if (!(await isAdmin())) return []
 
-    // Get all profiles
-    const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('updated_at', { ascending: false })
+    const { data, error } = await supabase.rpc('admin_get_all_users')
 
-    if (profileError) {
-        console.error('Error fetching profiles:', profileError)
+    if (error) {
+        console.error('Error fetching users:', error)
         return []
     }
 
-    // For each profile, get their trade count and total profit
-    const usersWithStats = await Promise.all(
-        (profiles || []).map(async (profile) => {
-            const { data: trades } = await supabase
-                .from('trades')
-                .select('profit')
-                .eq('user_id', profile.id)
-
-            const totalTrades = trades?.length || 0
-            const totalProfit = trades?.reduce((sum, t) => sum + (t.profit || 0), 0) || 0
-            const wins = trades?.filter(t => (t.profit || 0) > 0).length || 0
-            const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0
-
-            return {
-                ...profile,
-                totalTrades,
-                totalProfit,
-                winRate,
-            }
-        })
-    )
-
-    return usersWithStats
+    return (data || []).map((u: any) => ({
+        id: u.user_id,
+        username: u.username,
+        full_name: u.full_name,
+        avatar_url: u.avatar_url,
+        port_size: u.port_size,
+        profit_goal_percent: u.profit_goal_percent,
+        totalTrades: Number(u.total_trades) || 0,
+        totalProfit: Number(u.total_profit) || 0,
+        winRate: Number(u.win_rate) || 0,
+    }))
 }
 
-// Update a user's profile
+// Update a user's profile via SECURITY DEFINER function
 export async function updateUserProfile(userId: string, data: {
     username?: string
     full_name?: string
@@ -77,13 +61,13 @@ export async function updateUserProfile(userId: string, data: {
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { error } = await supabase
-        .from('profiles')
-        .update({
-            ...data,
-            updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId)
+    const { data: result, error } = await supabase.rpc('admin_update_profile', {
+        target_user_id: userId,
+        new_username: data.username || null,
+        new_full_name: data.full_name || null,
+        new_port_size: data.port_size || null,
+        new_goal_percent: data.profit_goal_percent || null,
+    })
 
     if (error) {
         console.error('Error updating profile:', error)
@@ -94,16 +78,15 @@ export async function updateUserProfile(userId: string, data: {
     return { success: true }
 }
 
-// Delete a user's trades (we can't delete auth users with anon key, but we can clean their data)
+// Delete a user's trades via SECURITY DEFINER function
 export async function deleteUserTrades(userId: string) {
     const supabase = await createClient()
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { error } = await supabase
-        .from('trades')
-        .delete()
-        .eq('user_id', userId)
+    const { data: result, error } = await supabase.rpc('admin_delete_user_trades', {
+        target_user_id: userId,
+    })
 
     if (error) {
         console.error('Error deleting trades:', error)
@@ -114,16 +97,15 @@ export async function deleteUserTrades(userId: string) {
     return { success: true }
 }
 
-// Delete a user's journal entries
+// Delete a user's journal entries via SECURITY DEFINER function
 export async function deleteUserJournalEntries(userId: string) {
     const supabase = await createClient()
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { error } = await supabase
-        .from('journal_entries')
-        .delete()
-        .eq('user_id', userId)
+    const { data: result, error } = await supabase.rpc('admin_delete_user_journal', {
+        target_user_id: userId,
+    })
 
     if (error) {
         console.error('Error deleting journal entries:', error)
@@ -134,21 +116,18 @@ export async function deleteUserJournalEntries(userId: string) {
     return { success: true }
 }
 
-// Delete user profile (removes profile, triggering cascade of related data)
+// Delete user entirely (trades + journal + profile) via SECURITY DEFINER function
 export async function deleteUserProfile(userId: string) {
     const supabase = await createClient()
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    // Delete trades first
-    await supabase.from('trades').delete().eq('user_id', userId)
-    // Delete journal entries
-    await supabase.from('journal_entries').delete().eq('user_id', userId)
-    // Delete profile
-    const { error } = await supabase.from('profiles').delete().eq('id', userId)
+    const { data: result, error } = await supabase.rpc('admin_delete_user', {
+        target_user_id: userId,
+    })
 
     if (error) {
-        console.error('Error deleting profile:', error)
+        console.error('Error deleting user:', error)
         return { error: error.message }
     }
 
