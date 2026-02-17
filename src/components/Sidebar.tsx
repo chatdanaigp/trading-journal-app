@@ -107,12 +107,16 @@ export function Sidebar() {
                     </Link>
                 ))}
 
-                <form action="/auth/signout" method="post" className="w-full mt-2">
-                    <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all w-full">
-                        <LogOut className="w-5 h-5" />
-                        <span>Log Out</span>
-                    </button>
-                </form>
+                <button
+                    onClick={async () => {
+                        await supabase.auth.signOut()
+                        window.location.href = '/login'
+                    }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all w-full"
+                >
+                    <LogOut className="w-5 h-5" />
+                    <span>Log Out</span>
+                </button>
             </div>
         </div>
     )
