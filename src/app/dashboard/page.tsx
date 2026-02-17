@@ -29,15 +29,15 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Overview</h1>
-                    <p className="text-gray-500">Welcome back, let&apos;s grow your portfolio.</p>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
+                    <p className="text-gray-500 text-sm lg:text-base">Welcome back, let&apos;s grow your portfolio.</p>
                 </div>
 
                 {/* Quick Actions / Date? */}
                 <div className="flex items-center gap-4">
-                    <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
+                    <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 hidden sm:block">
                         {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                     </div>
                 </div>

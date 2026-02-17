@@ -55,7 +55,7 @@ export default async function AdminPage() {
     const totalProfit = users.reduce((sum: number, u: { totalProfit: number }) => sum + u.totalProfit, 0)
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-8 relative overflow-hidden">
+        <div className="min-h-screen bg-[#050505] text-white p-4 lg:p-8 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-[#ccf381] blur-[150px] opacity-5 rounded-full pointer-events-none" />
             <div className="absolute bottom-10 left-10 w-[200px] h-[200px] bg-red-500 blur-[150px] opacity-5 rounded-full pointer-events-none" />
