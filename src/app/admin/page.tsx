@@ -11,7 +11,7 @@ export default async function AdminPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/login')
+        redirect('/adminlogin')
     }
 
     // Secure admin check
@@ -52,7 +52,7 @@ export default async function AdminPage() {
 
     const totalUsers = users.length
     const totalTrades = trades?.length || 0
-    const totalProfit = users.reduce((sum, u) => sum + u.totalProfit, 0)
+    const totalProfit = users.reduce((sum: number, u: { totalProfit: number }) => sum + u.totalProfit, 0)
 
     return (
         <div className="min-h-screen bg-[#050505] text-white p-8 relative overflow-hidden">
@@ -142,7 +142,7 @@ export default async function AdminPage() {
                         <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} users</span>
                     </div>
                     <div className="space-y-3">
-                        {users.map((user) => (
+                        {users.map((user: any) => (
                             <UserCard key={user.id} user={user} />
                         ))}
                     </div>
