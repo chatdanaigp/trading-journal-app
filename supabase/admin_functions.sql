@@ -1,13 +1,24 @@
 -- Admin Functions (SECURITY DEFINER = bypasses RLS)
 -- These functions check admin status internally before performing operations.
 
--- Helper: Check if calling user is admin
+-- Helper: Check if calling user is admin (by UUID list OR username)
 CREATE OR REPLACE FUNCTION is_admin()
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  admin_ids uuid[] := ARRAY[
+    '29014188-6bc8-41de-ba4e-6b4f04255a7c'::uuid,
+    '2df9465c-d83c-4302-a6ca-18880514482f'::uuid
+  ];
 BEGIN
+  -- Check by User ID first
+  IF auth.uid() = ANY(admin_ids) THEN
+    RETURN true;
+  END IF;
+
+  -- Fallback: check username
   RETURN EXISTS (
     SELECT 1 FROM profiles
     WHERE id = auth.uid()
