@@ -138,7 +138,7 @@ export default function VerifyPage() {
                         <p className="text-center text-xs text-gray-600 mt-4">
                             ไม่มี Client ID?{' '}
                             <a
-                                href="https://www.connextfx.com"
+                                href="https://clients.svg.connextfx.com/links/go/1544"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[#ccf381] hover:underline"
