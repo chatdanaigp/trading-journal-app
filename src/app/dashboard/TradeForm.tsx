@@ -18,8 +18,12 @@ export function TradeForm() {
     const [entry, setEntry] = useState('')
     const [exit, setExit] = useState('')
     const [lot, setLot] = useState('')
-    const [profit, setProfit] = useState('')
+    const [profitAmount, setProfitAmount] = useState('')
+    const [profitSign, setProfitSign] = useState<'+' | '-'>('+')
     const [points, setPoints] = useState<number | null>(null)
+
+    // The actual profit value with sign applied
+    const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''
 
     // Auto-Calculate Exit & Points when Profit/Lot/Entry changes
     // Using simple math for XAUUSD (Contract Size 100)
@@ -32,7 +36,9 @@ export function TradeForm() {
         // We use the latest values, overriding the state for the changed field
         const currentEntry = changedField === 'entry' ? parseFloat(val) : parseFloat(entry)
         const currentLot = changedField === 'lot' ? parseFloat(val) : parseFloat(lot)
-        const currentProfit = changedField === 'profit' ? parseFloat(val) : parseFloat(profit)
+        const currentSign = changedField === 'sign' ? val : profitSign
+        const rawAmount = changedField === 'profit' ? parseFloat(val) : parseFloat(profitAmount)
+        const currentProfit = !isNaN(rawAmount) ? (currentSign === '-' ? -rawAmount : rawAmount) : NaN
         const currentType = changedField === 'type' ? val : type
 
         // Calculate Points if Profit & Lot exist
@@ -77,7 +83,8 @@ export function TradeForm() {
                 setEntry('')
                 setExit('')
                 setLot('')
-                setProfit('')
+                setProfitAmount('')
+                setProfitSign('+')
                 setPoints(null)
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
@@ -201,29 +208,63 @@ export function TradeForm() {
             </div>
 
             <div className="grid gap-2">
-                <div className="flex justify-between">
-                    <Label htmlFor="profit" className="text-gray-400">Profit / Loss ($)</Label>
+                <div className="flex justify-between items-center">
+                    <Label className="text-gray-400">Profit / Loss ($)</Label>
                     {points !== null && (
                         <span className={`text-xs font-mono font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
                             TP/SL: {points > 0 ? '+' : ''}{points.toLocaleString()} pts
                         </span>
                     )}
                 </div>
+                {/* Profit/Loss Toggle */}
+                <div className="flex rounded-xl overflow-hidden border border-[#333] h-10">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setProfitSign('+')
+                            handleCalculation('sign', '+')
+                        }}
+                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '+'
+                                ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
+                                : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
+                            }`}
+                    >
+                        ✅ Profit
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setProfitSign('-')
+                            handleCalculation('sign', '-')
+                        }}
+                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '-'
+                                ? 'bg-red-500/20 text-red-400'
+                                : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
+                            }`}
+                    >
+                        ❌ Loss
+                    </button>
+                </div>
+                {/* Amount Input (always positive) */}
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-bold">$</span>
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-bold ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                        {profitSign === '+' ? '+$' : '-$'}
+                    </span>
                     <Input
-                        id="profit"
-                        name="profit"
+                        id="profitAmount"
                         type="number"
                         step="0.01"
+                        min="0"
                         placeholder="50.00"
-                        className="pl-6 bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl font-bold"
-                        value={profit}
+                        className={`pl-8 bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl font-bold ${profitSign === '-' ? 'focus:border-red-400' : ''}`}
+                        value={profitAmount}
                         onChange={(e) => {
-                            setProfit(e.target.value)
+                            setProfitAmount(e.target.value)
                             handleCalculation('profit', e.target.value)
                         }}
                     />
+                    {/* Hidden input sends the actual signed value */}
+                    <input type="hidden" name="profit" value={actualProfit} />
                 </div>
             </div>
 

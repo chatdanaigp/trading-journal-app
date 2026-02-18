@@ -20,7 +20,13 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [entry, setEntry] = useState(initialData.entry_price || '')
     const [exit, setExit] = useState(initialData.exit_price || '')
     const [lot, setLot] = useState(initialData.lot_size || '')
-    const [profit, setProfit] = useState(initialData.profit || '')
+    const [profitAmount, setProfitAmount] = useState(() => {
+        const p = initialData.profit
+        return p ? String(Math.abs(Number(p))) : ''
+    })
+    const [profitSign, setProfitSign] = useState<'+' | '-'>(() => {
+        return initialData.profit && Number(initialData.profit) < 0 ? '-' : '+'
+    })
     const [symbol, setSymbol] = useState(initialData.symbol || 'XAUUSD')
     const [notes, setNotes] = useState(initialData.notes || '')
     const [tradeDate, setTradeDate] = useState(() => {
@@ -30,11 +36,16 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
         return new Date().toISOString().split('T')[0]
     })
 
-    // Auto-Calculate Logic (Copied from TradeForm for consistency)
+    // The actual profit value with sign applied
+    const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''
+
+    // Auto-Calculate Logic
     const handleCalculation = (changedField: string, val: string) => {
         const currentEntry = changedField === 'entry' ? parseFloat(val) : parseFloat(String(entry))
         const currentLot = changedField === 'lot' ? parseFloat(val) : parseFloat(String(lot))
-        const currentProfit = changedField === 'profit' ? parseFloat(val) : parseFloat(String(profit))
+        const currentSign = changedField === 'sign' ? val : profitSign
+        const rawAmount = changedField === 'profit' ? parseFloat(val) : parseFloat(profitAmount)
+        const currentProfit = !isNaN(rawAmount) ? (currentSign === '-' ? -rawAmount : rawAmount) : NaN
         const currentType = changedField === 'type' ? val : type
 
         // Calculate Exit if Entry, Lot, Profit exist
@@ -182,21 +193,54 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="profit" className="text-gray-400">Profit / Loss ($)</Label>
+                <Label className="text-gray-400">Profit / Loss ($)</Label>
+                {/* Profit/Loss Toggle */}
+                <div className="flex rounded-xl overflow-hidden border border-[#333] h-10">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setProfitSign('+')
+                            handleCalculation('sign', '+')
+                        }}
+                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '+'
+                                ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
+                                : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
+                            }`}
+                    >
+                        ✅ Profit
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setProfitSign('-')
+                            handleCalculation('sign', '-')
+                        }}
+                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '-'
+                                ? 'bg-red-500/20 text-red-400'
+                                : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
+                            }`}
+                    >
+                        ❌ Loss
+                    </button>
+                </div>
+                {/* Amount Input */}
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-bold">$</span>
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-bold ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                        {profitSign === '+' ? '+$' : '-$'}
+                    </span>
                     <Input
-                        id="profit"
-                        name="profit"
+                        id="profitAmount"
                         type="number"
                         step="0.01"
-                        className="pl-6 bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white font-bold"
-                        value={profit}
+                        min="0"
+                        className={`pl-8 bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white font-bold ${profitSign === '-' ? 'focus:border-red-400' : ''}`}
+                        value={profitAmount}
                         onChange={(e) => {
-                            setProfit(e.target.value)
+                            setProfitAmount(e.target.value)
                             handleCalculation('profit', e.target.value)
                         }}
                     />
+                    <input type="hidden" name="profit" value={actualProfit} />
                 </div>
             </div>
 
