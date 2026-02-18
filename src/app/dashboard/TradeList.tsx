@@ -23,12 +23,12 @@ export function TradeList({ trades }: { trades: any[] }) {
                     <table className="w-full text-left min-w-[700px]">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider">
                             <tr>
-                                <th className="px-3 py-3 rounded-tl-xl">Asset</th>
-                                <th className="px-3 py-3">Side / Lot</th>
-                                <th className="px-3 py-3">Price</th>
-                                <th className="px-3 py-3">Result</th>
-                                <th className="px-3 py-3">Analysis</th>
-                                <th className="px-3 py-3 text-center rounded-tr-xl w-12"></th>
+                                <th className="px-5 py-3 rounded-tl-xl">Asset</th>
+                                <th className="px-5 py-3">Side / Lot</th>
+                                <th className="px-5 py-3">Price</th>
+                                <th className="px-5 py-3">Result</th>
+                                <th className="px-5 py-3">Analysis</th>
+                                <th className="px-5 py-3 text-center rounded-tr-xl w-12"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
@@ -49,17 +49,17 @@ export function TradeList({ trades }: { trades: any[] }) {
 
                                 return (
                                     <tr key={trade.id} className="hover:bg-[#252525] transition-colors group border-b border-[#252525] last:border-0 text-sm">
-                                        <td className="px-3 py-4">
+                                        <td className="px-5 py-4">
                                             <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
                                             <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{new Date(trade.created_at).toLocaleDateString()}</div>
                                         </td>
-                                        <td className="px-3 py-4">
+                                        <td className="px-5 py-4">
                                             <div className={`text-sm font-black mb-1 px-2 py-0.5 rounded inline-block ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                                                 {trade.type}
                                             </div>
                                             <div className="text-xs text-gray-400 font-medium mt-1">Lot: <span className="text-white">{trade.lot_size}</span></div>
                                         </td>
-                                        <td className="px-3 py-4 text-sm font-mono text-gray-300">
+                                        <td className="px-5 py-4 text-sm font-mono text-gray-300">
                                             <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                                                 <span className="text-gray-500 text-[10px] uppercase">En:</span>
                                                 <span className="text-white font-bold">{trade.entry_price?.toLocaleString()}</span>
@@ -69,7 +69,7 @@ export function TradeList({ trades }: { trades: any[] }) {
                                                 <span className="text-gray-300">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
-                                        <td className="px-3 py-4">
+                                        <td className="px-5 py-4">
                                             <div className={`text-xl font-black tracking-tight whitespace-nowrap ${profit > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
                                                 {profit > 0 ? `+$${profit.toLocaleString()}` : `$${profit.toLocaleString()}`}
                                             </div>
@@ -77,10 +77,10 @@ export function TradeList({ trades }: { trades: any[] }) {
                                                 {points > 0 ? '+' : ''}{points.toLocaleString()} pts
                                             </div>
                                         </td>
-                                        <td className="px-3 py-4">
+                                        <td className="px-5 py-4">
                                             <AIAnalysis tradeId={trade.id} initialAnalysis={trade.ai_analysis} />
                                         </td>
-                                        <td className="px-3 py-4 text-center">
+                                        <td className="px-5 py-4 text-center">
                                             <button
                                                 onClick={() => setEditingTrade(trade)}
                                                 className="p-1.5 bg-[#333] hover:bg-[#444] rounded-lg text-gray-400 hover:text-white transition-all"
