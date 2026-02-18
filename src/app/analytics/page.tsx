@@ -3,14 +3,11 @@ import { redirect } from 'next/navigation'
 import { getAnalyticsData } from './actions'
 import { KPIGrid } from './components/KPIGrid'
 import { AnalyticsCharts } from './components/AnalyticsCharts'
+import { requireVerifiedUser } from '@/utils/verify-client-id'
 
 export default async function AnalyticsPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-        redirect('/login')
-    }
+    // Server-side check: redirects to /verify if user has no client_id
+    const { user } = await requireVerifiedUser()
 
     // Fetch Analytics Data
     const data = await getAnalyticsData()

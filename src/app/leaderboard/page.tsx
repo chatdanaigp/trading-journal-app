@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { requireVerifiedUser } from '@/utils/verify-client-id'
 
 // Rank Badge System
 function getRankBadge(totalTrades: number, netProfit: number, winRate: number) {
@@ -20,12 +21,10 @@ function getRankBadge(totalTrades: number, netProfit: number, winRate: number) {
 }
 
 export default async function LeaderboardPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Server-side check: redirects to /verify if user has no client_id
+    const { user } = await requireVerifiedUser()
 
-    if (!user) {
-        redirect('/login')
-    }
+    const supabase = await createClient()
 
     // Call the enhanced RPC function
     const { data: leaderboard, error } = await supabase.rpc('get_leaderboard')

@@ -11,6 +11,7 @@ type UserData = {
     avatar_url: string | null
     port_size: number | null
     profit_goal_percent: number | null
+    client_id: string | null
     totalTrades: number
     totalProfit: number
     winRate: number
@@ -76,6 +77,9 @@ export function UserCard({ user }: { user: UserData }) {
                         <h3 className="text-sm font-bold text-white truncate">{user.full_name || 'Unknown'}</h3>
                         {user.username && (
                             <span className="text-[10px] text-gray-500 bg-[#0d0d0d] px-1.5 py-0.5 rounded border border-white/5">@{user.username}</span>
+                        )}
+                        {user.client_id && (
+                            <span className="text-[10px] text-[#ccf381] bg-[#ccf381]/10 px-1.5 py-0.5 rounded border border-[#ccf381]/20 font-mono font-semibold">ID: {user.client_id}</span>
                         )}
                     </div>
                     <p className="text-[11px] text-gray-600 truncate mt-0.5">{user.id}</p>

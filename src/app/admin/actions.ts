@@ -44,6 +44,7 @@ export async function getAllUsers() {
         avatar_url: u.avatar_url,
         port_size: u.port_size,
         profit_goal_percent: u.profit_goal_percent,
+        client_id: u.client_id,
         totalTrades: Number(u.total_trades) || 0,
         totalProfit: Number(u.total_profit) || 0,
         winRate: Number(u.win_rate) || 0,

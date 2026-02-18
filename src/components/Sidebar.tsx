@@ -11,6 +11,7 @@ import type { User } from '@supabase/supabase-js'
 export function Sidebar() {
     const pathname = usePathname()
     const [user, setUser] = useState<User | null>(null)
+    const [clientId, setClientId] = useState<string | null>(null)
     const [mobileOpen, setMobileOpen] = useState(false)
     const supabase = createClient()
 
@@ -18,6 +19,14 @@ export function Sidebar() {
         async function getUser() {
             const { data: { user } } = await supabase.auth.getUser()
             setUser(user)
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('client_id')
+                    .eq('id', user.id)
+                    .single()
+                setClientId(profile?.client_id || null)
+            }
         }
         getUser()
     }, [])
@@ -97,7 +106,11 @@ export function Sidebar() {
                         )}
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-white truncate">{discordName}</p>
-                            <p className="text-xs text-gray-500">Discord Account</p>
+                            {clientId ? (
+                                <p className="text-[10px] text-[#ccf381] font-mono font-semibold tracking-wider">ID: {clientId}</p>
+                            ) : (
+                                <p className="text-xs text-gray-500">Discord Account</p>
+                            )}
                         </div>
                     </div>
                 )}

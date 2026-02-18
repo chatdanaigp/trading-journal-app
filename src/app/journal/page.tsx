@@ -5,14 +5,11 @@ import { JournalForm } from './components/JournalForm'
 import { JournalList } from './components/JournalList'
 import { Card, CardContent } from '@/components/ui/card'
 import { BookOpen, Flame, CheckCircle } from 'lucide-react'
+import { requireVerifiedUser } from '@/utils/verify-client-id'
 
 export default async function JournalPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-        redirect('/login')
-    }
+    // Server-side check: redirects to /verify if user has no client_id
+    const { user } = await requireVerifiedUser()
 
     const [entries, stats] = await Promise.all([
         getJournalEntries(),

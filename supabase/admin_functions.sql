@@ -126,6 +126,7 @@ RETURNS TABLE (
   avatar_url text,
   port_size numeric,
   profit_goal_percent numeric,
+  client_id text,
   total_trades bigint,
   total_profit numeric,
   win_rate numeric
@@ -146,6 +147,7 @@ BEGIN
     p.avatar_url,
     p.port_size,
     p.profit_goal_percent,
+    p.client_id,
     COUNT(t.id) AS total_trades,
     COALESCE(SUM(t.profit), 0) AS total_profit,
     ROUND(
@@ -154,7 +156,7 @@ BEGIN
     ) AS win_rate
   FROM profiles p
   LEFT JOIN trades t ON t.user_id = p.id
-  GROUP BY p.id, p.username, p.full_name, p.avatar_url, p.port_size, p.profit_goal_percent
+  GROUP BY p.id, p.username, p.full_name, p.avatar_url, p.port_size, p.profit_goal_percent, p.client_id
   ORDER BY total_trades DESC;
 END;
 $$;
