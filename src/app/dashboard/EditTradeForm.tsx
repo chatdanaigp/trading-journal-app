@@ -21,8 +21,14 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [exit, setExit] = useState(initialData.exit_price || '')
     const [lot, setLot] = useState(initialData.lot_size || '')
     const [profit, setProfit] = useState(initialData.profit || '')
-    const [symbol, setSymbol] = useState(initialData.symbol || '')
+    const [symbol, setSymbol] = useState(initialData.symbol || 'XAUUSD')
     const [notes, setNotes] = useState(initialData.notes || '')
+    const [tradeDate, setTradeDate] = useState(() => {
+        if (initialData.created_at) {
+            return new Date(initialData.created_at).toISOString().split('T')[0]
+        }
+        return new Date().toISOString().split('T')[0]
+    })
 
     // Auto-Calculate Logic (Copied from TradeForm for consistency)
     const handleCalculation = (changedField: string, val: string) => {
@@ -80,7 +86,20 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                 </div>
             )}
 
+            {/* Row 1: Date + Symbol */}
             <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                    <Label htmlFor="tradeDate" className="text-gray-400">Date</Label>
+                    <Input
+                        id="tradeDate"
+                        name="tradeDate"
+                        type="date"
+                        required
+                        className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white [color-scheme:dark]"
+                        value={tradeDate}
+                        onChange={(e) => setTradeDate(e.target.value)}
+                    />
+                </div>
                 <div className="grid gap-2">
                     <Label htmlFor="symbol" className="text-gray-400">Symbol</Label>
                     <Input
@@ -89,27 +108,29 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                         required
                         className="uppercase bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white"
                         value={symbol}
-                        onChange={(e) => setSymbol(e.target.value)}
+                        onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                     />
                 </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="type" className="text-gray-400">Type</Label>
-                    <div className="relative">
-                        <select
-                            name="type"
-                            className="flex h-11 w-full rounded-xl border border-[#333] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#ccf381] appearance-none"
-                            required
-                            value={type}
-                            onChange={(e) => {
-                                setType(e.target.value)
-                                handleCalculation('type', e.target.value)
-                            }}
-                        >
-                            <option value="BUY">BUY</option>
-                            <option value="SELL">SELL</option>
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</div>
-                    </div>
+            </div>
+
+            {/* Row 2: Type */}
+            <div className="grid gap-2">
+                <Label htmlFor="type" className="text-gray-400">Type</Label>
+                <div className="relative">
+                    <select
+                        name="type"
+                        className="flex h-11 w-full rounded-xl border border-[#333] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#ccf381] appearance-none"
+                        required
+                        value={type}
+                        onChange={(e) => {
+                            setType(e.target.value)
+                            handleCalculation('type', e.target.value)
+                        }}
+                    >
+                        <option value="BUY">BUY</option>
+                        <option value="SELL">SELL</option>
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</div>
                 </div>
             </div>
 

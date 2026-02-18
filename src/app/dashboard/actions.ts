@@ -17,6 +17,7 @@ export async function createTrade(formData: FormData) {
     const type = formData.get('type') as string
     const lotSize = formData.get('lotSize')
     const entryPrice = formData.get('entryPrice')
+    const tradeDate = formData.get('tradeDate') as string
 
     // Optional fields
     const exitPrice = formData.get('exitPrice')
@@ -56,7 +57,8 @@ export async function createTrade(formData: FormData) {
         exit_price: exitPrice ? Number(exitPrice) : null,
         profit: profit ? Number(profit) : null,
         notes: notes,
-        screenshot_url: screenshotUrl
+        screenshot_url: screenshotUrl,
+        created_at: tradeDate ? new Date(tradeDate).toISOString() : new Date().toISOString()
     })
 
     if (error) {
@@ -110,6 +112,7 @@ export async function updateTrade(formData: FormData) {
     const type = formData.get('type') as string
     const lotSize = formData.get('lotSize')
     const entryPrice = formData.get('entryPrice')
+    const tradeDate = formData.get('tradeDate') as string
 
     // Optional fields
     const exitPrice = formData.get('exitPrice')
@@ -128,7 +131,8 @@ export async function updateTrade(formData: FormData) {
             entry_price: Number(entryPrice),
             exit_price: exitPrice ? Number(exitPrice) : null,
             profit: profit ? Number(profit) : null,
-            notes: notes
+            notes: notes,
+            created_at: tradeDate ? new Date(tradeDate).toISOString() : undefined
         })
         .eq('id', tradeId)
         .eq('user_id', user.id) // Ensure user owns the trade
