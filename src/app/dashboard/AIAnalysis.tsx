@@ -41,13 +41,13 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
     }
 
     return (
-        <div className="mt-4">
+        <div>
             <Button
                 onClick={handleAnalyze}
                 disabled={isLoading}
                 variant="outline"
                 size="sm"
-                className="w-full border-white/10 bg-gradient-to-r from-[#1a1a1a] to-[#252525] text-gray-400 hover:text-[#ccf381] hover:border-[#ccf381]/30 transition-all duration-300 shadow-lg relative group overflow-hidden"
+                className="w-full border-white/10 bg-gradient-to-r from-[#1a1a1a] to-[#252525] text-gray-400 hover:text-[#ccf381] hover:border-[#ccf381]/30 transition-all duration-300 shadow-lg relative group overflow-hidden whitespace-nowrap text-xs"
             >
                 <div className="absolute inset-0 bg-[#ccf381]/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 <div className="relative flex items-center justify-center">
