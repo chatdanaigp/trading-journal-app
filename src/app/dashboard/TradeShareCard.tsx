@@ -8,8 +8,6 @@ interface TradeShareCardProps {
         entry_price: number
         exit_price?: number
         profit: number
-        notes?: string
-        ai_analysis?: string
         created_at: string
     }
     username?: string
@@ -30,215 +28,139 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
             : trade.entry_price - diff
     }
 
-    // Trim AI analysis to a readable snippet
-    const aiRaw = trade.ai_analysis || ''
-    // Remove markdown bold markers and emoji for cleaner display
-    const aiClean = aiRaw.replace(/\*\*/g, '').replace(/[✅⚠️❌🔴🟡🟢]/g, '').trim()
-    const aiSnippet = aiClean.length > 160 ? aiClean.slice(0, 157) + '…' : aiClean
-
     const dateStr = new Date(trade.created_at).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'short', year: 'numeric'
     })
 
+    const accentColor = isProfit ? '#ccf381' : '#f87171'
+    const accentGlow = isProfit ? 'rgba(204,243,129,0.25)' : 'rgba(248,113,113,0.25)'
+    const typeColor = trade.type === 'BUY' ? '#4ade80' : '#f87171'
+    const typeBg = trade.type === 'BUY' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'
+
     return (
-        <div
-            style={{
-                width: '800px',
-                height: '420px',
-                background: 'linear-gradient(135deg, #0d0d0d 0%, #141414 40%, #0a0a0a 100%)',
-                borderRadius: '20px',
-                padding: '0',
-                fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            {/* Decorative glow blobs */}
+        <div style={{
+            width: '600px',
+            height: '360px',
+            background: 'linear-gradient(145deg, #111111 0%, #0d0d0d 60%, #0a0f0a 100%)',
+            borderRadius: '24px',
+            fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: '28px 32px',
+            boxSizing: 'border-box',
+        }}>
+            {/* Glow blob behind P&L */}
             <div style={{
-                position: 'absolute', top: '-60px', right: '-60px',
-                width: '240px', height: '240px',
-                background: isProfit ? 'rgba(204,243,129,0.12)' : 'rgba(239,68,68,0.12)',
-                borderRadius: '50%', filter: 'blur(60px)',
-                pointerEvents: 'none',
-            }} />
-            <div style={{
-                position: 'absolute', bottom: '-80px', left: '-40px',
-                width: '200px', height: '200px',
-                background: 'rgba(255,255,255,0.03)',
-                borderRadius: '50%', filter: 'blur(50px)',
+                position: 'absolute',
+                top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '340px', height: '220px',
+                background: accentGlow,
+                borderRadius: '50%',
+                filter: 'blur(80px)',
                 pointerEvents: 'none',
             }} />
 
-            {/* Border */}
+            {/* Corner accent lines */}
             <div style={{
-                position: 'absolute', inset: 0,
-                borderRadius: '20px',
-                border: `1px solid ${isProfit ? 'rgba(204,243,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                position: 'absolute', inset: 0, borderRadius: '24px',
+                border: `1px solid ${isProfit ? 'rgba(204,243,129,0.18)' : 'rgba(248,113,113,0.18)'}`,
                 pointerEvents: 'none',
             }} />
 
-            {/* Content wrapper */}
-            <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+            {/* TOP: Branding + Date */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                        width: '30px', height: '30px',
+                        background: 'linear-gradient(135deg, #ccf381, #a8d44e)',
+                        borderRadius: '8px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '15px', fontWeight: '900', color: '#000',
+                        flexShrink: 0,
+                    }}>T</div>
+                    <span style={{ color: '#ccf381', fontSize: '14px', fontWeight: '700', letterSpacing: '0.04em' }}>
+                        Trading Journal
+                    </span>
+                </div>
+                <span style={{ color: '#444', fontSize: '13px' }}>{dateStr}</span>
+            </div>
 
-                {/* TOP ROW: Branding + Date */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {/* Logo mark */}
-                        <div style={{
-                            width: '32px', height: '32px',
-                            background: 'linear-gradient(135deg, #ccf381, #a8d44e)',
-                            borderRadius: '8px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '16px', fontWeight: '900', color: '#000',
-                        }}>T</div>
-                        <span style={{ color: '#ccf381', fontSize: '14px', fontWeight: '700', letterSpacing: '0.05em' }}>
-                            Trading Journal
-                        </span>
+            {/* MIDDLE: Symbol + P&L */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
+                {/* Left: Symbol + Type */}
+                <div>
+                    <div style={{
+                        fontSize: '48px', fontWeight: '900', color: '#ffffff',
+                        letterSpacing: '-0.03em', lineHeight: 1,
+                    }}>
+                        {trade.symbol}
                     </div>
-                    <span style={{ color: '#555', fontSize: '13px' }}>{dateStr}</span>
+                    <div style={{
+                        display: 'inline-block', marginTop: '10px',
+                        padding: '5px 16px', borderRadius: '100px',
+                        background: typeBg,
+                        color: typeColor,
+                        fontSize: '13px', fontWeight: '800', letterSpacing: '0.08em',
+                    }}>
+                        {trade.type}
+                    </div>
                 </div>
 
-                {/* MAIN CONTENT ROW */}
-                <div style={{ display: 'flex', gap: '32px', flex: 1 }}>
-
-                    {/* LEFT: Trade Info */}
-                    <div style={{ flex: '0 0 auto', minWidth: '220px' }}>
-                        {/* Symbol */}
-                        <div style={{
-                            fontSize: '42px', fontWeight: '900', color: '#ffffff',
-                            letterSpacing: '-0.02em', lineHeight: 1,
-                        }}>
-                            {trade.symbol}
-                        </div>
-
-                        {/* Type Badge */}
-                        <div style={{
-                            display: 'inline-block', marginTop: '10px',
-                            padding: '4px 14px', borderRadius: '100px',
-                            background: trade.type === 'BUY' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-                            color: trade.type === 'BUY' ? '#4ade80' : '#f87171',
-                            fontSize: '13px', fontWeight: '800', letterSpacing: '0.08em',
-                        }}>
-                            {trade.type}
-                        </div>
-
-                        {/* Entry / Exit */}
-                        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
-                                <span style={{ color: '#555', fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', width: '28px' }}>EN</span>
-                                <span style={{ color: '#e0e0e0', fontSize: '16px', fontWeight: '700', fontFamily: 'monospace' }}>
-                                    {trade.entry_price?.toLocaleString()}
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
-                                <span style={{ color: '#555', fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', width: '28px' }}>EX</span>
-                                <span style={{ color: '#888', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace' }}>
-                                    {exitPrice?.toFixed(2)}
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
-                                <span style={{ color: '#555', fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', width: '28px' }}>LOT</span>
-                                <span style={{ color: '#888', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace' }}>
-                                    {trade.lot_size}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* P&L */}
-                        <div style={{ marginTop: '24px' }}>
-                            <div style={{
-                                fontSize: '44px', fontWeight: '900',
-                                color: isProfit ? '#ccf381' : '#f87171',
-                                lineHeight: 1,
-                                textShadow: isProfit
-                                    ? '0 0 30px rgba(204,243,129,0.4)'
-                                    : '0 0 30px rgba(248,113,113,0.4)',
-                            }}>
-                                {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
-                            </div>
-                            {points !== undefined && (
-                                <div style={{
-                                    marginTop: '6px', fontSize: '14px', fontWeight: '700',
-                                    color: isProfit ? 'rgba(204,243,129,0.6)' : 'rgba(248,113,113,0.6)',
-                                }}>
-                                    {points > 0 ? '+' : ''}{points?.toLocaleString()} pts
-                                </div>
-                            )}
-                        </div>
+                {/* Right: P&L */}
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{
+                        fontSize: '56px', fontWeight: '900',
+                        color: accentColor,
+                        lineHeight: 1, letterSpacing: '-0.02em',
+                        textShadow: `0 0 40px ${accentGlow}`,
+                    }}>
+                        {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
                     </div>
+                    {points !== undefined && points !== 0 && (
+                        <div style={{
+                            marginTop: '6px', fontSize: '16px', fontWeight: '700',
+                            color: isProfit ? 'rgba(204,243,129,0.55)' : 'rgba(248,113,113,0.55)',
+                            textAlign: 'right',
+                        }}>
+                            {points > 0 ? '+' : ''}{points.toLocaleString()} pts
+                        </div>
+                    )}
+                </div>
+            </div>
 
-                    {/* RIGHT: AI Analysis */}
-                    {aiSnippet ? (
-                        <div style={{
-                            flex: 1,
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '16px',
-                            padding: '20px 22px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                        }}>
-                            <div>
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'
-                                }}>
-                                    <div style={{
-                                        background: 'linear-gradient(135deg, #ccf381, #a8d44e)',
-                                        borderRadius: '6px', padding: '4px 8px',
-                                        fontSize: '10px', fontWeight: '900', color: '#000', letterSpacing: '0.05em',
-                                    }}>AI Coach</div>
-                                    <span style={{ color: '#555', fontSize: '11px' }}>Analysis</span>
-                                </div>
-                                <p style={{
-                                    color: '#aaa', fontSize: '14px', lineHeight: '1.6',
-                                    margin: 0, wordBreak: 'break-word',
-                                }}>
-                                    {aiSnippet}
-                                </p>
+            {/* BOTTOM: Entry/Exit/Lot + Username */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2 }}>
+                {/* Trade details row */}
+                <div style={{ display: 'flex', gap: '24px' }}>
+                    {[
+                        { label: 'ENTRY', value: trade.entry_price?.toLocaleString() },
+                        { label: 'EXIT', value: exitPrice?.toFixed(2) },
+                        { label: 'LOT', value: String(trade.lot_size) },
+                    ].map(({ label, value }) => (
+                        <div key={label}>
+                            <div style={{ color: '#444', fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', marginBottom: '3px' }}>
+                                {label}
                             </div>
-                            {trade.notes && (
-                                <div style={{
-                                    marginTop: '14px', paddingTop: '14px',
-                                    borderTop: '1px solid rgba(255,255,255,0.06)',
-                                    display: 'flex', gap: '8px',
-                                }}>
-                                    <span style={{ fontSize: '12px' }}>📝</span>
-                                    <span style={{ color: '#666', fontSize: '12px' }}>{trade.notes}</span>
-                                </div>
-                            )}
+                            <div style={{ color: '#999', fontSize: '15px', fontWeight: '600', fontFamily: 'monospace' }}>
+                                {value}
+                            </div>
                         </div>
-                    ) : trade.notes ? (
-                        <div style={{
-                            flex: 1,
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '16px',
-                            padding: '20px 22px',
-                        }}>
-                            <span style={{ fontSize: '13px' }}>📝</span>
-                            <p style={{ color: '#aaa', fontSize: '14px', lineHeight: '1.6', marginTop: '8px' }}>
-                                {trade.notes}
-                            </p>
-                        </div>
-                    ) : null}
+                    ))}
                 </div>
 
-                {/* BOTTOM ROW: Username + Watermark */}
-                <div style={{
-                    marginTop: '24px', paddingTop: '16px',
-                    borderTop: '1px solid rgba(255,255,255,0.06)',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                }}>
-                    {username ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* Username + Watermark */}
+                <div style={{ textAlign: 'right' }}>
+                    {username && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', justifyContent: 'flex-end', marginBottom: '4px' }}>
                             <div style={{
-                                width: '28px', height: '28px', borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #ccf381, #6ee7b7)',
+                                width: '22px', height: '22px', borderRadius: '50%',
+                                background: `linear-gradient(135deg, ${accentColor}, #6ee7b7)`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '12px', fontWeight: '900', color: '#000',
+                                fontSize: '11px', fontWeight: '900', color: '#000', flexShrink: 0,
                             }}>
                                 {username.charAt(0).toUpperCase()}
                             </div>
@@ -246,10 +168,10 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                                 {username}
                             </span>
                         </div>
-                    ) : <div />}
-                    <span style={{ color: '#333', fontSize: '11px', letterSpacing: '0.05em' }}>
+                    )}
+                    <div style={{ color: '#2a2a2a', fontSize: '11px', letterSpacing: '0.04em' }}>
                         trading-journal.app
-                    </span>
+                    </div>
                 </div>
             </div>
         </div>
