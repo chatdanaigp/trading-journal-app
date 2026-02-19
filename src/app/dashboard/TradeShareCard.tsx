@@ -29,156 +29,178 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
     }
 
     const dateStr = new Date(trade.created_at).toLocaleDateString('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric'
-    })
+        month: '2-digit', year: '2-digit'
+    }) // MM/YY format for card expiry feel
 
     const accentColor = isProfit ? '#ccf381' : '#f87171'
-    const accentGlow = isProfit ? 'rgba(204,243,129,0.25)' : 'rgba(248,113,113,0.25)'
-    const typeColor = trade.type === 'BUY' ? '#4ade80' : '#f87171'
-    const typeBg = trade.type === 'BUY' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'
+
+    // Luxury styles
+    const fontPrimary = "'Segoe UI', sans-serif"
+    const fontNumbers = "'Courier New', monospace"
 
     return (
         <div style={{
             width: '640px',
-            height: '420px',
-            background: 'linear-gradient(145deg, #111111 0%, #0d0d0d 60%, #0a0f0a 100%)',
+            height: '404px', // Credit Card Ratio ~1.58
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
             borderRadius: '24px',
-            fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
+            fontFamily: fontPrimary,
             position: 'relative',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            padding: '36px 42px',
+            padding: '32px 40px',
             boxSizing: 'border-box',
+            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.4)',
         }}>
-            {/* Glow blob behind P&L */}
+            {/* Texture Noise Overlay */}
             <div style={{
-                position: 'absolute',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '340px', height: '220px',
-                background: accentGlow,
-                borderRadius: '50%',
-                filter: 'blur(80px)',
-                pointerEvents: 'none',
+                position: 'absolute', inset: 0,
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.03\'/%3E%3C/svg%3E")',
+                pointerEvents: 'none', mixBlendMode: 'overlay',
             }} />
 
-            {/* Corner accent lines */}
+            {/* Glossy sheen */}
             <div style={{
-                position: 'absolute', inset: 0, borderRadius: '24px',
-                border: `1px solid ${isProfit ? 'rgba(204,243,129,0.18)' : 'rgba(248,113,113,0.18)'}`,
-                pointerEvents: 'none',
+                position: 'absolute', top: '-50%', left: '-50%', right: '-50%', bottom: '-50%',
+                background: 'linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.03) 50%, transparent 55%)',
+                transform: 'rotate(-45deg)', pointerEvents: 'none',
             }} />
 
-            {/* TOP: Branding + Date */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* TOP ROW: Bank Logo + Contactless */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{
-                        width: '30px', height: '30px',
+                        width: '28px', height: '28px',
                         background: 'linear-gradient(135deg, #ccf381, #a8d44e)',
-                        borderRadius: '8px',
+                        borderRadius: '6px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '15px', fontWeight: '900', color: '#000',
-                        flexShrink: 0,
+                        fontSize: '16px', fontWeight: '900', color: '#000',
                     }}>T</div>
-                    <span style={{ color: '#ccf381', fontSize: '14px', fontWeight: '700', letterSpacing: '0.04em' }}>
+                    <span style={{
+                        color: '#eee', fontSize: '14px', fontWeight: '700', letterSpacing: '0.1em',
+                        textTransform: 'uppercase', textShadow: '0 1px 2px rgba(0,0,0,0.8)'
+                    }}>
                         Trading Journal
                     </span>
                 </div>
-                <span style={{ color: '#444', fontSize: '13px' }}>{dateStr}</span>
+
+                {/* Contactless Symbol (CSS) */}
+                <div style={{ position: 'relative', width: '24px', height: '24px', opacity: 0.6 }}>
+                    <div style={{
+                        position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%) rotate(45deg)',
+                        width: '18px', height: '18px', borderRight: '2px solid #ccc', borderTop: '2px solid #ccc', borderRadius: '50%'
+                    }} />
+                    <div style={{
+                        position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%) rotate(45deg)',
+                        width: '10px', height: '10px', borderRight: '2px solid #ccc', borderTop: '2px solid #ccc', borderRadius: '50%'
+                    }} />
+                    <div style={{
+                        position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%) rotate(45deg)',
+                        width: '2px', height: '2px', background: '#ccc', borderRadius: '50%'
+                    }} />
+                </div>
             </div>
 
-            {/* MIDDLE: Symbol + P&L */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
-                {/* Left: Symbol + Type */}
-                <div>
+            {/* MIDDLE ROW: Chip + Symbol + P&L */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px', position: 'relative', zIndex: 10 }}>
+                {/* Left: Chip + Symbol */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    {/* EMV Chip */}
                     <div style={{
-                        fontSize: '52px', fontWeight: '900', color: '#ffffff',
-                        letterSpacing: '-0.03em', lineHeight: 1,
+                        width: '50px', height: '36px',
+                        background: 'linear-gradient(135deg, #eebb66 0%, #aa8844 100%)',
+                        borderRadius: '6px',
+                        position: 'relative', overflow: 'hidden',
+                        boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.5)'
                     }}>
-                        {trade.symbol}
+                        <div style={{ position: 'absolute', inset: 0, border: '1px solid rgba(0,0,0,0.2)', borderRadius: '6px' }} />
+                        <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(0,0,0,0.2)' }} />
+                        <div style={{ position: 'absolute', left: '33%', top: 0, bottom: 0, width: '1px', background: 'rgba(0,0,0,0.2)' }} />
+                        <div style={{ position: 'absolute', right: '33%', top: 0, bottom: 0, width: '1px', background: 'rgba(0,0,0,0.2)' }} />
                     </div>
-                    <div style={{
-                        display: 'inline-block', marginTop: '10px',
-                        padding: '5px 16px', borderRadius: '100px',
-                        background: typeBg,
-                        color: typeColor,
-                        fontSize: '13px', fontWeight: '800', letterSpacing: '0.08em',
-                    }}>
-                        {trade.type}
+
+                    {/* Symbol (Card Number Style) */}
+                    <div>
+                        <div style={{
+                            fontSize: '36px', fontWeight: '500', color: '#e0e0e0',
+                            letterSpacing: '0.1em', textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 0 rgba(255,255,255,0.1)',
+                            fontFamily: fontNumbers
+                        }}>
+                            {trade.symbol}
+                        </div>
+                        <div style={{
+                            fontSize: '12px', color: isProfit ? '#4ade80' : '#f87171',
+                            marginTop: '8px', letterSpacing: '0.1em', fontWeight: 'bold',
+                            textTransform: 'uppercase'
+                        }}>
+                            {trade.type} &bull; {dateStr}
+                        </div>
                     </div>
                 </div>
 
-                {/* Right: P&L */}
-                <div style={{ textAlign: 'right' }}>
+                {/* Right: P&L (Balance Style) */}
+                <div style={{ textAlign: 'right', marginTop: '40px' }}>
+                    <div style={{ fontSize: '9px', color: '#666', letterSpacing: '0.1em', fontWeight: '600', marginBottom: '4px' }}>ACCOUNT BALANCE</div>
                     <div style={{
-                        fontSize: '56px', fontWeight: '900',
+                        fontSize: '48px', fontWeight: 'bold',
                         color: accentColor,
-                        lineHeight: 1, letterSpacing: '-0.02em',
-                        textShadow: `0 0 40px ${accentGlow}`,
+                        letterSpacing: '-0.02em',
+                        textShadow: '0 0 20px rgba(0,0,0,0.5)',
+                        fontFamily: fontPrimary
                     }}>
                         {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
                     </div>
                     {points !== undefined && points !== 0 && (
-                        <div style={{
-                            marginTop: '6px', fontSize: '16px', fontWeight: '700',
-                            color: isProfit ? 'rgba(204,243,129,0.55)' : 'rgba(248,113,113,0.55)',
-                            textAlign: 'right',
-                        }}>
+                        <div style={{ fontSize: '14px', color: '#888', marginTop: '-4px', fontWeight: '500' }}>
                             {points > 0 ? '+' : ''}{points.toLocaleString()} pts
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* BOTTOM: Entry/Exit/Lot + Username */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2 }}>
-
-                {/* Trade details - Using table for perfect alignment */}
-                <div style={{ display: 'flex' }}>
-                    <table style={{ borderCollapse: 'collapse' }}>
-                        <tbody>
-                            <tr>
-                                <td style={{ paddingRight: '48px', verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>ENTRY</div>
-                                    <div style={{ color: '#ccc', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.entry_price?.toLocaleString()}</div>
-                                </td>
-                                <td style={{ paddingRight: '48px', verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>EXIT</div>
-                                    <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{exitPrice?.toFixed(2)}</div>
-                                </td>
-                                <td style={{ verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>LOT</div>
-                                    <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.lot_size}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Username + Watermark */}
-                <div style={{ textAlign: 'right' }}>
-                    {username && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '12px' }}>
-                            <div style={{
-                                width: '24px', height: '24px', borderRadius: '50%',
-                                background: `linear-gradient(135deg, ${accentColor}, #6ee7b7)`,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '12px', fontWeight: '900', color: '#000', flexShrink: 0,
-                                marginRight: '10px',
-                            }}>
-                                {username.charAt(0).toUpperCase()}
-                            </div>
-                            <span style={{ color: '#888', fontSize: '14px', fontWeight: '700' }}>
-                                {username}
-                            </span>
-                        </div>
-                    )}
-                    <div style={{ color: '#444', fontSize: '12px', letterSpacing: '0.05em', fontWeight: '700' }}>
-                        CRT.TRADER community
+            {/* BOTTOM ROW: Details + Name */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 10 }}>
+                {/* Name */}
+                <div>
+                    <div style={{ fontSize: '8px', color: '#666', letterSpacing: '0.1em', marginBottom: '4px' }}>CARD HOLDER</div>
+                    <div style={{
+                        fontSize: '18px', color: '#ddd', textTransform: 'uppercase',
+                        letterSpacing: '0.15em', fontWeight: '500',
+                        textShadow: '1px 1px 1px rgba(0,0,0,0.8)',
+                    }}>
+                        {username || 'TRADER'}
                     </div>
                 </div>
+
+                {/* Trade Details (Expiry Style) */}
+                <div style={{ display: 'flex', gap: '24px' }}>
+                    <div>
+                        <div style={{ fontSize: '7px', color: '#666', marginBottom: '2px' }}>ENTRY</div>
+                        <div style={{ fontSize: '14px', color: '#ccc', fontFamily: fontNumbers, fontWeight: 'bold' }}>{trade.entry_price?.toLocaleString()}</div>
+                    </div>
+                    {exitPrice && (
+                        <div>
+                            <div style={{ fontSize: '7px', color: '#666', marginBottom: '2px' }}>EXIT</div>
+                            <div style={{ fontSize: '14px', color: '#ccc', fontFamily: fontNumbers, fontWeight: 'bold' }}>{exitPrice.toFixed(2)}</div>
+                        </div>
+                    )}
+                    <div>
+                        <div style={{ fontSize: '7px', color: '#666', marginBottom: '2px' }}>LOT</div>
+                        <div style={{ fontSize: '14px', color: '#ccc', fontFamily: fontNumbers, fontWeight: 'bold' }}>{trade.lot_size}</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Right Watermark (Subtle) */}
+            <div style={{
+                position: 'absolute', bottom: '34px', right: '40px',
+                fontSize: '10px', color: '#333', fontWeight: 'bold',
+                letterSpacing: '0.1em',
+                transform: 'translateY(100%)' // Move below the details
+            }}>
+                CRT.TRADER community
             </div>
         </div>
     )
