@@ -38,7 +38,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
     // Luxury fonts
     const fontPrimary = "'Segoe UI', sans-serif"
     const fontMono = "'Courier New', monospace"
-    const fontSlab = "'Rockwell', 'Courier New', serif" // Stronger text for symbol
+    const fontSlab = "'Rockwell', 'Courier New', serif"
 
     return (
         <div style={{
@@ -68,7 +68,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
             }} />
 
 
-            {/* HEADER: Logo + Contactless (Absolute Top) */}
+            {/* HEADER: Logo + Contactless */}
             <div style={{ position: 'absolute', top: '24px', left: '32px', right: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{
@@ -93,7 +93,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 </div>
             </div>
 
-            {/* CHIP (Absolute) */}
+            {/* CHIP */}
             <div style={{
                 position: 'absolute', top: '75px', left: '32px',
                 width: '40px', height: '30px',
@@ -108,11 +108,12 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 <div style={{ position: 'absolute', right: '33%', top: 0, bottom: 0, width: '1px', background: 'rgba(0,0,0,0.2)' }} />
             </div>
 
-            {/* MAIN NUMBER: Symbol (Absolute Center-ish) */}
+            {/* MAIN NUMBER: Symbol + Profit (Aligned Baseline) */}
             <div style={{
                 position: 'absolute', top: '125px', left: '32px', right: '32px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
+                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline'
             }}>
+                {/* Left: Symbol */}
                 <div>
                     <div style={{
                         fontSize: '32px', fontWeight: '500', color: '#f3f4f6',
@@ -121,7 +122,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     }}>
                         {trade.symbol}
                     </div>
-                    {/* Details below symbol with MORE spacing to avoid overlap */}
+                    {/* Details below symbol */}
                     <div style={{ display: 'flex', gap: '20px', fontSize: '10px', letterSpacing: '0.08em', alignItems: 'center' }}>
                         <span style={{
                             color: isProfit ? '#22c55e' : '#ef4444', fontWeight: 'bold',
@@ -132,7 +133,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     </div>
                 </div>
 
-                {/* P&L (Right Aligned) */}
+                {/* Right: P&L */}
                 <div style={{ textAlign: 'right' }}>
                     <div style={{
                         fontSize: '44px', fontWeight: 'bold',
@@ -151,7 +152,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 </div>
             </div>
 
-            {/* BOTTOM INFO (Absolute Bottom) */}
+            {/* BOTTOM INFO */}
             <div style={{
                 position: 'absolute', bottom: '26px', left: '32px', right: '32px',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'
@@ -169,7 +170,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     </div>
                 </div>
 
-                {/* Trade Stats (Entry/Exit/Lot) */}
+                {/* Trade Stats */}
                 <div style={{ display: 'flex', gap: '24px' }}>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>ENTRY</div>
@@ -188,7 +189,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 </div>
             </div>
 
-            {/* Hologram Sticker (Bottom Right Accent) */}
+            {/* Hologram Sticker */}
             <div style={{
                 position: 'absolute', bottom: '80px', right: '32px',
                 width: '40px', height: '24px',
