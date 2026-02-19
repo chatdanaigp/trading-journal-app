@@ -9,6 +9,7 @@ import { AIAnalysis } from './AIAnalysis'
 import { ProfitTree } from './ProfitTree'
 import { TrendingUp, Activity, BarChart2 } from 'lucide-react'
 import { TradeList } from './TradeList'
+import { AdvancedStats } from './AdvancedStats'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 
 export default async function DashboardPage() {
@@ -123,6 +124,9 @@ export default async function DashboardPage() {
 
             {/* Middle Grid: Charts & Calendar */}
             <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12">
+                    <AdvancedStats stats={stats as any} />
+                </div>
                 <div className="col-span-12 lg:col-span-8">
                     {/* Equity Chart */}
                     <EquityChart trades={trades} />
