@@ -118,7 +118,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     <div style={{
                         fontSize: '32px', fontWeight: '500', color: '#f3f4f6',
                         letterSpacing: '0.12em', textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 0 rgba(255,255,255,0.05)',
-                        fontFamily: fontSlab, marginBottom: '20px', lineHeight: '1'
+                        fontFamily: fontSlab, marginBottom: '12px', lineHeight: '1' // Equal margin
                     }}>
                         {trade.symbol}
                     </div>
@@ -140,7 +140,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                         color: accentColor,
                         letterSpacing: '-0.03em',
                         textShadow: '0 0 25px rgba(0,0,0,0.6)',
-                        lineHeight: '1', marginBottom: '8px'
+                        lineHeight: '1', marginBottom: '12px' // Equal margin
                     }}>
                         {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
                     </div>
