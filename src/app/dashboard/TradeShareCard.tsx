@@ -43,8 +43,8 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
     return (
         <div style={{
             width: '600px',
-            height: '330px', // Further Reduced height (Ultra-sleek ratio)
-            background: 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)', // Gunmetal/Charcoal
+            height: '330px', // Ultra-sleek ratio
+            background: 'linear-gradient(135deg, #2c3e50 0%, #0f172a 100%)', // Gunmetal/Titanium Blue-Grey
             borderRadius: '16px',
             fontFamily: fontPrimary,
             position: 'relative',
@@ -117,7 +117,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     <div style={{
                         fontSize: '32px', fontWeight: '500', color: '#f3f4f6',
                         letterSpacing: '0.12em', textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 0 rgba(255,255,255,0.05)',
-                        fontFamily: fontSlab, marginBottom: '14px', lineHeight: '1'
+                        fontFamily: fontSlab, marginBottom: '20px', lineHeight: '1'
                     }}>
                         {trade.symbol}
                     </div>
@@ -139,7 +139,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                         color: accentColor,
                         letterSpacing: '-0.03em',
                         textShadow: '0 0 25px rgba(0,0,0,0.6)',
-                        lineHeight: '1', marginBottom: '4px'
+                        lineHeight: '1', marginBottom: '8px'
                     }}>
                         {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
                     </div>
@@ -158,11 +158,12 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
             }}>
                 {/* Name */}
                 <div style={{ transform: 'translateY(2px)' }}>
-                    <div style={{ fontSize: '7px', color: '#6b7280', letterSpacing: '0.15em', marginBottom: '4px', fontWeight: '700' }}>CARD HOLDER</div>
+                    <div style={{ fontSize: '7px', color: '#6b7280', letterSpacing: '0.15em', marginBottom: '8px', fontWeight: '700' }}>CARD HOLDER</div>
                     <div style={{
                         fontSize: '15px', color: '#e5e7eb', textTransform: 'uppercase',
                         letterSpacing: '0.15em', fontWeight: '600',
                         textShadow: '1px 1px 1px rgba(0,0,0,0.8)',
+                        lineHeight: 1
                     }}>
                         {username || 'TRADER'}
                     </div>
@@ -171,18 +172,18 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 {/* Trade Stats (Entry/Exit/Lot) */}
                 <div style={{ display: 'flex', gap: '24px' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '3px', fontWeight: '700', letterSpacing: '0.1em' }}>ENTRY</div>
-                        <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold' }}>{trade.entry_price?.toLocaleString()}</div>
+                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>ENTRY</div>
+                        <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{trade.entry_price?.toLocaleString()}</div>
                     </div>
                     {exitPrice && (
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '3px', fontWeight: '700', letterSpacing: '0.1em' }}>EXIT</div>
-                            <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold' }}>{exitPrice.toFixed(2)}</div>
+                            <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>EXIT</div>
+                            <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{exitPrice.toFixed(2)}</div>
                         </div>
                     )}
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '3px', fontWeight: '700', letterSpacing: '0.1em' }}>LOT</div>
-                        <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold' }}>{trade.lot_size}</div>
+                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>LOT</div>
+                        <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{trade.lot_size}</div>
                     </div>
                 </div>
             </div>
