@@ -39,8 +39,8 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
 
     return (
         <div style={{
-            width: '600px',
-            height: '400px',
+            width: '640px',
+            height: '420px',
             background: 'linear-gradient(145deg, #111111 0%, #0d0d0d 60%, #0a0f0a 100%)',
             borderRadius: '24px',
             fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
@@ -49,7 +49,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            padding: '30px 36px',
+            padding: '36px 42px',
             boxSizing: 'border-box',
         }}>
             {/* Glow blob behind P&L */}
@@ -94,7 +94,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 {/* Left: Symbol + Type */}
                 <div>
                     <div style={{
-                        fontSize: '48px', fontWeight: '900', color: '#ffffff',
+                        fontSize: '52px', fontWeight: '900', color: '#ffffff',
                         letterSpacing: '-0.03em', lineHeight: 1,
                     }}>
                         {trade.symbol}
@@ -140,16 +140,16 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                     <table style={{ borderCollapse: 'collapse' }}>
                         <tbody>
                             <tr>
-                                <td style={{ paddingRight: '24px', verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>ENTRY</div>
+                                <td style={{ paddingRight: '48px', verticalAlign: 'bottom' }}>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>ENTRY</div>
                                     <div style={{ color: '#ccc', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.entry_price?.toLocaleString()}</div>
                                 </td>
-                                <td style={{ paddingRight: '24px', verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>EXIT</div>
+                                <td style={{ paddingRight: '48px', verticalAlign: 'bottom' }}>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>EXIT</div>
                                     <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{exitPrice?.toFixed(2)}</div>
                                 </td>
                                 <td style={{ verticalAlign: 'bottom' }}>
-                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>LOT</div>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '6px' }}>LOT</div>
                                     <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.lot_size}</div>
                                 </td>
                             </tr>
@@ -160,13 +160,13 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 {/* Username + Watermark */}
                 <div style={{ textAlign: 'right' }}>
                     {username && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '12px' }}>
                             <div style={{
                                 width: '24px', height: '24px', borderRadius: '50%',
                                 background: `linear-gradient(135deg, ${accentColor}, #6ee7b7)`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: '12px', fontWeight: '900', color: '#000', flexShrink: 0,
-                                marginRight: '8px',
+                                marginRight: '10px',
                             }}>
                                 {username.charAt(0).toUpperCase()}
                             </div>
@@ -175,7 +175,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                             </span>
                         </div>
                     )}
-                    <div style={{ color: '#444', fontSize: '11px', letterSpacing: '0.05em', fontWeight: '700' }}>
+                    <div style={{ color: '#444', fontSize: '12px', letterSpacing: '0.05em', fontWeight: '700' }}>
                         CRT.TRADER community
                     </div>
                 </div>
