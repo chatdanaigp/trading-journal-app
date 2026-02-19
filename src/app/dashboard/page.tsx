@@ -15,10 +15,14 @@ export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
     const { user, clientId, isAdmin } = await requireVerifiedUser()
 
-    // Get username from profile (used for Share Card)
+    // Get display name for Share Card — Discord Display Name takes priority
     const supabase = await (await import('@/utils/supabase/server')).createClient()
     const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single()
-    const username = profile?.username || user.email?.split('@')[0] || 'Trader'
+    const username = (user.user_metadata?.full_name as string)
+        || (user.user_metadata?.name as string)
+        || profile?.username
+        || user.email?.split('@')[0]
+        || 'Trader'
 
     // Fetch data
     const trades = await getTrades()
