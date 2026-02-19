@@ -13,7 +13,12 @@ import { requireVerifiedUser } from '@/utils/verify-client-id'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
-    const { user, clientId } = await requireVerifiedUser()
+    const { user, clientId, isAdmin } = await requireVerifiedUser()
+
+    // Get username from profile (used for Share Card)
+    const supabase = await (await import('@/utils/supabase/server')).createClient()
+    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single()
+    const username = profile?.username || user.email?.split('@')[0] || 'Trader'
 
     // Fetch data
     const trades = await getTrades()
@@ -128,7 +133,7 @@ export default async function DashboardPage() {
             {/* Bottom Grid: Recent Trades & Trade Form */}
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-12 lg:col-span-8">
-                    <TradeList trades={trades} />
+                    <TradeList trades={trades} username={username} />
                 </div>
 
                 <div className="col-span-12 lg:col-span-4">

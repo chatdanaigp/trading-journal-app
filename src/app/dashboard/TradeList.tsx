@@ -4,12 +4,14 @@ import React from 'react'
 
 import { useState } from 'react'
 import { AIAnalysis } from './AIAnalysis'
-import { Pencil } from 'lucide-react'
+import { Pencil, Share2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { EditTradeForm } from './EditTradeForm'
+import { TradeShareModal } from './TradeShareModal'
 
-export function TradeList({ trades }: { trades: any[] }) {
+export function TradeList({ trades, username }: { trades: any[], username?: string }) {
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
+    const [sharingTrade, setSharingTrade] = useState<any | null>(null)
 
     return (
         <>
@@ -89,13 +91,22 @@ export function TradeList({ trades }: { trades: any[] }) {
                                             <AIAnalysis tradeId={trade.id} initialAnalysis={trade.ai_analysis} />
                                         </td>
                                         <td className="px-5 py-4 text-center">
-                                            <button
-                                                onClick={() => setEditingTrade(trade)}
-                                                className="p-1.5 bg-[#333] hover:bg-[#444] rounded-lg text-gray-400 hover:text-white transition-all"
-                                                title="Edit Trade"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
+                                            <div className="flex items-center justify-center gap-1.5">
+                                                <button
+                                                    onClick={() => setSharingTrade(trade)}
+                                                    className="p-1.5 bg-[#1a2a10] hover:bg-[#2a3d1a] rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
+                                                    title="Share Trade Card"
+                                                >
+                                                    <Share2 size={15} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingTrade(trade)}
+                                                    className="p-1.5 bg-[#333] hover:bg-[#444] rounded-lg text-gray-400 hover:text-white transition-all"
+                                                    title="Edit Trade"
+                                                >
+                                                    <Pencil size={15} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )
@@ -118,6 +129,15 @@ export function TradeList({ trades }: { trades: any[] }) {
                     />
                 )}
             </Modal>
+
+            {/* Modal for Sharing */}
+            {sharingTrade && (
+                <TradeShareModal
+                    trade={sharingTrade}
+                    username={username}
+                    onClose={() => setSharingTrade(null)}
+                />
+            )}
         </>
     )
 }
