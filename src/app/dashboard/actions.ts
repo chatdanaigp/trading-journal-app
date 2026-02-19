@@ -174,14 +174,52 @@ export async function getTradeStats() {
 
     const totalTrades = trades.length
     const winTrades = trades.filter(t => (t.profit || 0) > 0).length
+    const lossTrades = totalTrades - winTrades
     const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0)
 
-    const winRate = ((winTrades / totalTrades) * 100).toFixed(1)
+    const grossProfit = trades.filter(t => (t.profit || 0) > 0).reduce((sum, t) => sum + (t.profit || 0), 0)
+    const grossLoss = Math.abs(trades.filter(t => (t.profit || 0) < 0).reduce((sum, t) => sum + (t.profit || 0), 0))
+
+    const winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0'
+    const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '0.00')
+
+    const averageWin = winTrades > 0 ? (grossProfit / winTrades).toFixed(2) : '0.00'
+    const averageLoss = lossTrades > 0 ? (grossLoss / lossTrades).toFixed(2) : '0.00'
+
+    const totalLots = trades.reduce((sum, t) => sum + (t.lot_size || 0), 0).toFixed(2)
+
+    // Long vs Short Stats
+    const longTrades = trades.filter(t => t.type === 'BUY')
+    const shortTrades = trades.filter(t => t.type === 'SELL')
+
+    const longWinRate = longTrades.length > 0
+        ? ((longTrades.filter(t => (t.profit || 0) > 0).length / longTrades.length) * 100).toFixed(1)
+        : '0.0'
+    const shortWinRate = shortTrades.length > 0
+        ? ((shortTrades.filter(t => (t.profit || 0) > 0).length / shortTrades.length) * 100).toFixed(1)
+        : '0.0'
+
+    const longProfit = longTrades.reduce((sum, t) => sum + (t.profit || 0), 0).toFixed(2)
+    const shortProfit = shortTrades.reduce((sum, t) => sum + (t.profit || 0), 0).toFixed(2)
 
     return {
         totalTrades,
         winRate,
-        netProfit: totalProfit.toFixed(2)
+        netProfit: totalProfit.toFixed(2),
+        profitFactor,
+        averageWin,
+        averageLoss,
+        totalLots,
+        longStats: {
+            count: longTrades.length,
+            winRate: longWinRate,
+            profit: longProfit
+        },
+        shortStats: {
+            count: shortTrades.length,
+            winRate: shortWinRate,
+            profit: shortProfit
+        }
     }
 }
 

@@ -134,43 +134,48 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
 
             {/* BOTTOM: Entry/Exit/Lot + Username */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2 }}>
-                {/* Trade details - explicit marginBottom instead of gap for html-to-image compat */}
+
+                {/* Trade details - Using table for perfect alignment */}
                 <div style={{ display: 'flex' }}>
-                    {[
-                        { label: 'ENTRY', value: trade.entry_price?.toLocaleString() },
-                        { label: 'EXIT', value: exitPrice?.toFixed(2) },
-                        { label: 'LOT', value: String(trade.lot_size) },
-                    ].map(({ label, value }, i) => (
-                        <div key={label} style={{ marginRight: i < 2 ? '28px' : '0' }}>
-                            <div style={{ color: '#3a3a3a', fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', marginBottom: '5px' }}>
-                                {label}
-                            </div>
-                            <div style={{ color: '#777', fontSize: '15px', fontWeight: '600', fontFamily: 'monospace' }}>
-                                {value}
-                            </div>
-                        </div>
-                    ))}
+                    <table style={{ borderCollapse: 'collapse' }}>
+                        <tbody>
+                            <tr>
+                                <td style={{ paddingRight: '24px', verticalAlign: 'bottom' }}>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>ENTRY</div>
+                                    <div style={{ color: '#ccc', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.entry_price?.toLocaleString()}</div>
+                                </td>
+                                <td style={{ paddingRight: '24px', verticalAlign: 'bottom' }}>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>EXIT</div>
+                                    <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{exitPrice?.toFixed(2)}</div>
+                                </td>
+                                <td style={{ verticalAlign: 'bottom' }}>
+                                    <div style={{ color: '#555', fontSize: '10px', fontWeight: '800', letterSpacing: '0.1em', marginBottom: '4px' }}>LOT</div>
+                                    <div style={{ color: '#999', fontSize: '16px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>{trade.lot_size}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                {/* Username stacked above Watermark — block layout, no flex column */}
+                {/* Username + Watermark */}
                 <div style={{ textAlign: 'right' }}>
                     {username && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '10px' }}>
                             <div style={{
                                 width: '24px', height: '24px', borderRadius: '50%',
                                 background: `linear-gradient(135deg, ${accentColor}, #6ee7b7)`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '11px', fontWeight: '900', color: '#000', flexShrink: 0,
+                                fontSize: '12px', fontWeight: '900', color: '#000', flexShrink: 0,
                                 marginRight: '8px',
                             }}>
                                 {username.charAt(0).toUpperCase()}
                             </div>
-                            <span style={{ color: '#777', fontSize: '14px', fontWeight: '700' }}>
+                            <span style={{ color: '#888', fontSize: '14px', fontWeight: '700' }}>
                                 {username}
                             </span>
                         </div>
                     )}
-                    <div style={{ color: '#3a3a3a', fontSize: '11px', letterSpacing: '0.05em', fontWeight: '600' }}>
+                    <div style={{ color: '#444', fontSize: '11px', letterSpacing: '0.05em', fontWeight: '700' }}>
                         CRT.TRADER community
                     </div>
                 </div>
