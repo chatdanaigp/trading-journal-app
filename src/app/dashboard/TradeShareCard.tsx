@@ -134,18 +134,18 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
 
             {/* BOTTOM: Entry/Exit/Lot + Username */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2 }}>
-                {/* Trade details row */}
-                <div style={{ display: 'flex', gap: '24px' }}>
+                {/* Trade details */}
+                <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-end' }}>
                     {[
                         { label: 'ENTRY', value: trade.entry_price?.toLocaleString() },
                         { label: 'EXIT', value: exitPrice?.toFixed(2) },
                         { label: 'LOT', value: String(trade.lot_size) },
                     ].map(({ label, value }) => (
-                        <div key={label}>
-                            <div style={{ color: '#444', fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', marginBottom: '3px' }}>
+                        <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                            <div style={{ color: '#3a3a3a', fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em' }}>
                                 {label}
                             </div>
-                            <div style={{ color: '#999', fontSize: '15px', fontWeight: '600', fontFamily: 'monospace' }}>
+                            <div style={{ color: '#777', fontSize: '15px', fontWeight: '600', fontFamily: 'monospace' }}>
                                 {value}
                             </div>
                         </div>
@@ -155,7 +155,7 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                 {/* Username + Watermark */}
                 <div style={{ textAlign: 'right' }}>
                     {username && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', justifyContent: 'flex-end', marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', justifyContent: 'flex-end', marginBottom: '5px' }}>
                             <div style={{
                                 width: '22px', height: '22px', borderRadius: '50%',
                                 background: `linear-gradient(135deg, ${accentColor}, #6ee7b7)`,
@@ -169,8 +169,8 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
                             </span>
                         </div>
                     )}
-                    <div style={{ color: '#2a2a2a', fontSize: '11px', letterSpacing: '0.04em' }}>
-                        trading-journal.app
+                    <div style={{ color: '#333', fontSize: '11px', letterSpacing: '0.04em', fontWeight: '600' }}>
+                        CRT.TRADER community
                     </div>
                 </div>
             </div>
