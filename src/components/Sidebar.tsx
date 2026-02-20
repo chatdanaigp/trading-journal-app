@@ -7,7 +7,6 @@ import { cn } from '@/utils/cn'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
-import { isAdmin } from '@/app/admin/actions'
 
 export function Sidebar() {
     const pathname = usePathname()
@@ -24,13 +23,13 @@ export function Sidebar() {
             if (user) {
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('client_id')
+                    .select('client_id, username')
                     .eq('id', user.id)
                     .single()
                 setClientId(profile?.client_id || null)
 
-                // Check admin status
-                isAdmin().then(setIsUserAdmin).catch(console.error)
+                // Simple UI check for admin (actual security is on the server)
+                setIsUserAdmin(profile?.username === 'admin')
             }
         }
         getUser()
