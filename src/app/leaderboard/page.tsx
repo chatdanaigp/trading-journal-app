@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
+import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 
 // Rank Badge System
 function getRankBadge(totalTrades: number, netProfit: number, winRate: number) {
@@ -40,10 +41,10 @@ export default async function LeaderboardPage() {
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
 
-            <div className="max-w-7xl mx-auto space-y-12 relative z-10">
+            <StaggerContainer className="max-w-7xl mx-auto space-y-12 relative z-10">
 
                 {/* Header */}
-                <div className="text-center space-y-4">
+                <StaggerItem className="text-center space-y-4">
                     <h1 className="text-5xl font-black italic tracking-tighter uppercase whitespace-nowrap bg-gradient-to-r from-white via-[#ccf381] to-white bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(204,243,129,0.3)]">
                         🏆 Global Leaderboard
                     </h1>
@@ -53,10 +54,10 @@ export default async function LeaderboardPage() {
                     <a href="/dashboard" className="inline-flex items-center text-sm font-bold text-[#ccf381] hover:text-[#b0d16a] transition-colors mt-4 border border-[#ccf381]/30 px-4 py-2 rounded-full hover:bg-[#ccf381]/10">
                         ← Back to Dashboard
                     </a>
-                </div>
+                </StaggerItem>
 
                 {/* Top 3 Podium */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 items-end">
+                <StaggerItem className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 items-end">
                     {/* Rank 2 */}
                     {leaderboard?.[1] && (
                         <Card key={leaderboard[1].out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
@@ -159,10 +160,10 @@ export default async function LeaderboardPage() {
                             </CardContent>
                         </Card>
                     )}
-                </div>
+                </StaggerItem>
 
                 {/* Full Leaderboard Table */}
-                <div className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-2xl border border-[#333] overflow-hidden">
+                <StaggerItem className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-2xl border border-[#333] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-[#0d0d0d] text-gray-400 text-xs uppercase tracking-wider">
@@ -243,9 +244,9 @@ export default async function LeaderboardPage() {
                             No ranked traders yet. Be the first to log trades!
                         </div>
                     )}
-                </div>
+                </StaggerItem>
 
-            </div>
+            </StaggerContainer>
         </div>
     )
 }

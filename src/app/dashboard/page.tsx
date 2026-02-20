@@ -5,12 +5,12 @@ import { TradeForm } from './TradeForm'
 import { Card, CardContent } from '@/components/ui/card'
 import { EquityChart } from './EquityChart'
 import { CalendarWidget } from './CalendarWidget'
-import { AIAnalysis } from './AIAnalysis'
 import { ProfitTree } from './ProfitTree'
 import { TrendingUp, Activity, BarChart2 } from 'lucide-react'
 import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
+import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -34,34 +34,36 @@ export default async function DashboardPage() {
     const goalPercent = goals?.profit_goal_percent || 10
 
     return (
-        <div className="space-y-8">
+        <StaggerContainer className="space-y-8">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
-                    <p className="text-gray-500 text-sm lg:text-base">Welcome back, let&apos;s grow your portfolio.</p>
-                </div>
+            <StaggerItem>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
+                        <p className="text-gray-500 text-sm lg:text-base">Welcome back, let&apos;s grow your portfolio.</p>
+                    </div>
 
-                {/* Quick Actions / Date? */}
-                <div className="flex items-center gap-3">
-                    {clientId && (
-                        <div className="bg-[#ccf381]/10 border border-[#ccf381]/20 rounded-full px-4 py-2 text-sm text-[#ccf381] font-mono font-semibold hidden sm:flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
-                            </svg>
-                            Connext ID: {clientId}
+                    {/* Quick Actions / Date? */}
+                    <div className="flex items-center gap-3">
+                        {clientId && (
+                            <div className="bg-[#ccf381]/10 border border-[#ccf381]/20 rounded-full px-4 py-2 text-sm text-[#ccf381] font-mono font-semibold hidden sm:flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
+                                </svg>
+                                Connext ID: {clientId}
+                            </div>
+                        )}
+                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 hidden sm:block">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                         </div>
-                    )}
-                    <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 hidden sm:block">
-                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                     </div>
                 </div>
-            </div>
+            </StaggerItem>
 
             {/* Top Grid: Stats & Profit Tree */}
             <div className="grid grid-cols-12 gap-6">
                 {/* Left: Key Metrics (3 Cards Vertical or Grid) - Col 4 */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 h-full">
+                <StaggerItem className="col-span-12 lg:col-span-4 flex flex-col gap-6 h-full">
                     {/* Net Revenue / Net Profit */}
                     <Card className="relative overflow-hidden group border-0 shadow-2xl">
                         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
@@ -114,43 +116,43 @@ export default async function DashboardPage() {
                             </CardContent>
                         </Card>
                     </div>
-                </div>
+                </StaggerItem>
 
                 {/* Right: Profit Tree Big Card - Col 8 */}
-                <div className="col-span-12 lg:col-span-8 h-full">
+                <StaggerItem className="col-span-12 lg:col-span-8 h-full">
                     <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} />
-                </div>
+                </StaggerItem>
             </div>
 
             {/* Middle Grid: Charts & Calendar */}
             <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12">
+                <StaggerItem className="col-span-12">
                     <AdvancedStats stats={stats as any} />
-                </div>
-                <div className="col-span-12 lg:col-span-8">
+                </StaggerItem>
+                <StaggerItem className="col-span-12 lg:col-span-8">
                     {/* Equity Chart */}
                     <EquityChart trades={trades} />
-                </div>
-                <div className="col-span-12 lg:col-span-4">
+                </StaggerItem>
+                <StaggerItem className="col-span-12 lg:col-span-4">
                     <div className="h-full">
                         <CalendarWidget trades={trades} />
                     </div>
-                </div>
+                </StaggerItem>
             </div>
 
             {/* Bottom Grid: Recent Trades & Trade Form */}
             <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12 lg:col-span-8">
+                <StaggerItem className="col-span-12 lg:col-span-8">
                     <TradeList trades={trades} username={username} />
-                </div>
+                </StaggerItem>
 
-                <div className="col-span-12 lg:col-span-4">
+                <StaggerItem className="col-span-12 lg:col-span-4">
                     <div className="sticky top-6">
                         <h2 className="text-xl font-bold text-white mb-4">Quick Trade</h2>
                         <TradeForm />
                     </div>
-                </div>
+                </StaggerItem>
             </div>
-        </div>
+        </StaggerContainer>
     )
 }
