@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { toPng } from 'html-to-image'
+import { motion } from 'framer-motion'
 import { TradeShareCard } from './TradeShareCard'
 import { X, Download, Loader2 } from 'lucide-react'
 
@@ -40,12 +41,19 @@ export function TradeShareModal({ trade, username, onClose }: TradeShareModalPro
 
     return (
         // Backdrop
-        <div
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ background: 'rgba(0,0,0,0.85)' }}
             onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
         >
-            <div className="flex flex-col items-center gap-5 w-full max-w-4xl">
+            <motion.div
+                initial={{ scale: 0.85, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="flex flex-col items-center gap-5 w-full max-w-4xl"
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between w-full">
@@ -95,7 +103,7 @@ export function TradeShareModal({ trade, username, onClose }: TradeShareModalPro
                 <p className="text-gray-600 text-xs">
                     💡 ดาวน์โหลดแล้วโพสต์บน Twitter/X, Facebook, หรือ Discord ได้เลย
                 </p>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }
