@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { startOfMonth, endOfMonth, subMonths, isSameDay } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 
 export type AnalyticsData = {
     stats: {
@@ -109,7 +110,7 @@ export async function getAnalyticsData(range: string = 'all'): Promise<Analytics
         }
 
         return {
-            date: new Date(trade.created_at).toLocaleDateString(),
+            date: getTradingDay(trade.created_at).toLocaleDateString(),
             profit: netProfit,
             drawdown: currentDrawdown
         }
