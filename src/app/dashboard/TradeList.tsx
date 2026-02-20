@@ -17,15 +17,15 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
         <>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
-                <button className="text-sm text-[#ccf381] hover:underline">View All</button>
+                <a href="/journal" className="text-sm text-[#ccf381] hover:underline">View Journal</a>
             </div>
 
-            <div className="bg-[#1a1a1a] rounded-2xl overflow-x-auto">
+            <div className="bg-[#1a1a1a] rounded-2xl overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                 {trades.length === 0 ? (
                     <div className="p-10 text-center text-gray-500">No trades yet.</div>
                 ) : (
-                    <table className="w-full text-left min-w-[700px]">
-                        <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider">
+                    <table className="w-full text-left min-w-[700px] relative">
+                        <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10 shadow-md">
                             <tr>
                                 <th className="px-5 py-3 rounded-tl-xl">Asset</th>
                                 <th className="px-5 py-3">Side / Lot</th>
@@ -36,7 +36,7 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
-                            {trades.slice(0, 5).map((trade) => {
+                            {trades.map((trade) => {
                                 // Calculate Points & Exit if missing (Reverse Calc for display)
                                 const lot = trade.lot_size || 0.01 // Fallback
                                 const profit = trade.profit || 0
