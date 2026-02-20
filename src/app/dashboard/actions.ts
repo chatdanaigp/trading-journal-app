@@ -170,7 +170,17 @@ export async function getTrades() {
 export async function getTradeStats() {
     const trades = await getTrades()
 
-    if (!trades.length) return { totalTrades: 0, winRate: '0.0', netProfit: '0.00' }
+    if (!trades.length) return {
+        totalTrades: 0,
+        winRate: '0.0',
+        netProfit: '0.00',
+        profitFactor: '0.00',
+        averageWin: '0.00',
+        averageLoss: '0.00',
+        totalLots: '0.00',
+        longStats: { count: 0, winRate: '0.0', profit: '0.00' },
+        shortStats: { count: 0, winRate: '0.0', profit: '0.00' }
+    }
 
     const totalTrades = trades.length
     const winTrades = trades.filter(t => (t.profit || 0) > 0).length
