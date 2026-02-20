@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle, Menu, X, Shield } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -12,6 +12,7 @@ export function Sidebar() {
     const pathname = usePathname()
     const [user, setUser] = useState<User | null>(null)
     const [clientId, setClientId] = useState<string | null>(null)
+    const [isUserAdmin, setIsUserAdmin] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const supabase = createClient()
 
@@ -26,6 +27,9 @@ export function Sidebar() {
                     .eq('id', user.id)
                     .single()
                 setClientId(profile?.client_id || null)
+
+                // Check admin status
+                import('@/app/admin/actions').then(m => m.isAdmin()).then(setIsUserAdmin).catch(console.error)
             }
         }
         getUser()
@@ -138,6 +142,20 @@ export function Sidebar() {
                             </Link>
                         )
                     })}
+
+                    {/* Admin Panel Link (Conditional) */}
+                    {isUserAdmin && (
+                        <Link
+                            href="/admin"
+                            className={cn(
+                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group mt-4 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10",
+                                pathname === '/admin' ? "opacity-100" : "opacity-90"
+                            )}
+                        >
+                            <Shield className="w-5 h-5 text-red-400" />
+                            <span className="text-red-400 font-bold tracking-wide">Admin Panel</span>
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Lower Links */}
