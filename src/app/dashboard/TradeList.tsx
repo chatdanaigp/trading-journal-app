@@ -10,7 +10,7 @@ import { EditTradeForm } from './EditTradeForm'
 import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
 
-export function TradeList({ trades, username }: { trades: any[], username?: string }) {
+export function TradeList({ trades, username, dict }: { trades: any[], username?: string, dict?: any }) {
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null)
@@ -18,22 +18,22 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
     return (
         <>
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
-                <a href="/journal" className="text-sm text-[#ccf381] hover:underline">View Journal</a>
+                <h2 className="text-xl font-bold text-white">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
+                <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
             </div>
 
             <div className="bg-[#1a1a1a] rounded-2xl overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                 {trades.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">No trades yet.</div>
+                    <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                 ) : (
                     <table className="w-full text-left min-w-[700px] relative">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
-                                <th className="px-5 py-3 rounded-tl-xl transition-all duration-300">Asset</th>
-                                <th className="px-5 py-3 transition-all duration-300">Side / Lot</th>
-                                <th className="px-5 py-3 transition-all duration-300">Price</th>
-                                <th className="px-5 py-3 transition-all duration-300">Result</th>
-                                <th className="px-5 py-3 w-[150px] transition-all duration-300">Analysis</th>
+                                <th className="px-5 py-3 rounded-tl-xl transition-all duration-300">{dict?.dashboard?.asset || "Asset"}</th>
+                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.sideLot || "Side / Lot"}</th>
+                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.price || "Price"}</th>
+                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.result || "Result"}</th>
+                                <th className="px-5 py-3 w-[150px] transition-all duration-300">{dict?.dashboard?.analysis || "Analysis"}</th>
                                 <th className="px-5 py-3 text-center rounded-tr-xl w-12 transition-all duration-300"></th>
                             </tr>
                         </thead>

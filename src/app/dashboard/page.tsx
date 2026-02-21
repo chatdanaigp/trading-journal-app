@@ -11,13 +11,16 @@ import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
-import { getTradingDay } from '@/utils/date-helpers'
 import { isSameDay, isSameWeek, isSameMonth } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
+import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
     const { user, clientId, isAdmin } = await requireVerifiedUser()
+    const lang = await getCurrentLanguage()
+    const dict = getDictionary(lang)
 
     // Get display name for Share Card — Discord Display Name takes priority
     const supabase = await (await import('@/utils/supabase/server')).createClient()
@@ -60,8 +63,8 @@ export default async function DashboardPage() {
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
-                        <p className="text-gray-500 text-sm lg:text-base">Welcome back, let&apos;s grow your portfolio.</p>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
+                        <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
 
                     {/* Quick Actions / Date? */}
@@ -96,15 +99,15 @@ export default async function DashboardPage() {
                             <TrendingUp className="w-32 h-32 text-[#ccf381]" />
                         </div>
                         <CardContent className="p-6 relative z-30">
-                            <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">Net Profit</p>
+                            <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">{dict.dashboard.netProfit}</p>
                             <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
                                 ${Number(stats.netProfit).toLocaleString()}
                             </h3>
                             <div className="flex items-center gap-2 mt-4">
                                 <span className={`text-xs px-2 py-1 rounded-md border flex items-center gap-1 font-medium ${Number(stats.netProfit) >= 0 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                                    {Number(stats.netProfit) >= 0 ? '↗' : '↘'} {stats.winRate}% Win Rate
+                                    {Number(stats.netProfit) >= 0 ? '↗' : '↘'} {stats.winRate}% {dict.dashboard.winRate}
                                 </span>
-                                <span className="text-xs text-gray-600">vs last period</span>
+                                <span className="text-xs text-gray-600">{dict.dashboard.vsLastPeriod}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -119,7 +122,7 @@ export default async function DashboardPage() {
                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] border border-[#333] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                                     <Activity className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                                 </div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Total Trades</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.dashboard.totalTrades}</p>
                                 <h3 className="text-3xl font-bold text-white tracking-tight">{stats.totalTrades}</h3>
                             </CardContent>
                         </Card>
@@ -133,7 +136,7 @@ export default async function DashboardPage() {
                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ccf381]/20 to-[#ccf381]/5 border border-[#ccf381]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(204,243,129,0.1)]">
                                     <BarChart2 className="w-5 h-5 text-[#ccf381]" />
                                 </div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Win Rate</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.dashboard.winRate}</p>
                                 <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]">{stats.winRate}%</h3>
                             </CardContent>
                         </Card>
@@ -145,20 +148,20 @@ export default async function DashboardPage() {
                         <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none group-hover:border-[#ccf381]/20 transition-colors duration-300" />
 
                         <CardContent className="p-6 relative z-10 flex flex-col justify-center h-full">
-                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-2">Points (This Month)</p>
+                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-2">{dict.dashboard.pointsThisMonth}</p>
                             <h3 className={`text-5xl font-bold tracking-tight mb-4 ${monthlyPoints >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
                                 {monthlyPoints > 0 ? '+' : ''}{monthlyPoints.toLocaleString()} <span className="text-lg text-gray-400 font-normal">pts</span>
                             </h3>
 
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                                 <div>
-                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">Today</p>
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">{dict.dashboard.today}</p>
                                     <p className={`text-lg font-bold ${dailyPoints > 0 ? 'text-[#ccf381]' : dailyPoints < 0 ? 'text-red-400' : 'text-gray-300'}`}>
                                         {dailyPoints > 0 ? '+' : ''}{dailyPoints.toLocaleString()} pts
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">This Week</p>
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">{dict.dashboard.thisWeek}</p>
                                     <p className={`text-lg font-bold ${weeklyPoints > 0 ? 'text-[#ccf381]' : weeklyPoints < 0 ? 'text-red-400' : 'text-gray-300'}`}>
                                         {weeklyPoints > 0 ? '+' : ''}{weeklyPoints.toLocaleString()} pts
                                     </p>
@@ -170,7 +173,7 @@ export default async function DashboardPage() {
 
                 {/* Right: Profit Tree Big Card - Col 8 */}
                 <StaggerItem className="col-span-12 lg:col-span-8 h-full">
-                    <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} />
+                    <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} dict={dict} />
                 </StaggerItem>
             </div>
 
@@ -193,13 +196,13 @@ export default async function DashboardPage() {
             {/* Bottom Grid: Recent Trades & Trade Form */}
             <div className="grid grid-cols-12 gap-6">
                 <StaggerItem className="col-span-12 lg:col-span-8">
-                    <TradeList trades={trades} username={username} />
+                    <TradeList trades={trades} username={username} dict={dict} />
                 </StaggerItem>
 
                 <StaggerItem className="col-span-12 lg:col-span-4">
                     <div className="sticky top-6">
-                        <h2 className="text-xl font-bold text-white mb-4">Quick Trade</h2>
-                        <TradeForm />
+                        <h2 className="text-xl font-bold text-white mb-4">{dict.dashboard.quickTrade}</h2>
+                        <TradeForm dict={dict} />
                     </div>
                 </StaggerItem>
             </div>

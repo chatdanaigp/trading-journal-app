@@ -9,11 +9,13 @@ import { useState, useEffect } from 'react'
 export function ProfitTree({
     netProfit,
     portSize,
-    goalPercent
+    goalPercent,
+    dict
 }: {
     netProfit: number,
     portSize: number,
-    goalPercent: number
+    goalPercent: number,
+    dict?: any
 }) {
     // 1. Calculate Target
     const targetProfit = (portSize * goalPercent) / 100
@@ -129,9 +131,9 @@ export function ProfitTree({
                 {/* Header (Pointer events auto for interactivity) */}
                 <div className="flex justify-between items-start pointer-events-auto">
                     <div>
-                        <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-md">My Forest</h2>
+                        <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-md">{dict?.dashboard?.myForest || "My Forest"}</h2>
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-400 drop-shadow-md">Goal Target:</span>
+                            <span className="text-sm text-gray-400 drop-shadow-md">{dict?.dashboard?.goalTarget || "Goal Target"}:</span>
                             <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">${targetProfit.toLocaleString()}</span>
                         </div>
                     </div>
@@ -155,7 +157,7 @@ export function ProfitTree({
                     <div className="space-y-3">
                         <div className="flex justify-between items-end">
                             <div>
-                                <p className="text-xs text-gray-500 mb-1">Current Profit</p>
+                                <p className="text-xs text-gray-500 mb-1">{dict?.dashboard?.currentProfit || "Current Profit"}</p>
                                 <p className="text-2xl font-bold text-white">${netProfit.toLocaleString()}</p>
                             </div>
                             <div className="text-right">

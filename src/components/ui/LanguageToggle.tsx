@@ -18,6 +18,7 @@ export function LanguageToggle() {
     const toggleLang = (newLang: 'EN' | 'TH') => {
         setLang(newLang)
         localStorage.setItem('tj_language', newLang)
+        document.cookie = `tj_language=${newLang}; path=/; max-age=31536000`
         // Use a slight delay before reload to allow state update to render
         setTimeout(() => {
             window.location.reload()

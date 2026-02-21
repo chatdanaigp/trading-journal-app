@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
 
-export function TradeForm() {
+export function TradeForm({ dict }: { dict?: any }) {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
@@ -112,7 +112,7 @@ export function TradeForm() {
             {/* Row 1: Date + Symbol */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                    <Label htmlFor="tradeDate" className="text-gray-400">Date</Label>
+                    <Label htmlFor="tradeDate" className="text-gray-400">{dict?.tradeForm?.date || "Date"}</Label>
                     <Input
                         id="tradeDate"
                         name="tradeDate"
@@ -124,7 +124,7 @@ export function TradeForm() {
                     />
                 </div>
                 <div className="grid gap-2">
-                    <Label htmlFor="symbol" className="text-gray-400">Symbol</Label>
+                    <Label htmlFor="symbol" className="text-gray-400">{dict?.tradeForm?.symbol || "Symbol"}</Label>
                     <Input
                         id="symbol"
                         name="symbol"
@@ -138,7 +138,7 @@ export function TradeForm() {
 
             {/* Row 2: Type */}
             <div className="grid gap-2">
-                <Label htmlFor="type" className="text-gray-400">Type</Label>
+                <Label htmlFor="type" className="text-gray-400">{dict?.tradeForm?.type || "Type"}</Label>
                 <div className="relative">
                     <select
                         name="type"
@@ -159,7 +159,7 @@ export function TradeForm() {
 
             <div className="grid grid-cols-3 gap-4">
                 <div className="grid gap-2">
-                    <Label htmlFor="lotSize" className="text-gray-400">Lot Size</Label>
+                    <Label htmlFor="lotSize" className="text-gray-400">{dict?.tradeForm?.lotSize || "Lot Size"}</Label>
                     <Input
                         id="lotSize"
                         name="lotSize"
@@ -176,7 +176,7 @@ export function TradeForm() {
                     />
                 </div>
                 <div className="grid gap-2">
-                    <Label htmlFor="entryPrice" className="text-gray-400">Entry</Label>
+                    <Label htmlFor="entryPrice" className="text-gray-400">{dict?.tradeForm?.entryPrice || "Entry"}</Label>
                     <Input
                         id="entryPrice"
                         name="entryPrice"
@@ -193,7 +193,7 @@ export function TradeForm() {
                     />
                 </div>
                 <div className="grid gap-2">
-                    <Label htmlFor="exitPrice" className="text-gray-400">Exit</Label>
+                    <Label htmlFor="exitPrice" className="text-gray-400">{dict?.tradeForm?.exitPrice || "Exit"}</Label>
                     <Input
                         id="exitPrice"
                         name="exitPrice"
@@ -209,7 +209,7 @@ export function TradeForm() {
 
             <div className="grid gap-2">
                 <div className="flex justify-between items-center">
-                    <Label className="text-gray-400">Profit / Loss ($)</Label>
+                    <Label className="text-gray-400">{dict?.tradeForm?.profitLoss || "Profit / Loss ($)"}</Label>
                     {points !== null && (
                         <span className={`text-xs font-mono font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
                             TP/SL: {points > 0 ? '+' : ''}{points.toLocaleString()} pts
@@ -225,8 +225,8 @@ export function TradeForm() {
                             handleCalculation('sign', '+')
                         }}
                         className={`flex-1 text-sm font-bold transition-all ${profitSign === '+'
-                                ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
-                                : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
+                            ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
+                            : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
                             }`}
                     >
                         ✅ Profit
@@ -238,8 +238,8 @@ export function TradeForm() {
                             handleCalculation('sign', '-')
                         }}
                         className={`flex-1 text-sm font-bold transition-all ${profitSign === '-'
-                                ? 'bg-red-500/20 text-red-400'
-                                : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
+                            ? 'bg-red-500/20 text-red-400'
+                            : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
                             }`}
                     >
                         ❌ Loss
@@ -269,12 +269,14 @@ export function TradeForm() {
             </div>
 
             <div className="grid gap-2">
-                <Label htmlFor="notes" className="text-gray-400">Note</Label>
+                <div className="flex justify-between items-center">
+                    <Label htmlFor="notes" className="text-gray-400">{dict?.tradeForm?.notes || "Note"}</Label>
+                </div>
                 <Input id="notes" name="notes" placeholder="Trade rationale..." className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl" />
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#ccf381] hover:bg-[#bbe075] text-black font-bold h-12 rounded-xl text-md transition-all mt-2">
-                {loading ? 'Logging Trade...' : '+ Log Trade'}
+                {loading ? (dict?.tradeForm?.logging || 'Logging Trade...') : `+ ${dict?.tradeForm?.addTrade || 'Log Trade'}`}
             </Button>
         </form>
     )
