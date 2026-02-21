@@ -11,6 +11,8 @@ import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
+import { getTradingDay } from '@/utils/date-helpers'
+import { isSameDay, isSameWeek, isSameMonth } from 'date-fns'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -32,6 +34,24 @@ export default async function DashboardPage() {
 
     const portSize = goals?.port_size || 1000
     const goalPercent = goals?.profit_goal_percent || 10
+
+    // Points aggregation logic
+    const today = getTradingDay(new Date())
+    let monthlyPoints = 0
+    let weeklyPoints = 0
+    let dailyPoints = 0
+
+    trades.forEach(trade => {
+        const lot = trade.lot_size || 0.01 // Fallback to avoid div by zero
+        const profit = trade.profit || 0
+        const points = lot !== 0 ? Math.round(profit / lot) : 0
+        const tradeDay = getTradingDay(trade.created_at)
+
+        if (isSameMonth(tradeDay, today)) monthlyPoints += points
+        // weekStartsOn 1 = Monday
+        if (isSameWeek(tradeDay, today, { weekStartsOn: 1 })) weeklyPoints += points
+        if (isSameDay(tradeDay, today)) dailyPoints += points
+    })
 
     return (
         <StaggerContainer className="space-y-8">
@@ -88,7 +108,7 @@ export default async function DashboardPage() {
                     </Card>
 
                     {/* Total Trades & Win Rate Split */}
-                    <div className="flex-1 grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-6">
                         <Card className="relative overflow-hidden group border-0 shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-br from-[#1e1e1e] to-[#0d0d0d] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none group-hover:border-[#ccf381]/20 transition-colors duration-300" />
@@ -116,6 +136,34 @@ export default async function DashboardPage() {
                             </CardContent>
                         </Card>
                     </div>
+
+                    {/* Total Points Display */}
+                    <Card className="flex-1 relative overflow-hidden group border-0 shadow-xl">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#1e1e1e] to-[#0d0d0d] z-0" />
+                        <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none group-hover:border-[#ccf381]/20 transition-colors duration-300" />
+
+                        <CardContent className="p-6 relative z-10 flex flex-col justify-center h-full">
+                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-2">Points (This Month)</p>
+                            <h3 className={`text-5xl font-bold tracking-tight mb-4 ${monthlyPoints >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
+                                {monthlyPoints > 0 ? '+' : ''}{monthlyPoints.toLocaleString()} <span className="text-lg text-gray-400 font-normal">pts</span>
+                            </h3>
+
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">Today</p>
+                                    <p className={`text-lg font-bold ${dailyPoints > 0 ? 'text-[#ccf381]' : dailyPoints < 0 ? 'text-red-400' : 'text-gray-300'}`}>
+                                        {dailyPoints > 0 ? '+' : ''}{dailyPoints.toLocaleString()} pts
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">This Week</p>
+                                    <p className={`text-lg font-bold ${weeklyPoints > 0 ? 'text-[#ccf381]' : weeklyPoints < 0 ? 'text-red-400' : 'text-gray-300'}`}>
+                                        {weeklyPoints > 0 ? '+' : ''}{weeklyPoints.toLocaleString()} pts
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </StaggerItem>
 
                 {/* Right: Profit Tree Big Card - Col 8 */}
