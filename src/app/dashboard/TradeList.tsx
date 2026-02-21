@@ -31,7 +31,7 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                                 <th className="px-5 py-3">Side / Lot</th>
                                 <th className="px-5 py-3">Price</th>
                                 <th className="px-5 py-3">Result</th>
-                                <th className="px-5 py-3 w-[150px]">Analysis</th>
+                                <th className="px-5 py-3 transition-all duration-300">Analysis</th>
                                 <th className="px-5 py-3 text-center rounded-tr-xl w-12"></th>
                             </tr>
                         </thead>
@@ -87,7 +87,7 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                                                 {points > 0 ? '+' : ''}{points.toLocaleString()} pts
                                             </div>
                                         </td>
-                                        <td className="px-5 py-4 w-[150px] relative">
+                                        <td className="px-5 py-4 relative transition-all duration-300">
                                             <AIAnalysis tradeId={trade.id} initialAnalysis={trade.ai_analysis} />
                                         </td>
                                         <td className="px-5 py-4 text-center">

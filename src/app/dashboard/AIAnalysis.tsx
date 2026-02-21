@@ -30,7 +30,7 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
                 className={cn(
                     "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
                     isExpanded
-                        ? "w-[350px] h-auto max-h-[150px] absolute right-5 top-1/2 -translate-y-1/2 z-50 overflow-y-auto shadow-2xl"
+                        ? "w-[320px] h-[100px] relative z-10 overflow-y-auto shadow-inner"
                         : "w-[150px] h-[60px] relative z-0"
                 )}
             >
