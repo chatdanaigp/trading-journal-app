@@ -7,14 +7,17 @@ import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 
 export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { initialPortSize: number, initialGoalPercent: number, dict?: any }) {
-    const [portSize, setPortSize] = useState(initialPortSize)
-    const [goalPercent, setGoalPercent] = useState(initialGoalPercent)
+    const [portSize, setPortSize] = useState<number | string>(initialPortSize)
+    const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
 
+    const validPortSize = Number(portSize) || 0
+    const validGoalPercent = Number(goalPercent) || 0
+
     const handleSave = async () => {
         setIsLoading(true)
-        await updateProfileGoals(Number(portSize), Number(goalPercent))
+        await updateProfileGoals(validPortSize, validGoalPercent)
         setIsLoading(false)
         setIsOpen(false)
     }
@@ -62,7 +65,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { in
                         id="port-size"
                         type="number"
                         value={portSize}
-                        onChange={(e) => setPortSize(Number(e.target.value))}
+                        onChange={(e) => setPortSize(e.target.value === '' ? '' : Number(e.target.value))}
                         className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>
@@ -74,7 +77,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { in
                         id="goal-percent"
                         type="number"
                         value={goalPercent}
-                        onChange={(e) => setGoalPercent(Number(e.target.value))}
+                        onChange={(e) => setGoalPercent(e.target.value === '' ? '' : Number(e.target.value))}
                         className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>

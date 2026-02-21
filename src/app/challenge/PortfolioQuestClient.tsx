@@ -20,17 +20,19 @@ export function PortfolioQuestClient({
     netProfitToday: number
 }) {
     const [isActive, setIsActive] = useState(isQuestActive)
-    const [portSize, setPortSize] = useState(initialPortSize)
-    const [goalPercent, setGoalPercent] = useState(initialGoalPercent)
+    const [portSize, setPortSize] = useState<number | string>(initialPortSize)
+    const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [isLoading, setIsLoading] = useState(false)
 
+    const validPortSize = Number(portSize) || 0
+    const validGoalPercent = Number(goalPercent) || 0
     const TRADING_DAYS_PER_MONTH = 20
-    const monthlyGoalAmount = portSize * (goalPercent / 100)
+    const monthlyGoalAmount = validPortSize * (validGoalPercent / 100)
     const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
 
     const handleToggleQuest = async (newStatus: boolean) => {
         setIsLoading(true)
-        await updateProfileGoals(Number(portSize), Number(goalPercent), newStatus)
+        await updateProfileGoals(validPortSize, validGoalPercent, newStatus)
         setIsActive(newStatus)
         setIsLoading(false)
     }
@@ -55,7 +57,7 @@ export function PortfolioQuestClient({
                             id="port-size"
                             type="number"
                             value={portSize}
-                            onChange={(e) => setPortSize(Number(e.target.value))}
+                            onChange={(e) => setPortSize(e.target.value === '' ? '' : Number(e.target.value))}
                             className="bg-[#0d0d0d] border-white/10 h-12 text-lg text-white focus:border-[#ccf381]/50 rounded-xl"
                         />
                     </div>
@@ -67,7 +69,7 @@ export function PortfolioQuestClient({
                             id="goal-percent"
                             type="number"
                             value={goalPercent}
-                            onChange={(e) => setGoalPercent(Number(e.target.value))}
+                            onChange={(e) => setGoalPercent(e.target.value === '' ? '' : Number(e.target.value))}
                             className="bg-[#0d0d0d] border-white/10 h-12 text-lg text-white focus:border-[#ccf381]/50 rounded-xl"
                         />
                     </div>

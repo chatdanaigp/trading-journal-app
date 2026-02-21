@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
+import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 
 export function TradeForm({ dict }: { dict?: any }) {
     const [loading, setLoading] = useState(false)
@@ -160,19 +161,13 @@ export function TradeForm({ dict }: { dict?: any }) {
             <div className="grid grid-cols-3 gap-4">
                 <div className="grid gap-2">
                     <Label htmlFor="lotSize" className="text-gray-400">{dict?.tradeForm?.lotSize || "Lot Size"}</Label>
-                    <Input
-                        id="lotSize"
-                        name="lotSize"
-                        type="number"
-                        step="0.01"
-                        placeholder="0.01"
-                        required
-                        className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl"
+                    <LotSizeCombobox
                         value={lot}
-                        onChange={(e) => {
-                            setLot(e.target.value)
-                            handleCalculation('lot', e.target.value)
+                        onChange={(val) => {
+                            setLot(val)
+                            handleCalculation('lot', val)
                         }}
+                        dict={dict}
                     />
                 </div>
                 <div className="grid gap-2">
