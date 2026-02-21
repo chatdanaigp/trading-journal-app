@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { analyzeTrade } from './actions'
 import { Button } from '@/components/ui/button'
 import { Loader2, Sparkles } from 'lucide-react'
+import { cn } from '@/utils/cn'
 
 export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, initialAnalysis: string | null }) {
     const [isLoading, setIsLoading] = useState(false)
     const [analysis, setAnalysis] = useState(initialAnalysis)
+    const [isExpanded, setIsExpanded] = useState(false)
 
     const handleAnalyze = async () => {
         setIsLoading(true)
@@ -16,11 +18,6 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
 
         const result = await analyzeTrade(tradeId)
         if (result.success) {
-            // Trigger a page refresh or just optimistic update? 
-            // Since we revalidatePath in action, ensuring we get fresh data might need a router refresh.
-            // But for now, we can rely on the revalidatePath effectively reloading the server component data if we refresh.
-            // Actually, client component won't auto-update from server action reval without router.refresh().
-            // Let's just create a quick optimistic update or reload.
             window.location.reload()
         }
         setIsLoading(false)
@@ -28,8 +25,14 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
 
     if (analysis) {
         return (
-            <div className="p-2.5 bg-gradient-to-br from-[#252525]/80 to-[#1a1a1a]/80 backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md relative group max-w-xs cursor-default hover:bg-[#2a2a2a] transition-colors">
-                <div className="relative z-10 leading-snug line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+            <div
+                onClick={() => setIsExpanded(!isExpanded)}
+                className={cn(
+                    "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md relative group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 overflow-y-auto custom-scrollbar",
+                    isExpanded ? "w-[350px] h-[80px]" : "w-[150px] h-[60px]"
+                )}
+            >
+                <div className={cn("relative z-10 leading-snug", !isExpanded && "line-clamp-3")}>
                     {analysis}
                 </div>
             </div>
