@@ -28,24 +28,26 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
 
     if (analysis) {
         return (
-            <div
-                onClick={handleToggle}
-                className={cn(
-                    "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
-                    isExpanded
-                        ? "w-[240px] h-auto max-h-[150px] absolute right-5 top-1/2 -translate-y-1/2 z-50 overflow-y-auto shadow-2xl"
-                        : "w-[150px] h-[60px] relative z-0"
-                )}
-            >
-                <div className="w-full h-full relative z-10 flex flex-col justify-center">
-                    <div className={cn("leading-snug", !isExpanded && "line-clamp-2 pr-4")}>
-                        {analysis}
-                    </div>
-                    {!isExpanded && (
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[#ccf381]/40 group-hover:text-[#ccf381] group-hover:-translate-x-1 transition-all duration-300">
-                            <ChevronLeft size={14} />
-                        </div>
+            <div className="relative w-[150px] h-[60px] flex items-center">
+                <div
+                    onClick={handleToggle}
+                    className={cn(
+                        "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
+                        isExpanded
+                            ? "w-[240px] h-auto max-h-[150px] absolute right-0 top-1/2 -translate-y-1/2 z-50 overflow-y-auto shadow-2xl"
+                            : "w-[150px] h-[60px] absolute left-0 top-0 z-0"
                     )}
+                >
+                    <div className="w-full h-full relative z-10 flex flex-col justify-center">
+                        <div className={cn("leading-snug", !isExpanded && "line-clamp-2 pr-4")}>
+                            {analysis}
+                        </div>
+                        {!isExpanded && (
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[#ccf381]/40 group-hover:text-[#ccf381] group-hover:-translate-x-1 transition-all duration-300">
+                                <ChevronLeft size={14} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         )
