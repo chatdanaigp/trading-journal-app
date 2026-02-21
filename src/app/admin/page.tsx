@@ -163,8 +163,8 @@ export default async function AdminPage() {
                         <Card className="relative overflow-hidden border-0 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1d1d1d] via-[#0d0d0d] to-[#000000] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none z-20" />
-                            <CardContent className="relative z-10 p-0">
-                                <table className="w-full text-sm">
+                            <CardContent className="relative z-10 p-0 overflow-x-auto">
+                                <table className="w-full text-sm min-w-[600px]">
                                     <thead>
                                         <tr className="border-b border-white/5 text-gray-500 text-[10px] uppercase tracking-wider">
                                             <th className="text-left p-4 font-medium">{dict.admin.trader}</th>

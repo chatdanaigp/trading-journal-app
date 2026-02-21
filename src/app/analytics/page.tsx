@@ -20,7 +20,7 @@ export default async function AnalyticsPage() {
         <StaggerContainer className="space-y-8">
             {/* Header */}
             <StaggerItem>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.title}</h1>
                         <p className="text-gray-500">{dict.analytics.subtitle}</p>

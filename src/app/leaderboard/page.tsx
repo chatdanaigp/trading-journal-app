@@ -47,7 +47,7 @@ export default async function LeaderboardPage() {
 
                 {/* Header */}
                 <StaggerItem className="text-center space-y-4">
-                    <h1 className="text-5xl font-black italic tracking-tighter uppercase whitespace-nowrap bg-gradient-to-r from-white via-[#ccf381] to-white bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(204,243,129,0.3)]">
+                    <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase sm:whitespace-nowrap bg-gradient-to-r from-white via-[#ccf381] to-white bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(204,243,129,0.3)]">
                         🏆 {dict.leaderboard.title}
                     </h1>
                     <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -168,7 +168,7 @@ export default async function LeaderboardPage() {
                 {/* Full Leaderboard Table */}
                 <StaggerItem className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-2xl border border-[#333] overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="w-full text-left min-w-[800px]">
                             <thead className="bg-[#0d0d0d] text-gray-400 text-xs uppercase tracking-wider">
                                 <tr>
                                     <th className="p-4 font-bold text-[#ccf381]">{dict.leaderboard.rank}</th>
