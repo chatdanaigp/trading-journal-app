@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Loader2, Sparkles } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
-export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, initialAnalysis: string | null }) {
+export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpanded, onToggle }: { tradeId: string, initialAnalysis: string | null, isExpanded?: boolean, onToggle?: () => void }) {
     const [isLoading, setIsLoading] = useState(false)
     const [analysis, setAnalysis] = useState(initialAnalysis)
-    const [isExpanded, setIsExpanded] = useState(false)
+    const [internalExpanded, setInternalExpanded] = useState(false)
+
+    const isExpanded = externalExpanded !== undefined ? externalExpanded : internalExpanded
+    const handleToggle = () => onToggle ? onToggle() : setInternalExpanded(!internalExpanded)
 
     const handleAnalyze = async () => {
         setIsLoading(true)
@@ -26,11 +29,11 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
     if (analysis) {
         return (
             <div
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={handleToggle}
                 className={cn(
                     "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
                     isExpanded
-                        ? "w-[320px] h-[100px] relative z-10 overflow-y-auto shadow-inner"
+                        ? "w-[220px] h-auto max-h-[150px] relative z-10 overflow-y-auto shadow-inner"
                         : "w-[150px] h-[60px] relative z-0"
                 )}
             >
