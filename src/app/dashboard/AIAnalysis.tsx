@@ -34,8 +34,8 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
                     className={cn(
                         "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar absolute right-0 top-1/2 -translate-y-1/2",
                         isExpanded
-                            ? "w-[240px] h-[130px] z-50 overflow-y-auto shadow-2xl"
-                            : "w-[150px] h-[60px] z-10 shadow-md"
+                            ? "w-[260px] min-h-[60px] max-h-[200px] z-50 overflow-y-auto shadow-2xl"
+                            : "w-[150px] min-h-[60px] max-h-[60px] overflow-hidden z-10 shadow-md"
                     )}
                 >
                     <div className="w-full h-full relative z-10 flex flex-col justify-center">
