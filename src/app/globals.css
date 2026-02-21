@@ -24,7 +24,7 @@ body.lang-en {
 }
 
 body.lang-th {
-  --font-primary: var(--font-prompt);
+  --font-primary: var(--font-sarabun);
 }
 
 body {

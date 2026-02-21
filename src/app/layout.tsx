@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Prompt } from "next/font/google";
+import { Geist, Geist_Mono, Sarabun } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 
@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const prompt = Prompt({
-  variable: "--font-prompt",
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+const sarabun = Sarabun({
+  variable: "--font-sarabun",
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
   subsets: ["latin", "thai"],
 });
 
@@ -36,7 +36,7 @@ export default async function RootLayout({
   return (
     <html lang={lang}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased lang-${lang}`}
+        className={`${geistSans.variable} ${geistMono.variable} ${sarabun.variable} antialiased lang-${lang}`}
       >
         {children}
       </body>
