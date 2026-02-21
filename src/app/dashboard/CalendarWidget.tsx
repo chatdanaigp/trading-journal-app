@@ -28,7 +28,7 @@ type Trade = {
     profit: number | null
 }
 
-export function CalendarWidget({ trades }: { trades: Trade[] }) {
+export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }) {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedDay, setSelectedDay] = useState<Date | null>(null)
 
@@ -69,7 +69,7 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
 
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-                <CardTitle className="text-white">Trading Calendar</CardTitle>
+                <CardTitle className="text-white">{dict?.dashboard?.tradingCalendar || 'Trading Calendar'}</CardTitle>
                 <div className="flex items-center space-x-2 bg-[#252525] rounded-lg p-1">
                     <button onClick={prevMonth} className="p-1 hover:bg-[#333] rounded text-gray-400 hover:text-white transition-colors">←</button>
                     <span className="text-sm font-bold text-gray-200 w-24 text-center">
@@ -143,11 +143,11 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
                 <div className="flex justify-end items-center mt-4 gap-3 text-[10px] text-gray-500 relative z-10">
                     <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full bg-[#ccf381] shadow-[0_0_5px_#ccf381]"></div>
-                        <span>Profit</span>
+                        <span>{dict?.tradeForm?.profitBtn || 'Profit'}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_5px_red]"></div>
-                        <span>Loss</span>
+                        <span>{dict?.tradeForm?.lossBtn || 'Loss'}</span>
                     </div>
                 </div>
 
@@ -174,7 +174,7 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
                                         <h2 className="text-2xl font-black text-white flex items-center gap-3">
                                             <span>📅</span> {format(selectedDay, 'dd MMMM yyyy')}
                                         </h2>
-                                        <p className="text-gray-500 text-sm mt-1">Trading session: {format(selectedDay, 'dd MMM')} 06:00 - {format(addMonths(selectedDay, 0), 'dd') === format(selectedDay, 'dd') ? format(selectedDay, 'dd') : format(addMonths(selectedDay, 0), 'dd')} 05:59</p>
+                                        <p className="text-gray-500 text-sm mt-1">{dict?.dashboard?.tradingSession || 'Trading session:'} {format(selectedDay, 'dd MMM')} 06:00 - {format(addMonths(selectedDay, 0), 'dd') === format(selectedDay, 'dd') ? format(selectedDay, 'dd') : format(addMonths(selectedDay, 0), 'dd')} 05:59</p>
                                     </div>
                                     <button
                                         onClick={() => setSelectedDay(null)}
@@ -189,17 +189,17 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
                                     {/* Stats Grid */}
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">Net P&L</p>
+                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPnl || 'Net P&L'}</p>
                                             <p className={cn("text-2xl font-black", selectedDayStats.dailyProfit >= 0 ? "text-[#ccf381]" : "text-red-400")}>
                                                 {selectedDayStats.dailyProfit >= 0 ? '+' : ''}${selectedDayStats.dailyProfit.toLocaleString()}
                                             </p>
                                         </div>
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">Total Trades</p>
+                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.totalTrades || 'Total Trades'}</p>
                                             <p className="text-2xl font-black text-white">{selectedDayStats.tradeCount}</p>
                                         </div>
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">Win Rate</p>
+                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.winRate || 'Win Rate'}</p>
                                             <p className="text-2xl font-black text-blue-400">
                                                 {Math.round((selectedDayStats.winCount / selectedDayStats.tradeCount) * 100)}%
                                             </p>
@@ -208,7 +208,7 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
 
                                     {/* Trade List */}
                                     <div>
-                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-[#222] pb-2">Trade History</h3>
+                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-[#222] pb-2">{dict?.dashboard?.tradeHistory || 'Trade History'}</h3>
                                         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                             {selectedDayStats.dailyTrades.map((trade: any) => (
                                                 <div key={trade.id} className="flex justify-between items-center p-3 bg-[#1a1a1a] hover:bg-[#222] transition-colors rounded-xl border border-[#222]">
@@ -225,7 +225,7 @@ export function CalendarWidget({ trades }: { trades: Trade[] }) {
                                                         <p className={cn("font-bold text-sm", (trade.profit || 0) >= 0 ? "text-[#ccf381]" : "text-red-400")}>
                                                             {(trade.profit || 0) >= 0 ? '+' : ''}${(trade.profit || 0).toLocaleString()}
                                                         </p>
-                                                        <p className="text-xs text-gray-500">{trade.lot_size} Lots</p>
+                                                        <p className="text-xs text-gray-500">{trade.lot_size} {dict?.dashboard?.lots || 'Lots'}</p>
                                                     </div>
                                                 </div>
                                             ))}

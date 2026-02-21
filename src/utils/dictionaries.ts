@@ -27,6 +27,50 @@ export const dictionaries = {
             price: "Price",
             result: "Result",
             analysis: "Analysis",
+            stages: {
+                seed: "Seed Phase",
+                germination: "Germination",
+                sprouting: "Sprouting",
+                growth: "Growth",
+                prosperity: "Prosperity",
+                abundance: "Abundance"
+            },
+            goalSettingsTitle: "Goal Settings",
+            saveGoals: "Save Goals",
+            // Advanced Stats
+            totalVolume: "Total Volume",
+            lots: "Lots",
+            across: "Across",
+            tradesPlural: "trades",
+            avgTradeResult: "Avg Trade Result",
+            avgWin: "Avg Win",
+            avgLoss: "Avg Loss",
+            sideAnalysis: "Side Analysis",
+            profitFactorCard: "Profit Factor",
+            pfTarget: "Target: > 1.5",
+            // Equity Chart
+            equityCurve: "Equity Curve",
+            profitOverTime: "Profit over time",
+            tradeHash: "Trade #",
+            start: "Start",
+            equity: "Equity",
+            // Calendar & Modal
+            tradingCalendar: "Trading Calendar",
+            netPnl: "Net P&L",
+            tradeHistory: "Trade History",
+            tradingSession: "Trading session:",
+            // Share Card
+            cardHolder: "CARD HOLDER",
+            trader: "TRADER",
+            entryPrice: "ENTRY",
+            exitPrice: "EXIT",
+            lotSize: "LOT",
+            shareTitle: "Share Trade Card",
+            shareSubtitle: "Preview → Download PNG → Post anywhere",
+            exporting: "Exporting...",
+            downloadPng: "Download PNG",
+            close: "Close",
+            shareHint: "💡 Download and post to Twitter/X, Facebook, or Discord"
         },
         tradeForm: {
             symbol: "Symbol / Asset",
@@ -39,6 +83,11 @@ export const dictionaries = {
             notes: "Notes (Optional)",
             addTrade: "Add Trade",
             logging: "Logging...",
+            profitBtn: "Profit",
+            lossBtn: "Loss",
+            tpSl: "TP/SL",
+            pts: "pts",
+            rationale: "Trade rationale..."
         },
         sidebar: {
             dashboardLabel: "DASHBOARD",
@@ -96,7 +145,20 @@ export const dictionaries = {
             bestTrade: "Best Trade",
             streak: "Streak",
             you: "(You)",
-            noRanked: "No ranked traders yet. Be the first to log trades!"
+            noRanked: "No ranked traders yet. Be the first to log trades!",
+            badges: {
+                master: "Master",
+                diamond: "Diamond",
+                platinum: "Platinum",
+                gold: "Gold",
+                silver: "Silver",
+                bronze: "Bronze"
+            },
+            anonymous: "Anonymous",
+            traderDefault: "Trader",
+            championDefault: "Champion",
+            winRateShort: "WR",
+            tradesLabel: "Trades"
         },
         journal: {
             title: "Journal",
@@ -239,6 +301,50 @@ export const dictionaries = {
             price: "ราคาเข้า-ออก",
             result: "รายรับ",
             analysis: "วิเคราะห์",
+            stages: {
+                seed: "เมล็ดพันธุ์",
+                germination: "เริ่มงอก",
+                sprouting: "แตกยอดอ่อน",
+                growth: "กำลังเติบโต",
+                prosperity: "ผลิดอกออกผล",
+                abundance: "อุดมสมบูรณ์"
+            },
+            goalSettingsTitle: "ตั้งเป้าหมาย",
+            saveGoals: "บันทึกเป้าหมาย",
+            // Advanced Stats
+            totalVolume: "ปริมาณรวม",
+            lots: "Lots",
+            across: "จากทั้งหมด",
+            tradesPlural: "ออเดอร์",
+            avgTradeResult: "ผลลัพธ์เฉลี่ยต่อเทรด",
+            avgWin: "กำไรเฉลี่ย",
+            avgLoss: "ขาดทุนเฉลี่ย",
+            sideAnalysis: "วิเคราะห์ฝั่งเทรด",
+            profitFactorCard: "สัดส่วนกำไร (Profit Factor)",
+            pfTarget: "เป้าหมาย: > 1.5",
+            // Equity Chart
+            equityCurve: "กราฟการเติบโต",
+            profitOverTime: "กำไรตามระยะเวลา",
+            tradeHash: "ออเดอร์ #",
+            start: "เริ่มต้น",
+            equity: "เงินทุน",
+            // Calendar & Modal
+            tradingCalendar: "ปฏิทินการเทรด",
+            netPnl: "กำไรสุทธิ",
+            tradeHistory: "ประวัติการเทรด",
+            tradingSession: "รอบการเทรด:",
+            // Share Card
+            cardHolder: "เจ้าของพอร์ต",
+            trader: "TRADER",
+            entryPrice: "ราคาเข้า",
+            exitPrice: "ราคาออก",
+            lotSize: "จำนวน LOT",
+            shareTitle: "แชร์บัตรเทรด",
+            shareSubtitle: "ดูตัวอย่าง → โหลดรูป → โพสต์อวดได้เลย",
+            exporting: "กำลังโหลด...",
+            downloadPng: "ดาวน์โหลดรูป",
+            close: "ปิด",
+            shareHint: "💡 ดาวน์โหลดแล้วโพสต์บน Twitter/X, Facebook, หรือ Discord ได้เลย"
         },
         tradeForm: {
             symbol: "ชื่อสินทรัพย์",
@@ -251,6 +357,11 @@ export const dictionaries = {
             notes: "บันทึกเพิ่มเติม",
             addTrade: "บันทึกเทรด",
             logging: "กำลังบันทึก...",
+            profitBtn: "กำไร",
+            lossBtn: "ขาดทุน",
+            tpSl: "เป้า TP/SL",
+            pts: "จุด",
+            rationale: "เหตุผลที่เข้าเทรด..."
         },
         sidebar: {
             dashboardLabel: "แดชบอร์ด",
@@ -308,7 +419,20 @@ export const dictionaries = {
             bestTrade: "เทรดดีที่สุด",
             streak: "ชนะติดกัน",
             you: "(คุณ)",
-            noRanked: "ยังไม่มีเทรดเดอร์จัดอันดับ เป็นคนแรกที่เริ่มบันทึกเทรดสิ!"
+            noRanked: "ยังไม่มีเทรดเดอร์จัดอันดับ เป็นคนแรกที่เริ่มบันทึกเทรดสิ!",
+            badges: {
+                master: "มาสเตอร์",
+                diamond: "ไดมอนด์",
+                platinum: "แพลตตินัม",
+                gold: "โกลด์",
+                silver: "ซิลเวอร์",
+                bronze: "บรอนซ์"
+            },
+            anonymous: "ไม่ระบุชื่อ",
+            traderDefault: "เทรดเดอร์",
+            championDefault: "แชมป์เปี้ยน",
+            winRateShort: "WR",
+            tradesLabel: "ออเดอร์"
         },
         journal: {
             title: "สมุดบันทึก",

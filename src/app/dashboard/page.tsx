@@ -180,15 +180,15 @@ export default async function DashboardPage() {
             {/* Middle Grid: Charts & Calendar */}
             <div className="grid grid-cols-12 gap-6">
                 <StaggerItem className="col-span-12">
-                    <AdvancedStats stats={stats as any} />
+                    <AdvancedStats stats={stats as any} dict={dict} />
                 </StaggerItem>
                 <StaggerItem className="col-span-12 lg:col-span-8">
                     {/* Equity Chart */}
-                    <EquityChart trades={trades} />
+                    <EquityChart trades={trades} dict={dict} />
                 </StaggerItem>
                 <StaggerItem className="col-span-12 lg:col-span-4">
                     <div className="h-full">
-                        <CalendarWidget trades={trades} />
+                        <CalendarWidget trades={trades} dict={dict} />
                     </div>
                 </StaggerItem>
             </div>

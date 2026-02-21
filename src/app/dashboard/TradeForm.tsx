@@ -212,7 +212,7 @@ export function TradeForm({ dict }: { dict?: any }) {
                     <Label className="text-gray-400">{dict?.tradeForm?.profitLoss || "Profit / Loss ($)"}</Label>
                     {points !== null && (
                         <span className={`text-xs font-mono font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
-                            TP/SL: {points > 0 ? '+' : ''}{points.toLocaleString()} pts
+                            {dict?.tradeForm?.tpSl || 'TP/SL'}: {points > 0 ? '+' : ''}{points.toLocaleString()} {dict?.tradeForm?.pts || 'pts'}
                         </span>
                     )}
                 </div>
@@ -229,7 +229,7 @@ export function TradeForm({ dict }: { dict?: any }) {
                             : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
                             }`}
                     >
-                        ✅ Profit
+                        ✅ {dict?.tradeForm?.profitBtn || 'Profit'}
                     </button>
                     <button
                         type="button"
@@ -242,7 +242,7 @@ export function TradeForm({ dict }: { dict?: any }) {
                             : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
                             }`}
                     >
-                        ❌ Loss
+                        ❌ {dict?.tradeForm?.lossBtn || 'Loss'}
                     </button>
                 </div>
                 {/* Amount Input (always positive) */}
@@ -272,7 +272,7 @@ export function TradeForm({ dict }: { dict?: any }) {
                 <div className="flex justify-between items-center">
                     <Label htmlFor="notes" className="text-gray-400">{dict?.tradeForm?.notes || "Note"}</Label>
                 </div>
-                <Input id="notes" name="notes" placeholder="Trade rationale..." className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl" />
+                <Input id="notes" name="notes" placeholder={dict?.tradeForm?.rationale || "Trade rationale..."} className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl" />
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#ccf381] hover:bg-[#bbe075] text-black font-bold h-12 rounded-xl text-md transition-all mt-2">

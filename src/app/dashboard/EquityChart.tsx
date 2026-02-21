@@ -9,7 +9,7 @@ type Trade = {
     profit: number | null
 }
 
-export function EquityChart({ trades }: { trades: Trade[] }) {
+export function EquityChart({ trades, dict }: { trades: Trade[], dict?: any }) {
     // Sort trades by date (oldest first)
     const sortedTrades = [...trades].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
@@ -25,10 +25,10 @@ export function EquityChart({ trades }: { trades: Trade[] }) {
 
     // Add initial point (0,0) if no trades, or prepending start
     if (data.length > 0) {
-        data.unshift({ name: 0, date: 'Start', profit: 0 })
+        data.unshift({ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 })
     } else {
         // Placeholder data for empty state
-        data.push({ name: 0, date: 'Start', profit: 0 })
+        data.push({ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 })
     }
 
     return (
@@ -41,8 +41,8 @@ export function EquityChart({ trades }: { trades: Trade[] }) {
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/5 rounded-full blur-[80px] -ml-20 -mb-20 pointer-events-none opacity-30"></div>
             <CardHeader className="relative z-10">
                 <CardTitle className="text-white flex items-center gap-2">
-                    Equity Curve
-                    <span className="text-xs font-normal text-gray-500 bg-[#252525] px-2 py-0.5 rounded-full border border-white/5">Profit over time</span>
+                    {dict?.dashboard?.equityCurve || 'Equity Curve'}
+                    <span className="text-xs font-normal text-gray-500 bg-[#252525] px-2 py-0.5 rounded-full border border-white/5">{dict?.dashboard?.profitOverTime || 'Profit over time'}</span>
                 </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
@@ -78,8 +78,8 @@ export function EquityChart({ trades }: { trades: Trade[] }) {
                                 contentStyle={{ backgroundColor: '#000', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
                                 itemStyle={{ color: '#ccf381', fontWeight: 'bold' }}
                                 labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
-                                formatter={(value: any) => [`$${Number(value).toFixed(2)}`, 'Equity']}
-                                labelFormatter={(label) => `Trade #${label}`}
+                                formatter={(value: any) => [`$${Number(value).toFixed(2)}`, dict?.dashboard?.equity || 'Equity']}
+                                labelFormatter={(label) => `${dict?.dashboard?.tradeHash || 'Trade #'}${label}`}
                                 cursor={{ stroke: '#ccf381', strokeWidth: 1, strokeDasharray: '5 5' }}
                             />
                             <Area

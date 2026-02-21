@@ -28,29 +28,29 @@ export function ProfitTree({
 
     // 3. Determine Tree Stage
     let treeImage = "/images/tree/level_1.jpg"
-    let stageName = "Seed Phase"
+    let stageName = dict?.dashboard?.stages?.seed || "Seed Phase"
     let headerColor = "text-[#ccf381]"
     let scale = 1
 
     if (rawProgress > 100) {
         treeImage = "/images/tree/level_5.jpg" // Overachiever
-        stageName = "Abundance"
+        stageName = dict?.dashboard?.stages?.abundance || "Abundance"
         scale = 1.1
     } else if (rawProgress >= 75) {
         treeImage = "/images/tree/level_4.jpg" // Goal Met
-        stageName = "Prosperity"
+        stageName = dict?.dashboard?.stages?.prosperity || "Prosperity"
         scale = 1.05
     } else if (rawProgress >= 50) {
         treeImage = "/images/tree/level_3.jpg" // Halfway
-        stageName = "Growth"
+        stageName = dict?.dashboard?.stages?.growth || "Growth"
         scale = 1.0
     } else if (rawProgress >= 25) {
         treeImage = "/images/tree/level_2.jpg" // Quarter
-        stageName = "Sprouting"
+        stageName = dict?.dashboard?.stages?.sprouting || "Sprouting"
         scale = 1.0
     } else {
         treeImage = "/images/tree/level_1.jpg" // Start
-        stageName = "Germination"
+        stageName = dict?.dashboard?.stages?.germination || "Germination"
         scale = 1.0
     }
 
@@ -137,7 +137,7 @@ export function ProfitTree({
                             <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">${targetProfit.toLocaleString()}</span>
                         </div>
                     </div>
-                    <GoalSettings initialPortSize={portSize} initialGoalPercent={goalPercent} />
+                    <GoalSettings initialPortSize={portSize} initialGoalPercent={goalPercent} dict={dict} />
                 </div>
 
                 {/* Middle Spacer */}

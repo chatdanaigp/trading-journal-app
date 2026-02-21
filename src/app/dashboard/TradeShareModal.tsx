@@ -10,9 +10,10 @@ interface TradeShareModalProps {
     trade: any
     username?: string
     onClose: () => void
+    dict?: any
 }
 
-export function TradeShareModal({ trade, username, onClose }: TradeShareModalProps) {
+export function TradeShareModal({ trade, username, onClose, dict }: TradeShareModalProps) {
     const cardRef = useRef<HTMLDivElement>(null)
     const [downloading, setDownloading] = useState(false)
 
@@ -58,8 +59,8 @@ export function TradeShareModal({ trade, username, onClose }: TradeShareModalPro
                 {/* Header */}
                 <div className="flex items-center justify-between w-full">
                     <div>
-                        <h2 className="text-white font-bold text-xl">Share Trade Card</h2>
-                        <p className="text-gray-500 text-sm mt-0.5">Preview → Download PNG → Post anywhere</p>
+                        <h2 className="text-white font-bold text-xl">{dict?.dashboard?.shareTitle || 'Share Trade Card'}</h2>
+                        <p className="text-gray-500 text-sm mt-0.5">{dict?.dashboard?.shareSubtitle || 'Preview → Download PNG → Post anywhere'}</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -76,7 +77,7 @@ export function TradeShareModal({ trade, username, onClose }: TradeShareModalPro
                 >
                     {/* This ref is what gets captured */}
                     <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0 }}>
-                        <TradeShareCard trade={trade} username={username} points={points} />
+                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} />
                     </div>
                 </div>
 
@@ -88,20 +89,20 @@ export function TradeShareModal({ trade, username, onClose }: TradeShareModalPro
                         className="flex items-center gap-2 px-6 py-3 bg-[#ccf381] hover:bg-[#bbe075] text-black font-bold rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed text-sm"
                     >
                         {downloading
-                            ? <><Loader2 size={16} className="animate-spin" /> Exporting…</>
-                            : <><Download size={16} /> Download PNG</>
+                            ? <><Loader2 size={16} className="animate-spin" /> {dict?.dashboard?.exporting || 'Exporting…'}</>
+                            : <><Download size={16} /> {dict?.dashboard?.downloadPng || 'Download PNG'}</>
                         }
                     </button>
                     <button
                         onClick={onClose}
                         className="px-5 py-3 bg-[#1a1a1a] border border-[#333] text-gray-400 hover:text-white rounded-xl transition-all text-sm font-medium"
                     >
-                        Close
+                        {dict?.dashboard?.close || 'Close'}
                     </button>
                 </div>
 
                 <p className="text-gray-600 text-xs">
-                    💡 ดาวน์โหลดแล้วโพสต์บน Twitter/X, Facebook, หรือ Discord ได้เลย
+                    {dict?.dashboard?.shareHint || '💡 ดาวน์โหลดแล้วโพสต์บน Twitter/X, Facebook, หรือ Discord ได้เลย'}
                 </p>
             </motion.div>
         </motion.div>

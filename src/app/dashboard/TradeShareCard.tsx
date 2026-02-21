@@ -12,9 +12,10 @@ interface TradeShareCardProps {
     }
     username?: string
     points?: number
+    dict?: any
 }
 
-export function TradeShareCard({ trade, username, points }: TradeShareCardProps) {
+export function TradeShareCard({ trade, username, points, dict }: TradeShareCardProps) {
     const profit = Number(trade.profit) || 0
     const isProfit = profit >= 0
 
@@ -159,31 +160,31 @@ export function TradeShareCard({ trade, username, points }: TradeShareCardProps)
             }}>
                 {/* Name */}
                 <div style={{ transform: 'translateY(2px)' }}>
-                    <div style={{ fontSize: '7px', color: '#6b7280', letterSpacing: '0.15em', marginBottom: '8px', fontWeight: '700' }}>CARD HOLDER</div>
+                    <div style={{ fontSize: '7px', color: '#6b7280', letterSpacing: '0.15em', marginBottom: '8px', fontWeight: '700' }}>{dict?.dashboard?.cardHolder || 'CARD HOLDER'}</div>
                     <div style={{
                         fontSize: '15px', color: '#e5e7eb', textTransform: 'uppercase',
                         letterSpacing: '0.15em', fontWeight: '600',
                         textShadow: '1px 1px 1px rgba(0,0,0,0.8)',
                         lineHeight: 1
                     }}>
-                        {username || 'TRADER'}
+                        {username || dict?.dashboard?.trader || 'TRADER'}
                     </div>
                 </div>
 
                 {/* Trade Stats */}
                 <div style={{ display: 'flex', gap: '24px' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>ENTRY</div>
+                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>{dict?.dashboard?.entryPrice || 'ENTRY'}</div>
                         <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{trade.entry_price?.toLocaleString()}</div>
                     </div>
                     {exitPrice && (
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>EXIT</div>
+                            <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>{dict?.dashboard?.exitPrice || 'EXIT'}</div>
                             <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{exitPrice.toFixed(2)}</div>
                         </div>
                     )}
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>LOT</div>
+                        <div style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.1em' }}>{dict?.dashboard?.lotSize || 'LOT'}</div>
                         <div style={{ fontSize: '12px', color: '#d1d5db', fontFamily: fontMono, fontWeight: 'bold', lineHeight: 1 }}>{trade.lot_size}</div>
                     </div>
                 </div>

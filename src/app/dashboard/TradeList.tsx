@@ -153,6 +153,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                     trade={sharingTrade}
                     username={username}
                     onClose={() => setSharingTrade(null)}
+                    dict={dict}
                 />
             )}
         </>

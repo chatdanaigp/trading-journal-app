@@ -7,19 +7,19 @@ import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 
 // Rank Badge System
-function getRankBadge(totalTrades: number, netProfit: number, winRate: number) {
+function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
     if (totalTrades >= 200 && netProfit >= 10000 && winRate >= 75) {
-        return { badge: '🌟', name: 'Master', color: 'from-yellow-400 to-yellow-600' }
+        return { badge: '🌟', name: dict?.leaderboard?.badges?.master || 'Master', color: 'from-yellow-400 to-yellow-600' }
     } else if (totalTrades >= 100 && netProfit >= 5000 && winRate >= 70) {
-        return { badge: '👑', name: 'Diamond', color: 'from-cyan-400 to-blue-600' }
+        return { badge: '👑', name: dict?.leaderboard?.badges?.diamond || 'Diamond', color: 'from-cyan-400 to-blue-600' }
     } else if (totalTrades >= 50 && netProfit >= 2000 && winRate >= 60) {
-        return { badge: '💎', name: 'Platinum', color: 'from-purple-400 to-purple-600' }
+        return { badge: '💎', name: dict?.leaderboard?.badges?.platinum || 'Platinum', color: 'from-purple-400 to-purple-600' }
     } else if (totalTrades >= 20 && netProfit >= 500 && winRate >= 50) {
-        return { badge: '⚡', name: 'Gold', color: 'from-yellow-500 to-yellow-700' }
+        return { badge: '⚡', name: dict?.leaderboard?.badges?.gold || 'Gold', color: 'from-yellow-500 to-yellow-700' }
     } else if (totalTrades >= 10 && netProfit >= 100) {
-        return { badge: '🔵', name: 'Silver', color: 'from-gray-300 to-gray-500' }
+        return { badge: '🔵', name: dict?.leaderboard?.badges?.silver || 'Silver', color: 'from-gray-300 to-gray-500' }
     } else {
-        return { badge: '🔴', name: 'Bronze', color: 'from-orange-600 to-orange-800' }
+        return { badge: '🔴', name: dict?.leaderboard?.badges?.bronze || 'Bronze', color: 'from-orange-600 to-orange-800' }
     }
 }
 
@@ -69,17 +69,17 @@ export default async function LeaderboardPage() {
                                 {leaderboard[1].avatar_url && (
                                     <img
                                         src={leaderboard[1].avatar_url}
-                                        alt={leaderboard[1].username || leaderboard[1].full_name || 'Trader'}
+                                        alt={leaderboard[1].username || leaderboard[1].full_name || dict?.leaderboard?.traderDefault || 'Trader'}
                                         className="w-16 h-16 rounded-full border-2 border-gray-400 mx-auto mb-3"
                                     />
                                 )}
                                 <CardTitle className="text-xl font-bold text-gray-200">
-                                    {leaderboard[1].username || leaderboard[1].full_name || 'Anonymous'}
+                                    {leaderboard[1].username || leaderboard[1].full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
                                 </CardTitle>
                                 <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.runnerUp}</p>
                                 <div className="mt-2">
-                                    <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).color} text-white font-bold`}>
-                                        {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).badge} {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).name}
+                                    <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate, dict).color} text-white font-bold`}>
+                                        {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate, dict).badge} {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate, dict).name}
                                     </span>
                                 </div>
                             </CardHeader>
@@ -88,8 +88,8 @@ export default async function LeaderboardPage() {
                                     ${leaderboard[1].net_profit?.toLocaleString()}
                                 </div>
                                 <div className="text-xs text-gray-400 flex justify-center gap-2 flex-wrap">
-                                    <span className="bg-[#333] px-2 py-1 rounded">WR: {leaderboard[1].win_rate}%</span>
-                                    <span className="bg-[#333] px-2 py-1 rounded">Trades: {leaderboard[1].total_trades}</span>
+                                    <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.winRateShort || 'WR'}: {leaderboard[1].win_rate}%</span>
+                                    <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.tradesLabel || 'Trades'}: {leaderboard[1].total_trades}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -104,17 +104,17 @@ export default async function LeaderboardPage() {
                                 {leaderboard[0].avatar_url && (
                                     <img
                                         src={leaderboard[0].avatar_url}
-                                        alt={leaderboard[0].username || leaderboard[0].full_name || 'Champion'}
+                                        alt={leaderboard[0].username || leaderboard[0].full_name || dict?.leaderboard?.championDefault || 'Champion'}
                                         className="w-20 h-20 rounded-full border-4 border-[#ccf381] mx-auto mb-3 shadow-lg shadow-[#ccf381]/30"
                                     />
                                 )}
                                 <CardTitle className="text-2xl font-black text-[#ccf381] drop-shadow-md">
-                                    {leaderboard[0].username || leaderboard[0].full_name || 'Anonymous'}
+                                    {leaderboard[0].username || leaderboard[0].full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
                                 </CardTitle>
                                 <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">{dict.leaderboard.champion}</p>
                                 <div className="mt-2">
-                                    <span className={`text-sm px-3 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).color} text-white font-bold shadow-lg`}>
-                                        {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).badge} {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).name}
+                                    <span className={`text-sm px-3 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).color} text-white font-bold shadow-lg`}>
+                                        {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).badge} {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).name}
                                     </span>
                                 </div>
                             </CardHeader>
@@ -123,8 +123,8 @@ export default async function LeaderboardPage() {
                                     ${leaderboard[0].net_profit?.toLocaleString()}
                                 </div>
                                 <div className="text-sm text-gray-300 flex justify-center gap-2 flex-wrap">
-                                    <span className="bg-[#ccf381]/20 text-[#ccf381] px-3 py-1 rounded border border-[#ccf381]/20">Win Rate: {leaderboard[0].win_rate}%</span>
-                                    <span className="bg-[#333] px-3 py-1 rounded border border-[#333]">Trades: {leaderboard[0].total_trades}</span>
+                                    <span className="bg-[#ccf381]/20 text-[#ccf381] px-3 py-1 rounded border border-[#ccf381]/20">{dict.leaderboard.winRate}: {leaderboard[0].win_rate}%</span>
+                                    <span className="bg-[#333] px-3 py-1 rounded border border-[#333]">{dict.leaderboard.trades}: {leaderboard[0].total_trades}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -138,17 +138,17 @@ export default async function LeaderboardPage() {
                                 {leaderboard[2].avatar_url && (
                                     <img
                                         src={leaderboard[2].avatar_url}
-                                        alt={leaderboard[2].username || leaderboard[2].full_name || 'Trader'}
+                                        alt={leaderboard[2].username || leaderboard[2].full_name || dict?.leaderboard?.traderDefault || 'Trader'}
                                         className="w-16 h-16 rounded-full border-2 border-orange-600 mx-auto mb-3"
                                     />
                                 )}
                                 <CardTitle className="text-xl font-bold text-gray-200">
-                                    {leaderboard[2].username || leaderboard[2].full_name || 'Anonymous'}
+                                    {leaderboard[2].username || leaderboard[2].full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
                                 </CardTitle>
                                 <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.thirdPlace}</p>
                                 <div className="mt-2">
-                                    <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).color} text-white font-bold`}>
-                                        {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).badge} {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).name}
+                                    <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate, dict).color} text-white font-bold`}>
+                                        {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate, dict).badge} {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate, dict).name}
                                     </span>
                                 </div>
                             </CardHeader>
@@ -157,8 +157,8 @@ export default async function LeaderboardPage() {
                                     ${leaderboard[2].net_profit?.toLocaleString()}
                                 </div>
                                 <div className="text-xs text-gray-400 flex justify-center gap-2 flex-wrap">
-                                    <span className="bg-[#333] px-2 py-1 rounded">WR: {leaderboard[2].win_rate}%</span>
-                                    <span className="bg-[#333] px-2 py-1 rounded">Trades: {leaderboard[2].total_trades}</span>
+                                    <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.winRateShort || 'WR'}: {leaderboard[2].win_rate}%</span>
+                                    <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.tradesLabel || 'Trades'}: {leaderboard[2].total_trades}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -184,7 +184,7 @@ export default async function LeaderboardPage() {
                             </thead>
                             <tbody className="divide-y divide-[#222]">
                                 {leaderboard?.map((trader: any, index: number) => {
-                                    const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate)
+                                    const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate, dict)
                                     const isCurrentUser = trader.out_user_id === user?.id
                                     return (
                                         <tr
@@ -204,8 +204,8 @@ export default async function LeaderboardPage() {
                                                         />
                                                     )}
                                                     <span className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}>
-                                                        {trader.username || trader.full_name || 'Anonymous'}
-                                                        {isCurrentUser && <span className="ml-2 text-xs">(You)</span>}
+                                                        {trader.username || trader.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
+                                                        {isCurrentUser && <span className="ml-2 text-xs">({dict?.leaderboard?.you || 'You'})</span>}
                                                     </span>
                                                 </div>
                                             </td>
