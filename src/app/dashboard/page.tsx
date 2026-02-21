@@ -13,6 +13,7 @@ import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { getTradingDay } from '@/utils/date-helpers'
 import { isSameDay, isSameWeek, isSameMonth } from 'date-fns'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -65,6 +66,7 @@ export default async function DashboardPage() {
 
                     {/* Quick Actions / Date? */}
                     <div className="flex items-center gap-3">
+                        <LanguageToggle />
                         {clientId && (
                             <div className="bg-[#ccf381]/10 border border-[#ccf381]/20 rounded-full px-4 py-2 text-sm text-[#ccf381] font-mono font-semibold hidden sm:flex items-center gap-2">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
