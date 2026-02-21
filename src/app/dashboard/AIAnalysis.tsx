@@ -28,12 +28,8 @@ export function AIAnalysis({ tradeId, initialAnalysis }: { tradeId: string, init
 
     if (analysis) {
         return (
-            <div className="mt-6 p-4 bg-gradient-to-br from-[#252525]/80 to-[#1a1a1a]/80 backdrop-blur-md border border-white/5 rounded-xl text-sm text-gray-300 shadow-xl relative overflow-hidden group">
-                {/* Decorative glow */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-[#ccf381]/5 blur-xl -mr-10 -mt-10 pointer-events-none" />
-
-                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-[#2a2a2a] border-t border-l border-white/10 rotate-45 z-10" />
-                <div className="relative z-10 leading-relaxed">
+            <div className="p-2.5 bg-gradient-to-br from-[#252525]/80 to-[#1a1a1a]/80 backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md relative group max-w-xs cursor-default hover:bg-[#2a2a2a] transition-colors">
+                <div className="relative z-10 leading-snug line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                     {analysis}
                 </div>
             </div>
