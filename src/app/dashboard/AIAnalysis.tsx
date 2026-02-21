@@ -32,10 +32,10 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
                 <div
                     onClick={handleToggle}
                     className={cn(
-                        "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
+                        "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar absolute right-0 top-1/2 -translate-y-1/2",
                         isExpanded
-                            ? "w-[240px] h-auto max-h-[150px] absolute right-0 top-1/2 -translate-y-1/2 z-50 overflow-y-auto shadow-2xl"
-                            : "w-[150px] h-[60px] absolute left-0 top-0 z-0"
+                            ? "w-[240px] h-[130px] z-50 overflow-y-auto shadow-2xl"
+                            : "w-[150px] h-[60px] z-10 shadow-md"
                     )}
                 >
                     <div className="w-full h-full relative z-10 flex flex-col justify-center">
