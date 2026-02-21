@@ -45,20 +45,32 @@ export function LotSizeCombobox({
 
     return (
         <div className="relative" ref={containerRef}>
-            {/* The Trigger Button */}
-            <button
-                type="button"
-                onClick={() => setOpen(!open)}
-                className="flex items-center justify-between w-full h-11 px-3 bg-[#0d0d0d] border border-[#333] hover:border-[#ccf381]/50 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ccf381]/50 transition-all font-mono"
-            >
-                <span className={value ? "text-white" : "text-gray-700"}>
-                    {value || "0.01"}
-                </span>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${open ? 'rotate-180 text-[#ccf381]' : ''}`} />
-            </button>
+            <div className="relative flex items-center">
+                <input
+                    type="text"
+                    name="lotSize"
+                    value={value}
+                    onChange={(e) => {
+                        onChange(e.target.value)
+                        setSearch(e.target.value) // Also update search when typing so dropdown filters
+                        if (!open) setOpen(true)
+                    }}
+                    onFocus={() => setOpen(true)}
+                    placeholder="0.01"
+                    className="w-full h-11 pl-3 pr-10 bg-[#0d0d0d] border border-[#333] focus:border-[#ccf381]/50 focus:ring-1 focus:ring-[#ccf381]/50 text-white placeholder-gray-700 rounded-xl outline-none font-mono transition-all"
+                    autoComplete="off"
+                    required
+                />
 
-            {/* Hidden Input to store the actual value for the FormData submit */}
-            <input type="hidden" name="lotSize" value={value} required />
+                <button
+                    type="button"
+                    onClick={() => setOpen(!open)}
+                    className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-gray-500 hover:text-[#ccf381] transition-colors"
+                    tabIndex={-1}
+                >
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? 'rotate-180 text-[#ccf381]' : ''}`} />
+                </button>
+            </div>
 
             {/* The Dropdown Menu */}
             <AnimatePresence>
@@ -70,12 +82,12 @@ export function LotSizeCombobox({
                         transition={{ duration: 0.15, ease: "easeOut" }}
                         className="absolute z-50 w-full mt-2 bg-[#151515] border border-[#333] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden"
                     >
-                        {/* Search Input */}
+                        {/* Search Input (Now functioning purely as a filter if people want to use it instead of typing in main input) */}
                         <div className="flex items-center px-3 py-2 border-b border-[#333] bg-[#0d0d0d]/50">
                             <Search className="w-4 h-4 text-gray-500 mr-2 shrink-0" />
                             <input
                                 type="text"
-                                placeholder={dict?.tradeForm?.searchLot || "Search size..."}
+                                placeholder={dict?.tradeForm?.searchLot || "Filter list..."}
                                 className="w-full bg-transparent text-sm text-white placeholder-gray-600 focus:outline-none font-mono"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -97,8 +109,8 @@ export function LotSizeCombobox({
                                             setSearch('')
                                         }}
                                         className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg font-mono transition-colors ${value === lot
-                                                ? 'bg-[#ccf381]/10 text-[#ccf381] font-bold'
-                                                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                                            ? 'bg-[#ccf381]/10 text-[#ccf381] font-bold'
+                                            : 'text-gray-300 hover:bg-white/5 hover:text-white'
                                             }`}
                                     >
                                         {lot}
