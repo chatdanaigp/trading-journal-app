@@ -15,6 +15,7 @@ import { isSameDay, isSameWeek, isSameMonth } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { CelebrationModal } from '@/components/ui/CelebrationModal'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -44,6 +45,7 @@ export default async function DashboardPage() {
     let monthlyPoints = 0
     let weeklyPoints = 0
     let dailyPoints = 0
+    let dailyProfit = 0
 
     trades.forEach(trade => {
         const lot = trade.lot_size || 0.01 // Fallback to avoid div by zero
@@ -54,11 +56,19 @@ export default async function DashboardPage() {
         if (isSameMonth(tradeDay, today)) monthlyPoints += points
         // weekStartsOn 1 = Monday
         if (isSameWeek(tradeDay, today, { weekStartsOn: 1 })) weeklyPoints += points
-        if (isSameDay(tradeDay, today)) dailyPoints += points
+        if (isSameDay(tradeDay, today)) {
+            dailyPoints += points
+            dailyProfit += profit
+        }
     })
+
+    const TRADING_DAYS_PER_MONTH = 20
+    const monthlyGoalAmount = portSize * (goalPercent / 100)
+    const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
 
     return (
         <StaggerContainer className="space-y-8">
+            <CelebrationModal dailyTarget={dailyTargetAmount} netToday={dailyProfit} dict={dict} />
             {/* Header */}
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
