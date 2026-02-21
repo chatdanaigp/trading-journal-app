@@ -65,10 +65,11 @@ export default async function DashboardPage() {
     const TRADING_DAYS_PER_MONTH = 20
     const monthlyGoalAmount = portSize * (goalPercent / 100)
     const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
+    const isQuestActive = goals?.is_portfolio_quest_active || false
 
     return (
         <StaggerContainer className="space-y-8">
-            <CelebrationModal dailyTarget={dailyTargetAmount} netToday={dailyProfit} dict={dict} />
+            <CelebrationModal dailyTarget={dailyTargetAmount} netToday={dailyProfit} isQuestActive={isQuestActive} dict={dict} />
             {/* Header */}
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

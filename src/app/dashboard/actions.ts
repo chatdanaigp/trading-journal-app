@@ -292,30 +292,36 @@ export async function getProfileGoals() {
 
     const { data, error } = await supabase
         .from('profiles')
-        .select('port_size, profit_goal_percent')
+        .select('port_size, profit_goal_percent, is_portfolio_quest_active')
         .eq('id', user.id)
         .single()
 
     if (error) {
         console.error('Error fetching profile goals:', error)
-        return { port_size: 1000, profit_goal_percent: 10 } // Default fallback
+        return { port_size: 1000, profit_goal_percent: 10, is_portfolio_quest_active: false } // Default fallback
     }
 
     return data
 }
 
-export async function updateProfileGoals(portSize: number, profitGoalPercent: number) {
+export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return { error: 'Not authenticated' }
 
+    const updateData: any = {
+        port_size: portSize,
+        profit_goal_percent: profitGoalPercent
+    }
+
+    if (isQuestActive !== undefined) {
+        updateData.is_portfolio_quest_active = isQuestActive
+    }
+
     const { error } = await supabase
         .from('profiles')
-        .update({
-            port_size: portSize,
-            profit_goal_percent: profitGoalPercent
-        })
+        .update(updateData)
         .eq('id', user.id)
 
     if (error) return { error: error.message }

@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { getDictionary, getCurrentLanguage } from '@/utils/dictionaries'
 import { getProfileGoals, getTrades } from '@/app/dashboard/actions'
 import { Target, Trophy, Clock, Lock, CheckCircle2, TrendingUp, Sparkles } from 'lucide-react'
+import { PortfolioQuestClient } from './PortfolioQuestClient'
 
 export default async function ChallengePage() {
     const supabase = await createClient()
@@ -29,10 +30,7 @@ export default async function ChallengePage() {
     const TRADING_DAYS_PER_MONTH = 20
     const portSize = goals ? Number(goals.port_size) : 1000
     const goalPercent = goals ? Number(goals.profit_goal_percent) : 10
-
-    // Calculations
-    const monthlyGoalAmount = portSize * (goalPercent / 100)
-    const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
+    const isQuestActive = goals?.is_portfolio_quest_active || false
 
     // Today's Profit
     const getTradingDay = (dateStr: string) => {
@@ -130,8 +128,8 @@ export default async function ChallengePage() {
                                 <div
                                     key={i}
                                     className={`relative overflow-hidden p-6 rounded-2xl border transition-all duration-300 ${quest.completed
-                                            ? `border-[#ccf381]/30 bg-[#ccf381]/5`
-                                            : `border-[#2a2a2a] bg-[#151515]`
+                                        ? `border-[#ccf381]/30 bg-[#ccf381]/5`
+                                        : `border-[#2a2a2a] bg-[#151515]`
                                         }`}
                                 >
                                     {/* Completion Badge */}
@@ -167,85 +165,13 @@ export default async function ChallengePage() {
 
                     {/* RIGHT COLUMN: Portfolio Quest (Daily Target) */}
                     <div className="lg:col-span-5">
-                        <div className="bg-[#151515] border border-[#2a2a2a] rounded-3xl p-6 lg:p-8 sticky top-8">
-                            <div className="flex justify-between items-start mb-8">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 rounded-lg bg-[#ccf381]/20 border border-[#ccf381]/30 flex items-center justify-center">
-                                            <Target className="w-4 h-4 text-[#ccf381]" />
-                                        </div>
-                                        <h2 className="text-xl font-bold">{dict.challenge.portfolioQuest}</h2>
-                                    </div>
-                                    <p className="text-xs text-gray-500 flex items-center gap-1.5">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        {dict.challenge.tradingDays}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Math Config Display */}
-                            <div className="grid grid-cols-2 gap-3 mb-8">
-                                <div className="bg-[#0d0d0d] border border-white/5 rounded-2xl p-4">
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">{dict.challenge.portSize}</p>
-                                    <p className="text-lg font-bold text-white">${portSize.toLocaleString()}</p>
-                                </div>
-                                <div className="bg-[#0d0d0d] border border-white/5 rounded-2xl p-4">
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">{dict.challenge.monthlyGoal}</p>
-                                    <p className="text-lg font-bold text-[#ccf381]">{goalPercent}% <span className="text-sm font-normal text-gray-500">(${monthlyGoalAmount.toLocaleString()})</span></p>
-                                </div>
-                            </div>
-
-                            {/* Today's Target Calculation */}
-                            <div className="mb-8">
-                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-3">{dict.challenge.dailyTarget}</p>
-                                <div className="flex items-baseline gap-2 mb-2">
-                                    <span className="text-4xl lg:text-5xl font-black tracking-tighter text-white">
-                                        ${dailyTargetAmount.toFixed(2)}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <hr className="border-white/5 my-8" />
-
-                            {/* Today's Progress Bar */}
-                            <div>
-                                <div className="flex justify-between items-end mb-3">
-                                    <p className="text-sm font-bold text-gray-400">{dict.challenge.netToday}</p>
-                                    <div className="text-right">
-                                        <span className={`text-xl font-bold ${netProfitToday >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
-                                            ${netProfitToday.toFixed(2)}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Progress Bar */}
-                                <div className="h-4 bg-[#0d0d0d] rounded-full overflow-hidden border border-white/5 relative">
-                                    {netProfitToday > 0 && (
-                                        <div
-                                            className="h-full bg-gradient-to-r from-[#a3d149] to-[#ccf381] rounded-full transition-all duration-1000 ease-out"
-                                            style={{ width: `${Math.min((netProfitToday / dailyTargetAmount) * 100, 100)}%` }}
-                                        />
-                                    )}
-                                </div>
-
-                                {netProfitToday >= dailyTargetAmount ? (
-                                    <div className="mt-4 p-3 bg-[#ccf381]/10 border border-[#ccf381]/20 rounded-xl flex items-start gap-3">
-                                        <div className="shrink-0 pt-0.5">
-                                            <Sparkles className="w-4 h-4 text-[#ccf381]" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold text-[#ccf381]">{dict.challenge.hitTarget}</p>
-                                            <p className="text-xs text-[#ccf381]/70">You completed your daily objective!</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <p className="text-xs text-center text-gray-500 mt-4 font-medium italic">
-                                        {dict.challenge.keepGoing}
-                                    </p>
-                                )}
-                            </div>
-
-                        </div>
+                        <PortfolioQuestClient
+                            dict={dict}
+                            initialPortSize={portSize}
+                            initialGoalPercent={goalPercent}
+                            isQuestActive={isQuestActive}
+                            netProfitToday={netProfitToday}
+                        />
                     </div>
                 </div>
 

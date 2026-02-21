@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Trophy, X, Target } from 'lucide-react'
 
-export function CelebrationModal({ dailyTarget, netToday, dict }: { dailyTarget: number, netToday: number, dict: any }) {
+export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: any }) {
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        // Only trigger if we meet the target
-        if (netToday >= dailyTarget && dailyTarget > 0) {
+        // Only trigger if we meet the target and the quest is actually active
+        if (isQuestActive && netToday >= dailyTarget && dailyTarget > 0) {
             const todayStr = new Date().toISOString().split('T')[0]
             const lastCelebration = localStorage.getItem('tj_celebrated_date')
 

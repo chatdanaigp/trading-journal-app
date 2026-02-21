@@ -298,6 +298,12 @@ export const dictionaries = {
             portSize: "Capital (Port Size)",
             monthlyGoal: "Monthly Goal",
             dailyGoalAmount: "Daily Goal Amount",
+            optInTitle: "Start Your Journey",
+            optInDesc: "Set your starting capital and target profit. We'll calculate your daily goals to keep you on track.",
+            startQuest: "Accept Quest",
+            cancelQuest: "Abandon Quest",
+            cancelConfirm: "Are you sure you want to abandon your current quest?",
+            targetPercent: "Target Profit (%)"
         }
     },
     TH: {
@@ -595,6 +601,12 @@ export const dictionaries = {
             portSize: "เงินทุน (Port Size)",
             monthlyGoal: "เป้ายอดกำไร/เดือน",
             dailyGoalAmount: "เป้ากำไรรายวัน",
+            optInTitle: "เริ่มต้นภารกิจของคุณ",
+            optInDesc: "กำหนดเงินทุนและกำไรเป้าหมาย เพื่อให้ระบบคำนวณเป้าหมายรายวันให้คุณ",
+            startQuest: "ยอมรับภารกิจ",
+            cancelQuest: "ยกเลิกภารกิจ",
+            cancelConfirm: "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกภารกิจปัจจุบัน?",
+            targetPercent: "เป้ากำไร (%)"
         }
     }
 }
