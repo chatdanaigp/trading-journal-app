@@ -17,7 +17,7 @@ type UserData = {
     winRate: number
 }
 
-export function UserCard({ user }: { user: UserData }) {
+export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     const [expanded, setExpanded] = useState(false)
     const [editing, setEditing] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -88,15 +88,15 @@ export function UserCard({ user }: { user: UserData }) {
                 {/* Quick Stats */}
                 <div className="hidden md:flex items-center gap-4 flex-shrink-0">
                     <div className="text-center">
-                        <p className="text-[10px] text-gray-500 uppercase font-bold">Trades</p>
+                        <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.trades}</p>
                         <p className="text-sm font-bold text-white">{user.totalTrades}</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-[10px] text-gray-500 uppercase font-bold">Win Rate</p>
+                        <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.winRate}</p>
                         <p className={`text-sm font-bold ${user.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{user.winRate.toFixed(0)}%</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-[10px] text-gray-500 uppercase font-bold">P&L</p>
+                        <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.pnl}</p>
                         <p className={`text-sm font-bold ${user.totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
                             {user.totalProfit >= 0 ? '+' : ''}${user.totalProfit.toLocaleString()}
                         </p>
@@ -115,15 +115,15 @@ export function UserCard({ user }: { user: UserData }) {
                     {/* Mobile Stats */}
                     <div className="md:hidden grid grid-cols-3 gap-3">
                         <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">Trades</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.trades}</p>
                             <p className="text-lg font-bold text-white">{user.totalTrades}</p>
                         </div>
                         <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">Win Rate</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.winRate}</p>
                             <p className={`text-lg font-bold ${user.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{user.winRate.toFixed(0)}%</p>
                         </div>
                         <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">P&L</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.pnl}</p>
                             <p className={`text-lg font-bold ${user.totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${user.totalProfit.toLocaleString()}</p>
                         </div>
                     </div>
@@ -133,31 +133,31 @@ export function UserCard({ user }: { user: UserData }) {
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Username</label>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">{dict.admin.usernameLabel}</label>
                                     <input value={username} onChange={e => setUsername(e.target.value)}
                                         className="w-full bg-[#0d0d0d] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#ccf381]/30" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Full Name</label>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">{dict.admin.fullNameLabel}</label>
                                     <input value={fullName} onChange={e => setFullName(e.target.value)}
                                         className="w-full bg-[#0d0d0d] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#ccf381]/30" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Port Size ($)</label>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">{dict.admin.portSize}</label>
                                     <input type="number" value={portSize} onChange={e => setPortSize(Number(e.target.value))}
                                         className="w-full bg-[#0d0d0d] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#ccf381]/30" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Goal (%)</label>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">{dict.admin.goalPercent}</label>
                                     <input type="number" value={goalPercent} onChange={e => setGoalPercent(Number(e.target.value))}
                                         className="w-full bg-[#0d0d0d] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#ccf381]/30" />
                                 </div>
                             </div>
                             <div className="flex justify-end gap-2">
-                                <button onClick={() => setEditing(false)} className="px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
+                                <button onClick={() => setEditing(false)} className="px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-white/5 transition-colors">{dict.admin.cancel}</button>
                                 <button onClick={handleSave} disabled={saving}
                                     className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#ccf381] text-black text-xs font-bold hover:bg-[#d4f78e] transition-all disabled:opacity-50">
-                                    {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Save className="w-3 h-3" /> Save</>}
+                                    {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Save className="w-3 h-3" /> {dict.admin.save}</>}
                                 </button>
                             </div>
                         </div>
@@ -166,29 +166,29 @@ export function UserCard({ user }: { user: UserData }) {
                         <div className="flex flex-wrap gap-2">
                             <button onClick={() => setEditing(true)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold hover:bg-blue-500/20 transition-colors">
-                                <User className="w-3 h-3" /> Edit Profile
+                                <User className="w-3 h-3" /> {dict.admin.editProfile}
                             </button>
                             <button onClick={handleDeleteTrades}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition-colors">
-                                <BarChart3 className="w-3 h-3" /> Delete Trades
+                                <BarChart3 className="w-3 h-3" /> {dict.admin.deleteTrades}
                             </button>
 
                             {!confirmDelete ? (
                                 <button onClick={() => setConfirmDelete(true)}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors">
-                                    <Trash2 className="w-3 h-3" /> Delete User
+                                    <Trash2 className="w-3 h-3" /> {dict.admin.deleteUser}
                                 </button>
                             ) : (
                                 <div className="flex items-center gap-2 bg-red-500/5 border border-red-500/20 rounded-lg px-3 py-1.5">
                                     <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-                                    <span className="text-xs text-red-400 font-bold">Are you sure?</span>
+                                    <span className="text-xs text-red-400 font-bold">{dict.admin.areYouSure}</span>
                                     <button onClick={handleDeleteUser} disabled={deleting}
                                         className="px-2 py-0.5 rounded bg-red-500 text-white text-xs font-bold hover:bg-red-600 disabled:opacity-50">
-                                        {deleting ? '...' : 'Yes, Delete'}
+                                        {deleting ? '...' : dict.admin.yesDelete}
                                     </button>
                                     <button onClick={() => setConfirmDelete(false)}
                                         className="px-2 py-0.5 rounded bg-white/10 text-gray-300 text-xs hover:bg-white/20">
-                                        Cancel
+                                        {dict.admin.cancel}
                                     </button>
                                 </div>
                             )}

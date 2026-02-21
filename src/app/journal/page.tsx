@@ -6,6 +6,7 @@ import { JournalList } from './components/JournalList'
 import { Card, CardContent } from '@/components/ui/card'
 import { BookOpen, Flame, CheckCircle } from 'lucide-react'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
+import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 
 export default async function JournalPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -16,13 +17,16 @@ export default async function JournalPage() {
         getJournalStats(),
     ])
 
+    const lang = await getCurrentLanguage()
+    const dict = await getDictionary(lang)
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Journal</h1>
-                    <p className="text-gray-500">Track your mindset and improve your discipline.</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">{dict.journal.title}</h1>
+                    <p className="text-gray-500">{dict.journal.subtitle}</p>
                 </div>
                 <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
                     {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -42,11 +46,11 @@ export default async function JournalPage() {
                         </div>
 
                         <CardContent className="p-6 relative z-30 flex flex-col justify-center h-full">
-                            <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">Total Entries</p>
+                            <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">{dict.journal.totalEntries}</p>
                             <h3 className="text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]">
                                 {stats.totalEntries}
                             </h3>
-                            <p className="text-xs text-gray-600 mt-2">Journal entries recorded</p>
+                            <p className="text-xs text-gray-600 mt-2">{dict.journal.entriesRecorded}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -61,11 +65,11 @@ export default async function JournalPage() {
                             <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Flame className="w-6 h-6 text-orange-400" />
                             </div>
-                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Writing Streak</p>
+                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.journal.writingStreak}</p>
                             <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-orange-400">
-                                {stats.streakDays} day{stats.streakDays !== 1 ? 's' : ''}
+                                {stats.streakDays} {stats.streakDays !== 1 ? dict.journal.days : dict.journal.daySingle}
                             </h3>
-                            <p className="text-[10px] text-gray-600 mt-1">Keep it going!</p>
+                            <p className="text-[10px] text-gray-600 mt-1">{dict.journal.keepGoing}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -80,11 +84,11 @@ export default async function JournalPage() {
                             <div className="w-12 h-12 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <CheckCircle className="w-6 h-6 text-[#ccf381]" />
                             </div>
-                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Plan Adherence</p>
+                            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.journal.planAdherence}</p>
                             <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]">
                                 {stats.followedPlanRate.toFixed(0)}%
                             </h3>
-                            <p className="text-[10px] text-gray-600 mt-1">Trading plan compliance</p>
+                            <p className="text-[10px] text-gray-600 mt-1">{dict.journal.compliance}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -101,11 +105,11 @@ export default async function JournalPage() {
                         <div className="relative z-10 p-6 border-b border-white/5">
                             <h2 className="text-white font-bold flex items-center gap-2">
                                 <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
-                                Recent Entries
+                                {dict.journal.recentEntries}
                             </h2>
                         </div>
                         <div className="relative z-10 p-6">
-                            <JournalList entries={entries} />
+                            <JournalList entries={entries} dict={dict} />
                         </div>
                     </Card>
                 </div>
@@ -120,11 +124,11 @@ export default async function JournalPage() {
                             <div className="relative z-10 p-6 border-b border-white/5">
                                 <h2 className="text-white font-bold flex items-center gap-2">
                                     <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
-                                    New Entry
+                                    {dict.journal.newEntry}
                                 </h2>
                             </div>
                             <div className="relative z-10 p-6">
-                                <JournalForm />
+                                <JournalForm dict={dict} />
                             </div>
                         </Card>
                     </div>

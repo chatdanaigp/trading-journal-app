@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+import { Trophy, TrendingUp, Search, Crown, ArrowLeft, Activity, Target, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
@@ -22,10 +24,10 @@ function getRankBadge(totalTrades: number, netProfit: number, winRate: number) {
 }
 
 export default async function LeaderboardPage() {
-    // Server-side check: redirects to /verify if user has no client_id
-    const { user } = await requireVerifiedUser()
-
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const lang = await getCurrentLanguage()
+    const dict = await getDictionary(lang)
 
     // Call the enhanced RPC function
     const { data: leaderboard, error } = await supabase.rpc('get_leaderboard')
@@ -46,14 +48,15 @@ export default async function LeaderboardPage() {
                 {/* Header */}
                 <StaggerItem className="text-center space-y-4">
                     <h1 className="text-5xl font-black italic tracking-tighter uppercase whitespace-nowrap bg-gradient-to-r from-white via-[#ccf381] to-white bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(204,243,129,0.3)]">
-                        🏆 Global Leaderboard
+                        🏆 {dict.leaderboard.title}
                     </h1>
                     <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                        Compete with traders worldwide. Climb the ranks and earn prestigious badges!
+                        {dict.leaderboard.subtitle}
                     </p>
-                    <a href="/dashboard" className="inline-flex items-center text-sm font-bold text-[#ccf381] hover:text-[#b0d16a] transition-colors mt-4 border border-[#ccf381]/30 px-4 py-2 rounded-full hover:bg-[#ccf381]/10">
-                        ← Back to Dashboard
-                    </a>
+                    <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:bg-white/10">
+                        <ArrowLeft className="w-4 h-4" />
+                        {dict.leaderboard.backToDashboard}
+                    </Link>
                 </StaggerItem>
 
                 {/* Top 3 Podium */}
@@ -73,7 +76,7 @@ export default async function LeaderboardPage() {
                                 <CardTitle className="text-xl font-bold text-gray-200">
                                     {leaderboard[1].username || leaderboard[1].full_name || 'Anonymous'}
                                 </CardTitle>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Runner Up</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.runnerUp}</p>
                                 <div className="mt-2">
                                     <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).color} text-white font-bold`}>
                                         {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).badge} {getRankBadge(leaderboard[1].total_trades, leaderboard[1].net_profit, leaderboard[1].win_rate).name}
@@ -108,7 +111,7 @@ export default async function LeaderboardPage() {
                                 <CardTitle className="text-2xl font-black text-[#ccf381] drop-shadow-md">
                                     {leaderboard[0].username || leaderboard[0].full_name || 'Anonymous'}
                                 </CardTitle>
-                                <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">Champion</p>
+                                <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">{dict.leaderboard.champion}</p>
                                 <div className="mt-2">
                                     <span className={`text-sm px-3 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).color} text-white font-bold shadow-lg`}>
                                         {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).badge} {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate).name}
@@ -142,7 +145,7 @@ export default async function LeaderboardPage() {
                                 <CardTitle className="text-xl font-bold text-gray-200">
                                     {leaderboard[2].username || leaderboard[2].full_name || 'Anonymous'}
                                 </CardTitle>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">3rd Place</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.thirdPlace}</p>
                                 <div className="mt-2">
                                     <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).color} text-white font-bold`}>
                                         {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).badge} {getRankBadge(leaderboard[2].total_trades, leaderboard[2].net_profit, leaderboard[2].win_rate).name}
@@ -168,21 +171,21 @@ export default async function LeaderboardPage() {
                         <table className="w-full text-left">
                             <thead className="bg-[#0d0d0d] text-gray-400 text-xs uppercase tracking-wider">
                                 <tr>
-                                    <th className="p-4 font-bold text-[#ccf381]">Rank</th>
-                                    <th className="p-4">Trader</th>
-                                    <th className="p-4">Badge</th>
-                                    <th className="p-4 text-center">Trades</th>
-                                    <th className="p-4 text-center">Win Rate</th>
-                                    <th className="p-4 text-right">Net Profit</th>
-                                    <th className="p-4 text-right">Avg Trade</th>
-                                    <th className="p-4 text-right">Best Trade</th>
-                                    <th className="p-4 text-center">Streak</th>
+                                    <th className="p-4 font-bold text-[#ccf381]">{dict.leaderboard.rank}</th>
+                                    <th className="p-4">{dict.leaderboard.trader}</th>
+                                    <th className="p-4">{dict.leaderboard.badge}</th>
+                                    <th className="p-4 text-center">{dict.leaderboard.trades}</th>
+                                    <th className="p-4 text-center">{dict.leaderboard.winRate}</th>
+                                    <th className="p-4 text-right">{dict.leaderboard.netProfit}</th>
+                                    <th className="p-4 text-right">{dict.leaderboard.avgTrade}</th>
+                                    <th className="p-4 text-right">{dict.leaderboard.bestTrade}</th>
+                                    <th className="p-4 text-center">{dict.leaderboard.streak}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#222]">
                                 {leaderboard?.map((trader: any, index: number) => {
                                     const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate)
-                                    const isCurrentUser = trader.out_user_id === user.id
+                                    const isCurrentUser = trader.out_user_id === user?.id
                                     return (
                                         <tr
                                             key={trader.out_user_id}
@@ -241,7 +244,7 @@ export default async function LeaderboardPage() {
                     </div>
                     {(!leaderboard || leaderboard.length === 0) && (
                         <div className="p-12 text-center text-gray-600 italic">
-                            No ranked traders yet. Be the first to log trades!
+                            {dict.leaderboard.noRanked}
                         </div>
                     )}
                 </StaggerItem>

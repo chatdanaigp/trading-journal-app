@@ -8,7 +8,7 @@ import {
 } from 'recharts'
 import { BarChart3 } from 'lucide-react'
 
-export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
+export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: any }) {
     if (data.stats.totalTrades === 0) {
         return (
             <Card className="border-0 shadow-2xl overflow-hidden relative group">
@@ -19,8 +19,8 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                     <div className="p-6 bg-[#252525] rounded-full mb-4 border border-white/5 shadow-lg">
                         <BarChart3 className="w-12 h-12 text-gray-600" />
                     </div>
-                    <p className="text-xl font-bold text-gray-300">No trading data available yet.</p>
-                    <p className="text-sm mt-2 text-gray-500">Start logging your trades to see insights here!</p>
+                    <p className="text-xl font-bold text-gray-300">{dict.analytics.noData}</p>
+                    <p className="text-sm mt-2 text-gray-500">{dict.analytics.noDataSub}</p>
                 </CardContent>
             </Card>
         )
@@ -39,7 +39,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                         <CardHeader className="relative z-10 border-b border-white/5 pb-4">
                             <CardTitle className="text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
-                                Portfolio Growth
+                                {dict.analytics.portfolioGrowth}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="relative z-10 h-[320px] pt-6">
@@ -75,7 +75,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                         <CardHeader className="relative z-10 border-b border-white/5 pb-4">
                             <CardTitle className="text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-purple-500 rounded-full inline-block" />
-                                Win/Loss Ratio
+                                {dict.analytics.winLossRatio}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="relative z-10 pt-4 flex flex-col h-[320px]">
@@ -99,14 +99,14 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                                         </Pie>
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                            formatter={(val: any, name: any) => [`${val} trades`, name]}
+                                            formatter={(val: any, name: any) => [`${val} ${dict.analytics.tradesPlural}`, name]}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
                                 {/* Center Text */}
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                     <span className="text-3xl font-black text-white">{data.stats.winRate.toFixed(0)}%</span>
-                                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">Win Rate</span>
+                                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{dict.analytics.winRate}</span>
                                 </div>
                             </div>
 
@@ -137,7 +137,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                         <CardHeader className="relative z-10 border-b border-white/5 pb-4">
                             <CardTitle className="text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-red-500 rounded-full inline-block" />
-                                Drawdown
+                                {dict.analytics.drawdown}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="relative z-10 h-[280px] pt-6">
@@ -173,7 +173,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                         <CardHeader className="relative z-10 border-b border-white/5 pb-4">
                             <CardTitle className="text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
-                                Asset Performance
+                                {dict.analytics.assetPerformance}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="relative z-10 pt-6">
@@ -202,10 +202,10 @@ export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
                                 <table className="w-full text-xs">
                                     <thead>
                                         <tr className="text-gray-500 uppercase tracking-wider">
-                                            <th className="text-left pb-2 font-medium">Symbol</th>
-                                            <th className="text-right pb-2 font-medium">Trades</th>
-                                            <th className="text-right pb-2 font-medium">Win Rate</th>
-                                            <th className="text-right pb-2 font-medium">P&L</th>
+                                            <th className="text-left pb-2 font-medium">{dict.analytics.symbol}</th>
+                                            <th className="text-right pb-2 font-medium">{dict.analytics.trades}</th>
+                                            <th className="text-right pb-2 font-medium">{dict.analytics.winRate}</th>
+                                            <th className="text-right pb-2 font-medium">{dict.analytics.pnl}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">

@@ -17,7 +17,7 @@ const TAG_PRESETS = [
     'Early Exit', 'Late Entry', 'Perfect Execution',
 ]
 
-export function JournalForm() {
+export function JournalForm({ dict }: { dict: any }) {
     const [loading, setLoading] = useState(false)
     const [selectedMood, setSelectedMood] = useState<string>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -80,78 +80,83 @@ export function JournalForm() {
 
             {/* Mood */}
             <div>
-                <label className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 block">How did you feel?</label>
-                <div className="flex gap-2">
-                    {MOOD_OPTIONS.map(m => (
-                        <button
-                            key={m.value}
-                            type="button"
-                            onClick={() => setSelectedMood(m.value)}
-                            className={`flex-1 py-2.5 rounded-xl text-center transition-all text-sm border ${selectedMood === m.value
-                                    ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-white shadow-lg shadow-[#ccf381]/5'
+                <div className="space-y-3">
+                    <label className="text-sm font-medium text-gray-300">{dict.journalForm.howFeel}</label>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        {MOOD_OPTIONS.map((m) => (
+                            <button
+                                key={m.value}
+                                type="button"
+                                onClick={() => setSelectedMood(m.value)}
+                                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${selectedMood === m.value
+                                    ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
                                     : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300'
-                                }`}
-                        >
-                            <div className="text-lg">{m.emoji}</div>
-                            <div className="text-[10px] mt-0.5">{m.label}</div>
-                        </button>
-                    ))}
+                                    }`}
+                            >
+                                <span className="text-2xl mb-1">{m.emoji}</span>
+                                <span className="text-xs font-medium">{dict.journalForm[m.value]}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* Content */}
             <div>
-                <label className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1.5 block">Notes</label>
+                <label className="text-sm font-medium text-gray-300">{dict.journalForm.notes}</label>
                 <textarea
                     name="content"
                     rows={4}
-                    placeholder="What happened today? What did you learn? How can you improve?"
+                    placeholder={dict.journalForm.notesPlaceholder}
                     className="w-full bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-[#ccf381]/30 transition-colors resize-none"
                 />
             </div>
 
             {/* Followed Plan */}
-            <div>
-                <label className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 block">Followed Trading Plan?</label>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#1a1a1a] border border-[#333]">
+                <div className="flex-1">
+                    <p className="text-sm font-medium text-white">{dict.journalForm.followedPlanTitle}</p>
+                    <p className="text-xs text-gray-500">{dict.journalForm.followedPlanSub}</p>
+                </div>
                 <div className="flex gap-3">
                     <button
                         type="button"
                         onClick={() => setFollowedPlan(true)}
                         className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${followedPlan
-                                ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
-                                : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
+                            ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
+                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
                             }`}
                     >
-                        ✅ Yes
+                        ✅ {dict.journalForm.yes}
                     </button>
                     <button
                         type="button"
                         onClick={() => setFollowedPlan(false)}
                         className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${!followedPlan
-                                ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                                : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
+                            ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
                             }`}
                     >
-                        ❌ No
+                        ❌ {dict.journalForm.no}
                     </button>
                 </div>
             </div>
 
             {/* Tags */}
-            <div>
-                <label className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 block">Tags</label>
+            <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-300">{dict.journalForm.tagsLabel}</label>
                 <div className="flex flex-wrap gap-2">
                     {TAG_PRESETS.map(tag => (
                         <button
                             key={tag}
                             type="button"
                             onClick={() => toggleTag(tag)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${selectedTags.includes(tag)
-                                    ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
-                                    : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300'
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedTags.includes(tag)
+                                ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
+                                : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300'
                                 }`}
                         >
-                            {tag}
+                            #{dict.journalForm.tagOptions[tag.replace(/\s/g, '')]}
                         </button>
                     ))}
                 </div>

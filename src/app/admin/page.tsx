@@ -5,10 +5,14 @@ import { UserCard } from './components/UserCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Shield, ShieldAlert, Users, BarChart3, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 
 export default async function AdminPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    const lang = await getCurrentLanguage()
+    const dict = await getDictionary(lang)
 
     if (!user) {
         redirect('/adminlogin')
@@ -24,17 +28,17 @@ export default async function AdminPage() {
                     <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
                         <ShieldAlert className="w-8 h-8 text-red-400" />
                     </div>
-                    <h1 className="text-3xl font-bold text-red-400">Access Denied</h1>
-                    <p className="text-gray-500">You do not have permission to access the admin panel.</p>
+                    <h1 className="text-3xl font-bold text-red-400">{dict.admin.accessDenied}</h1>
+                    <p className="text-gray-500">{dict.admin.noPermission}</p>
                     <p className="text-xs text-gray-600 bg-[#1a1a1a] rounded-xl p-3 border border-white/5">
-                        If you believe this is an error, contact your administrator to add your User ID to the <code className="text-[#ccf381]">ADMIN_USER_IDS</code> environment variable.
+                        {dict.admin.errorHelp} <code className="text-[#ccf381]">ADMIN_USER_IDS</code>
                     </p>
                     <Link
                         href="/dashboard"
                         className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 text-[#ccf381] text-sm font-bold hover:bg-[#ccf381]/20 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
+                        {dict.admin.backToDashboard}
                     </Link>
                 </div>
             </div>
@@ -69,9 +73,9 @@ export default async function AdminPage() {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-white tracking-tight">
-                                Admin <span className="text-[#ccf381]">Panel</span>
+                                {dict.admin.title}
                             </h1>
-                            <p className="text-gray-500 text-sm">Manage users and monitor platform activity</p>
+                            <p className="text-gray-500 text-sm">{dict.admin.subtitle}</p>
                         </div>
                     </div>
                     <Link
@@ -79,7 +83,7 @@ export default async function AdminPage() {
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a1a] border border-white/5 text-sm text-gray-400 hover:text-white hover:border-white/10 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Dashboard
+                        {dict.admin.backToDashboard}
                     </Link>
                 </div>
 
@@ -94,7 +98,7 @@ export default async function AdminPage() {
                                     <Users className="w-6 h-6 text-purple-400" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Users</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.admin.totalUsers}</p>
                                     <h3 className="text-3xl font-bold text-white">{totalUsers}</h3>
                                 </div>
                             </CardContent>
@@ -109,7 +113,7 @@ export default async function AdminPage() {
                                     <BarChart3 className="w-6 h-6 text-blue-400" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Trades</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.admin.totalTrades}</p>
                                     <h3 className="text-3xl font-bold text-white">{totalTrades}</h3>
                                 </div>
                             </CardContent>
@@ -124,7 +128,7 @@ export default async function AdminPage() {
                                     <span className="text-xl font-bold">{totalProfit >= 0 ? '💰' : '📉'}</span>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Platform P&L</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.admin.platformPnL}</p>
                                     <h3 className={`text-3xl font-bold ${totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
                                         {totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()}
                                     </h3>
@@ -138,12 +142,12 @@ export default async function AdminPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-4">
                         <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
-                        <h2 className="text-xl font-bold text-white">User Management</h2>
-                        <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} users</span>
+                        <h2 className="text-xl font-bold text-white">{dict.admin.userManagement}</h2>
+                        <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} {dict.admin.users}</span>
                     </div>
                     <div className="space-y-3">
                         {users.map((user: any) => (
-                            <UserCard key={user.id} user={user} />
+                            <UserCard key={user.id} user={user} dict={dict} />
                         ))}
                     </div>
                 </div>
@@ -153,8 +157,8 @@ export default async function AdminPage() {
                     <div>
                         <div className="flex items-center gap-2 mb-4">
                             <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
-                            <h2 className="text-xl font-bold text-white">Recent Trades</h2>
-                            <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalTrades} trades</span>
+                            <h2 className="text-xl font-bold text-white">{dict.admin.recentTrades}</h2>
+                            <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalTrades} {dict.admin.trades}</span>
                         </div>
                         <Card className="relative overflow-hidden border-0 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1d1d1d] via-[#0d0d0d] to-[#000000] z-0" />
@@ -163,11 +167,11 @@ export default async function AdminPage() {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-white/5 text-gray-500 text-[10px] uppercase tracking-wider">
-                                            <th className="text-left p-4 font-medium">Trader</th>
-                                            <th className="text-left p-4 font-medium">Symbol</th>
-                                            <th className="text-left p-4 font-medium">Type</th>
-                                            <th className="text-right p-4 font-medium">Profit</th>
-                                            <th className="text-right p-4 font-medium">Date</th>
+                                            <th className="text-left p-4 font-medium">{dict.admin.trader}</th>
+                                            <th className="text-left p-4 font-medium">{dict.admin.symbol}</th>
+                                            <th className="text-left p-4 font-medium">{dict.admin.type}</th>
+                                            <th className="text-right p-4 font-medium">{dict.admin.profit}</th>
+                                            <th className="text-right p-4 font-medium">{dict.admin.date}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">

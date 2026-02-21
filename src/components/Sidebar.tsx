@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
-export function Sidebar() {
+export function Sidebar({ dict }: { dict: any }) {
     const pathname = usePathname()
     const [user, setUser] = useState<User | null>(null)
     const [clientId, setClientId] = useState<string | null>(null)
@@ -41,15 +41,15 @@ export function Sidebar() {
     }, [pathname])
 
     const links = [
-        { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-        { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-        { name: 'Journal', href: '/journal', icon: Wallet },
+        { name: dict.sidebar.dashboard, href: '/dashboard', icon: LayoutDashboard },
+        { name: dict.sidebar.analytics, href: '/analytics', icon: BarChart3 },
+        { name: dict.sidebar.leaderboard, href: '/leaderboard', icon: Trophy },
+        { name: dict.sidebar.journal, href: '/journal', icon: Wallet },
     ]
 
     const lowerLinks = [
-        { name: 'Settings', href: '#', icon: Settings },
-        { name: 'Help', href: '#', icon: HelpCircle },
+        { name: dict.sidebar.settings, href: '#', icon: Settings },
+        { name: dict.sidebar.help, href: '#', icon: HelpCircle },
     ]
 
     const discordAvatar = user?.user_metadata?.avatar_url
@@ -113,14 +113,14 @@ export function Sidebar() {
                             {clientId ? (
                                 <p className="text-[10px] text-[#ccf381] font-mono font-semibold tracking-wider">ID: {clientId}</p>
                             ) : (
-                                <p className="text-xs text-gray-500">Discord Account</p>
+                                <p className="text-xs text-gray-500">{dict.sidebar.discordAccount}</p>
                             )}
                         </div>
                     </div>
                 )}
 
                 {/* Menu Label */}
-                <div className="text-xs font-bold text-gray-500 mb-4 px-2 tracking-wider">DASHBOARD</div>
+                <div className="text-xs font-bold text-gray-500 mb-4 px-2 tracking-wider">{dict.sidebar.dashboardLabel}</div>
 
                 {/* Navigation */}
                 <nav className="space-y-1 flex-1">
@@ -153,14 +153,14 @@ export function Sidebar() {
                             )}
                         >
                             <Shield className="w-5 h-5 text-red-400" />
-                            <span className="text-red-400 font-bold tracking-wide">Admin Panel</span>
+                            <span className="text-red-400 font-bold tracking-wide">{dict.sidebar.adminPanel}</span>
                         </Link>
                     )}
                 </nav>
 
                 {/* Lower Links */}
                 <div className="border-t border-[#1f1f1f] pt-6 space-y-1">
-                    <div className="text-xs font-bold text-gray-500 mb-4 px-2 tracking-wider">SETTINGS</div>
+                    <div className="text-xs font-bold text-gray-500 mb-4 px-2 tracking-wider">{dict.sidebar.settingsLabel}</div>
                     {lowerLinks.map((link) => (
                         <Link
                             key={link.name}
@@ -180,7 +180,7 @@ export function Sidebar() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all w-full"
                     >
                         <LogOut className="w-5 h-5" />
-                        <span>Log Out</span>
+                        <span>{dict.sidebar.logout}</span>
                     </button>
                 </div>
             </div>

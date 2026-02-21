@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { AnalyticsData } from '../actions'
 import { TrendingUp, TrendingDown, Activity, Target, Zap, ArrowUpDown } from 'lucide-react'
 
-export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
+export function KPIGrid({ stats, dict }: { stats: AnalyticsData['stats'], dict: any }) {
     return (
         <div className="grid grid-cols-12 gap-6">
             {/* Hero Card: Net Profit — Col 4 */}
@@ -18,15 +18,15 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                     </div>
 
                     <CardContent className="p-6 relative z-30 flex flex-col justify-center h-full">
-                        <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">Net Profit</p>
+                        <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">{dict.analytics.netProfit}</p>
                         <h3 className={`text-5xl font-bold tracking-tight ${stats.netProfit >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
                             ${stats.netProfit.toLocaleString()}
                         </h3>
                         <div className="flex items-center gap-2 mt-4">
                             <span className={`text-xs px-2 py-1 rounded-md border flex items-center gap-1 font-medium ${stats.netProfit >= 0 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                                {stats.netProfit >= 0 ? '↗' : '↘'} {stats.winRate.toFixed(1)}% Win Rate
+                                {stats.netProfit >= 0 ? '↗' : '↘'} {stats.winRate.toFixed(1)}% {dict.analytics.winRate}
                             </span>
-                            <span className="text-xs text-gray-600">All Time</span>
+                            <span className="text-xs text-gray-600">{dict.analytics.allTimeView}</span>
                         </div>
                     </CardContent>
                 </Card>
@@ -45,9 +45,9 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                                 <Activity className="w-4 h-4 text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Profit Factor</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.analytics.profitFactor}</p>
                                 <h3 className="text-2xl font-bold text-white tracking-tight">{stats.profitFactor.toFixed(2)}</h3>
-                                <p className="text-[10px] text-gray-600 mt-0.5">&gt; 1.5 is Good</p>
+                                <p className="text-[10px] text-gray-600 mt-0.5">{dict.analytics.pfGood}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -63,7 +63,7 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                                 <Target className="w-4 h-4 text-purple-400" />
                             </div>
                             <div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Win Rate</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.analytics.winRate}</p>
                                 <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-400">{stats.winRate.toFixed(1)}%</h3>
                                 <p className="text-[10px] text-gray-600 mt-0.5">R:R {stats.avgLoss > 0 ? (stats.avgWin / stats.avgLoss).toFixed(2) : '-'}</p>
                             </div>
@@ -80,9 +80,9 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                                 <TrendingDown className="w-4 h-4 text-red-400" />
                             </div>
                             <div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Max Drawdown</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.analytics.maxDrawdown}</p>
                                 <h3 className="text-2xl font-bold text-red-500 tracking-tight">-${stats.maxDrawdown.toLocaleString()}</h3>
-                                <p className="text-[10px] text-gray-600 mt-0.5">Peak to Trough</p>
+                                <p className="text-[10px] text-gray-600 mt-0.5">{dict.analytics.peakToTrough}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -98,11 +98,11 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                                 <Zap className="w-4 h-4 text-cyan-400" />
                             </div>
                             <div>
-                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Expectancy</p>
+                                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">{dict.analytics.expectancy}</p>
                                 <h3 className={`text-2xl font-bold tracking-tight ${stats.expectancy >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400' : 'text-red-400'}`}>
                                     ${stats.expectancy.toFixed(2)}
                                 </h3>
-                                <p className="text-[10px] text-gray-600 mt-0.5">Per Trade EV</p>
+                                <p className="text-[10px] text-gray-600 mt-0.5">{dict.analytics.perTradeEV}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -117,11 +117,11 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                             <ArrowUpDown className="w-5 h-5 text-[#ccf381]" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Average Win</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.analytics.avgWin}</p>
                             <p className="text-xl font-bold text-[#ccf381]">${stats.avgWin.toFixed(0)}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Average Loss</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.analytics.avgLoss}</p>
                             <p className="text-xl font-bold text-red-400">${stats.avgLoss.toFixed(0)}</p>
                         </div>
                     </div>
@@ -130,11 +130,11 @@ export function KPIGrid({ stats }: { stats: AnalyticsData['stats'] }) {
                             <Activity className="w-5 h-5 text-[#ccf381]" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Trades</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.analytics.totalTrades}</p>
                             <p className="text-xl font-bold text-white">{stats.totalTrades}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Profit Factor</p>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{dict.analytics.profitFactor}</p>
                             <p className={`text-xl font-bold ${stats.profitFactor >= 1.5 ? 'text-[#ccf381]' : 'text-amber-400'}`}>{stats.profitFactor.toFixed(2)}x</p>
                         </div>
                     </div>
