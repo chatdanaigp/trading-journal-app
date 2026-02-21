@@ -8,15 +8,12 @@ import { Pencil, Share2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { EditTradeForm } from './EditTradeForm'
 import { TradeShareModal } from './TradeShareModal'
+import { cn } from '@/utils/cn'
 
 export function TradeList({ trades, username }: { trades: any[], username?: string }) {
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null)
-
-    const isAnyExpanded = !!expandedAnalysisId
-    const headPad = isAnyExpanded ? "px-3 py-3" : "px-5 py-3"
-    const cellPad = isAnyExpanded ? "px-3 py-4" : "px-5 py-4"
 
     return (
         <>
@@ -32,12 +29,12 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                     <table className="w-full text-left min-w-[700px] relative">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10 shadow-md">
                             <tr>
-                                <th className={`${headPad} rounded-tl-xl transition-all duration-300`}>Asset</th>
-                                <th className={`${headPad} transition-all duration-300`}>Side / Lot</th>
-                                <th className={`${headPad} transition-all duration-300`}>Price</th>
-                                <th className={`${headPad} transition-all duration-300`}>Result</th>
-                                <th className={`${headPad} transition-all duration-300`}>Analysis</th>
-                                <th className={`${headPad} text-center rounded-tr-xl w-12 transition-all duration-300`}></th>
+                                <th className="px-5 py-3 rounded-tl-xl transition-all duration-300">Asset</th>
+                                <th className="px-5 py-3 transition-all duration-300">Side / Lot</th>
+                                <th className="px-5 py-3 transition-all duration-300">Price</th>
+                                <th className="px-5 py-3 transition-all duration-300">Result</th>
+                                <th className="px-5 py-3 w-[150px] transition-all duration-300">Analysis</th>
+                                <th className="px-5 py-3 text-center rounded-tr-xl w-12 transition-all duration-300"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
@@ -56,51 +53,61 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                                         : trade.entry_price - priceDiff
                                 }
 
+                                const isExpanded = expandedAnalysisId === trade.id
+
                                 return (
                                     <tr key={trade.id} className="hover:bg-[#252525] transition-colors group border-b border-[#252525] last:border-0 text-sm">
-                                        <td className={`${cellPad} transition-all duration-300`}>
-                                            <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
-                                            <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{new Date(trade.created_at).toLocaleDateString()}</div>
-                                            {trade.notes && (
-                                                <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
-                                                    <span className="text-gray-600 shrink-0">📝</span>
-                                                    <span>{trade.notes}</span>
+                                        <td className="px-5 py-4 transition-all duration-300">
+                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
+                                                <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
+                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{new Date(trade.created_at).toLocaleDateString()}</div>
+                                                {trade.notes && (
+                                                    <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
+                                                        <span className="text-gray-600 shrink-0">📝</span>
+                                                        <span>{trade.notes}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 transition-all duration-300">
+                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-6 opacity-60" : "translate-x-0")}>
+                                                <div className={`text-sm font-black mb-1 px-2 py-0.5 rounded inline-block ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                    {trade.type}
                                                 </div>
-                                            )}
-                                        </td>
-                                        <td className={`${cellPad} transition-all duration-300`}>
-                                            <div className={`text-sm font-black mb-1 px-2 py-0.5 rounded inline-block ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                                                {trade.type}
-                                            </div>
-                                            <div className="text-xs text-gray-400 font-medium mt-1">Lot: <span className="text-white">{trade.lot_size}</span></div>
-                                        </td>
-                                        <td className={`${cellPad} text-sm font-mono text-gray-300 transition-all duration-300`}>
-                                            <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-                                                <span className="text-gray-500 text-[10px] uppercase">En:</span>
-                                                <span className="text-white font-bold">{trade.entry_price?.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex items-baseline gap-1.5 mt-1 whitespace-nowrap">
-                                                <span className="text-gray-500 text-[10px] uppercase">Ex:</span>
-                                                <span className="text-gray-300">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <div className="text-xs text-gray-400 font-medium mt-1">Lot: <span className="text-white">{trade.lot_size}</span></div>
                                             </div>
                                         </td>
-                                        <td className={`${cellPad} transition-all duration-300`}>
-                                            <div className={`text-xl font-black tracking-tight whitespace-nowrap ${profit > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
-                                                {profit > 0 ? `+$${profit.toLocaleString()}` : `$${profit.toLocaleString()}`}
-                                            </div>
-                                            <div className={`text-xs font-bold mt-1 ${points > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
-                                                {points > 0 ? '+' : ''}{points.toLocaleString()} pts
+                                        <td className="px-5 py-4 text-sm font-mono text-gray-300 transition-all duration-300">
+                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-12 opacity-80" : "translate-x-0")}>
+                                                <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+                                                    <span className="text-gray-500 text-[10px] uppercase">En:</span>
+                                                    <span className="text-white font-bold">{trade.entry_price?.toLocaleString()}</span>
+                                                </div>
+                                                <div className="flex items-baseline gap-1.5 mt-1 whitespace-nowrap">
+                                                    <span className="text-gray-500 text-[10px] uppercase">Ex:</span>
+                                                    <span className="text-gray-300">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className={`${cellPad} relative transition-all duration-300`}>
+                                        <td className="px-5 py-4 transition-all duration-300">
+                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-20" : "translate-x-0")}>
+                                                <div className={`text-xl font-black tracking-tight whitespace-nowrap ${profit > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
+                                                    {profit > 0 ? `+$${profit.toLocaleString()}` : `$${profit.toLocaleString()}`}
+                                                </div>
+                                                <div className={`text-xs font-bold mt-1 ${points > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
+                                                    {points > 0 ? '+' : ''}{points.toLocaleString()} pts
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 relative transition-all duration-300">
                                             <AIAnalysis
                                                 tradeId={trade.id}
                                                 initialAnalysis={trade.ai_analysis}
-                                                isExpanded={expandedAnalysisId === trade.id}
-                                                onToggle={() => setExpandedAnalysisId(expandedAnalysisId === trade.id ? null : trade.id)}
+                                                isExpanded={isExpanded}
+                                                onToggle={() => setExpandedAnalysisId(isExpanded ? null : trade.id)}
                                             />
                                         </td>
-                                        <td className={`${cellPad} text-center transition-all duration-300`}>
+                                        <td className="px-5 py-4 text-center transition-all duration-300">
                                             <div className="flex items-center justify-center gap-1.5">
                                                 <button
                                                     onClick={() => setSharingTrade(trade)}

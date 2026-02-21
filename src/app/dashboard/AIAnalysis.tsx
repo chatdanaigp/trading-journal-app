@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { analyzeTrade } from './actions'
 import { Button } from '@/components/ui/button'
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2, Sparkles, ChevronLeft } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpanded, onToggle }: { tradeId: string, initialAnalysis: string | null, isExpanded?: boolean, onToggle?: () => void }) {
@@ -33,12 +33,19 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
                 className={cn(
                     "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 shadow-md group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar",
                     isExpanded
-                        ? "w-[220px] h-auto max-h-[150px] relative z-10 overflow-y-auto shadow-inner"
+                        ? "w-[240px] h-auto max-h-[150px] absolute right-5 top-1/2 -translate-y-1/2 z-50 overflow-y-auto shadow-2xl"
                         : "w-[150px] h-[60px] relative z-0"
                 )}
             >
-                <div className={cn("relative z-10 leading-snug", !isExpanded && "line-clamp-3")}>
-                    {analysis}
+                <div className="w-full h-full relative z-10 flex flex-col justify-center">
+                    <div className={cn("leading-snug", !isExpanded && "line-clamp-2 pr-4")}>
+                        {analysis}
+                    </div>
+                    {!isExpanded && (
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[#ccf381]/40 group-hover:text-[#ccf381] group-hover:-translate-x-1 transition-all duration-300">
+                            <ChevronLeft size={14} />
+                        </div>
+                    )}
                 </div>
             </div>
         )
