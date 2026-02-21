@@ -41,7 +41,7 @@ export function Sidebar({ dict }: { dict: any }) {
     }, [pathname])
 
     const links = [
-        { name: dict.sidebar.dashboard, href: '/dashboard', icon: LayoutDashboard },
+        { name: dict.sidebar.overview, href: '/dashboard', icon: LayoutDashboard },
         { name: dict.sidebar.analytics, href: '/analytics', icon: BarChart3 },
         { name: dict.sidebar.leaderboard, href: '/leaderboard', icon: Trophy },
         { name: dict.sidebar.journal, href: '/journal', icon: Wallet },
