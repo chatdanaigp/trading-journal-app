@@ -27,7 +27,7 @@ export function TradeList({ trades, username }: { trades: any[], username?: stri
                     <div className="p-10 text-center text-gray-500">No trades yet.</div>
                 ) : (
                     <table className="w-full text-left min-w-[700px] relative">
-                        <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10 shadow-md">
+                        <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
                                 <th className="px-5 py-3 rounded-tl-xl transition-all duration-300">Asset</th>
                                 <th className="px-5 py-3 transition-all duration-300">Side / Lot</th>
