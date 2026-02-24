@@ -20,8 +20,8 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
         await new Promise(resolve => setTimeout(resolve, 1500))
 
         const result = await analyzeTrade(tradeId)
-        if (result.success) {
-            window.location.reload()
+        if (result.success && result.analysis) {
+            setAnalysis(result.analysis)
         }
         setIsLoading(false)
     }

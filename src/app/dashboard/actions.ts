@@ -301,7 +301,7 @@ export async function analyzeTrade(tradeId: string) {
     if (updateError) return { error: updateError.message }
 
     revalidatePath('/', 'layout')
-    return { success: true }
+    return { success: true, analysis }
 }
 
 export async function getProfileGoals() {
