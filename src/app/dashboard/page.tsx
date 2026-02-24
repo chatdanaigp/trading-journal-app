@@ -98,11 +98,36 @@ export default async function DashboardPage() {
                             <TrendingUp className="w-32 h-32 text-[#ccf381]" />
                         </div>
                         <CardContent className="p-6 relative z-30">
-                            <p className="text-gray-500 font-medium mb-1 tracking-wide text-xs uppercase">{dict.dashboard.netProfit}</p>
-                            <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
-                                ${Number(stats.netProfit).toLocaleString()}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-4">
+                            <p className="text-gray-500 font-medium tracking-wide text-xs uppercase mb-1">{dict.dashboard.netProfit}</p>
+
+                            <div className="flex justify-between items-end mb-4">
+                                <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
+                                    ${Number(stats.netProfit).toLocaleString()}
+                                </h3>
+
+                                {/* Progress vs Goal */}
+                                {portSize > 0 && goalPercent > 0 && (
+                                    <div className="text-right flex flex-col items-end opacity-90 mb-1">
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
+                                            {dict.challenge?.monthlyGoal || 'Monthly Goal'}
+                                        </p>
+                                        <div className="flex items-baseline gap-1 mb-1.5">
+                                            <span className="text-sm font-bold text-[#ccf381]">{((Number(stats.netProfit) / (portSize * (goalPercent / 100))) * 100).toFixed(1)}%</span>
+                                            <span className="text-xs text-gray-500">/ ${(portSize * (goalPercent / 100)).toLocaleString()}</span>
+                                        </div>
+                                        <div className="w-28 h-1.5 bg-[#0d0d0d] rounded-full overflow-hidden border border-white/5 relative shadow-inner">
+                                            {Number(stats.netProfit) > 0 && (
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-[#a3d149] to-[#ccf381] rounded-full transition-all duration-1000 ease-out"
+                                                    style={{ width: `${Math.min((Number(stats.netProfit) / (portSize * (goalPercent / 100))) * 100, 100)}%` }}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
                                 <span className={`text-xs px-2 py-1 rounded-md border flex items-center gap-1 font-medium ${Number(stats.netProfit) >= 0 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
                                     {Number(stats.netProfit) >= 0 ? '↗' : '↘'} {stats.winRate}% {dict.dashboard.winRate}
                                 </span>
