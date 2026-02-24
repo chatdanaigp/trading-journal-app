@@ -28,22 +28,22 @@ export function AIAnalysis({ tradeId, initialAnalysis, isExpanded: externalExpan
 
     if (analysis) {
         return (
-            <div className="relative w-[150px] h-[60px] flex items-center">
+            <div className="relative w-[150px] md:w-full h-[60px] md:h-auto flex items-center md:items-start">
                 <div
                     onClick={handleToggle}
                     className={cn(
-                        "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] text-gray-300 group cursor-pointer hover:bg-[#2a2a2a] transition-all duration-300 custom-scrollbar absolute right-0 top-1/2 -translate-y-1/2",
+                        "p-2.5 bg-gradient-to-br from-[#1a1a1a] to-[#252525] backdrop-blur-md border border-white/5 rounded-lg text-[11px] md:text-xs text-gray-300 group transition-all duration-300 custom-scrollbar absolute md:relative right-0 md:right-auto top-1/2 md:top-auto -translate-y-1/2 md:translate-y-0",
                         isExpanded
-                            ? "w-[260px] min-h-[60px] max-h-[200px] z-50 overflow-y-auto shadow-2xl"
-                            : "w-[150px] min-h-[60px] max-h-[60px] overflow-hidden z-10 shadow-md"
+                            ? "w-[260px] md:w-full min-h-[60px] max-h-[200px] md:max-h-none z-50 md:z-10 overflow-y-auto shadow-2xl md:shadow-sm"
+                            : "w-[150px] md:w-full min-h-[60px] md:min-h-0 max-h-[60px] md:max-h-none overflow-hidden z-10 shadow-md md:shadow-sm"
                     )}
                 >
-                    <div className="w-full h-full relative z-10 flex flex-col justify-center">
-                        <div className={cn("leading-snug", !isExpanded && "line-clamp-2 pr-4")}>
+                    <div className="w-full h-full relative z-10 flex flex-col justify-center md:justify-start cursor-pointer md:cursor-auto">
+                        <div className={cn("leading-snug", !isExpanded && "line-clamp-2 md:line-clamp-none pr-4 md:pr-0")}>
                             {analysis}
                         </div>
                         {!isExpanded && (
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[#ccf381]/40 group-hover:text-[#ccf381] group-hover:-translate-x-1 transition-all duration-300">
+                            <div className="absolute md:hidden right-0 top-1/2 -translate-y-1/2 text-[#ccf381]/40 group-hover:text-[#ccf381] group-hover:-translate-x-1 transition-all duration-300">
                                 <ChevronLeft size={14} />
                             </div>
                         )}

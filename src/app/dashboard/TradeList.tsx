@@ -33,7 +33,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                 <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.sideLot || "Side / Lot"}</th>
                                 <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.price || "Price"}</th>
                                 <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3 w-[150px] transition-all duration-300">{dict?.dashboard?.analysis || "Analysis"}</th>
+                                <th className="px-5 py-3 w-[150px] md:w-[250px] lg:w-auto lg:min-w-[300px] xl:min-w-[400px] transition-all duration-300">{dict?.dashboard?.analysis || "Analysis"}</th>
                                 <th className="px-5 py-3 text-center rounded-tr-xl w-12 transition-all duration-300"></th>
                             </tr>
                         </thead>
@@ -60,7 +60,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                 return (
                                     <tr key={trade.id} className="hover:bg-[#252525] transition-colors group border-b border-[#252525] last:border-0 text-sm">
                                         <td className="px-5 py-4 transition-all duration-300">
-                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
+                                            <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
                                                 <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
                                                 <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{new Date(trade.created_at).toLocaleDateString()}</div>
                                                 {trade.notes && (
@@ -72,7 +72,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 transition-all duration-300">
-                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-6 opacity-60" : "translate-x-0")}>
+                                            <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-6 opacity-60" : "translate-x-0")}>
                                                 <div className={`text-sm font-black mb-1 px-2 py-0.5 rounded inline-block ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                                                     {trade.type}
                                                 </div>
@@ -80,7 +80,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 text-sm font-mono text-gray-300 transition-all duration-300">
-                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-12 opacity-80" : "translate-x-0")}>
+                                            <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-12 opacity-80" : "translate-x-0")}>
                                                 <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                                                     <span className="text-gray-500 text-[10px] uppercase">En:</span>
                                                     <span className="text-white font-bold">{trade.entry_price?.toLocaleString()}</span>
@@ -92,7 +92,7 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 transition-all duration-300">
-                                            <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-20" : "translate-x-0")}>
+                                            <div className={cn("transition-transform duration-300 md:translate-x-0", isExpanded ? "-translate-x-20" : "translate-x-0")}>
                                                 <div className={`text-xl font-black tracking-tight whitespace-nowrap ${Math.abs(Number(profit)) < 0.01 ? 'text-white' : Number(profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
                                                     {Math.abs(Number(profit)) < 0.01 ? `$0` : Number(profit) > 0 ? `+$${Number(profit).toLocaleString()}` : `$${Number(profit).toLocaleString()}`}
                                                 </div>
