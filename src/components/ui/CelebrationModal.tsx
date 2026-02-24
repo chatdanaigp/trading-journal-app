@@ -1,53 +1,52 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Trophy, X, Target } from 'lucide-react'
 
 export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: any }) {
     const [isOpen, setIsOpen] = useState(false)
+    const prevNetToday = useRef(netToday)
 
     useEffect(() => {
         if (!isQuestActive || dailyTarget <= 0) return
 
         const todayStr = new Date().toISOString().split('T')[0]
         const storedDate = localStorage.getItem('tj_celebrated_date')
-        const storedProfitStr = localStorage.getItem('tj_celebrated_profit')
-        // Default to a very low number if not set, so the first trade doesn't look like a drop
-        const storedProfit = storedProfitStr ? parseFloat(storedProfitStr) : -999999
 
         // 1. New Day Reset
         if (storedDate !== todayStr) {
             localStorage.setItem('tj_celebrated_date', todayStr)
-            localStorage.setItem('tj_celebrated_profit', netToday.toString())
 
             // If we somehow start a new day already above target, celebrate
             if (netToday >= dailyTarget) {
                 setIsOpen(true)
                 const timer = setTimeout(() => setIsOpen(false), 7000)
+                // Sync the ref
+                prevNetToday.current = netToday
                 return () => clearTimeout(timer)
             }
+
+            // Sync the ref
+            prevNetToday.current = netToday
             return
         }
 
-        // 2. Same Day Logic: Check for a crossover
-        // We trigger if the CURRENT profit is >= target AND the PREVIOUS local storage profit was < target
+        // 2. Same Day Logic: Check for a crossover using purely internal React state
+        // This avoids race conditions with localStorage during rapid Next.js Server Action re-renders
         const isCurrentlyAbove = netToday >= dailyTarget
-        const wasPreviouslyBelow = storedProfit < dailyTarget
+        const wasPreviouslyBelow = prevNetToday.current < dailyTarget
 
         if (isCurrentlyAbove && wasPreviouslyBelow) {
             setIsOpen(true)
             const timer = setTimeout(() => setIsOpen(false), 7000)
 
-            // Update storage to reflect we are now above target
-            localStorage.setItem('tj_celebrated_profit', netToday.toString())
+            prevNetToday.current = netToday
             return () => clearTimeout(timer)
         }
 
-        // 3. Keep tracking the profit in local storage so we know if it dips below target later
-        if (netToday !== storedProfit) {
-            localStorage.setItem('tj_celebrated_profit', netToday.toString())
-        }
+        // 3. Keep tracking the profit locally per-session so rapid toggles evaluate properly
+        prevNetToday.current = netToday
 
     }, [dailyTarget, netToday, isQuestActive])
 
