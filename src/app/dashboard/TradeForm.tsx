@@ -17,6 +17,14 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
     // Calculate total net profit
     const totalNetProfit = trades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
 
+    // Calculate today's net profit
+    const today = getTradingDay(new Date())
+    const todayTrades = trades.filter((t: any) => {
+        if (!t.created_at) return false
+        return isSameDay(getTradingDay(t.created_at), today)
+    })
+    const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
+
     // Form State for Auto-Calculation
     const [type, setType] = useState('BUY')
     const [symbol, setSymbol] = useState('XAUUSD')
@@ -286,7 +294,7 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         </Button>
                     </div>
 
-                    {/* Row 4: Total Challenge Progress */}
+                    {/* Row 4: Total & Daily Challenge Progress */}
                     {portSize > 0 && goalPercent > 0 && (
                         <div className="mt-4 pt-4 border-t border-[#333] flex flex-col gap-3">
                             <div className="flex justify-between items-end">
@@ -296,23 +304,26 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                         <p className="text-sm font-bold text-white">${portSize.toLocaleString()}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">{dict?.challenge?.monthlyGoal || 'Monthly Goal'}</p>
-                                        <p className="text-sm font-bold text-[#ccf381]">{goalPercent}% <span className="text-xs text-gray-500 font-normal hidden sm:inline-block">(${(portSize * (goalPercent / 100)).toLocaleString()})</span></p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">{dict?.dashboard?.netProfit || 'Net Profit'}</p>
+                                        <p className="text-sm font-bold text-[#ccf381]">
+                                            <span className={`${totalNetProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${totalNetProfit.toFixed(2)}</span>
+                                            <span className="text-xs text-gray-500 font-normal hidden sm:inline-block ml-1">/ ${(portSize * (goalPercent / 100)).toLocaleString()}</span>
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">{dict?.dashboard?.netProfit || 'Total Profit'}</p>
+                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">{dict?.challenge?.dailyTarget || 'Daily Target'}</p>
                                     <p className="text-sm font-bold text-white">
-                                        <span className={`${totalNetProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${totalNetProfit.toFixed(2)}</span>
-                                        <span className="text-gray-500 font-normal"> / ${(portSize * (goalPercent / 100)).toFixed(2)}</span>
+                                        <span className={`${netProfitToday >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${netProfitToday.toFixed(2)}</span>
+                                        <span className="text-gray-500 font-normal"> / ${(portSize * (goalPercent / 100) / 20).toFixed(2)}</span>
                                     </p>
                                 </div>
                             </div>
                             <div className="h-1.5 bg-[#0d0d0d] rounded-full overflow-hidden border border-white/5 relative">
-                                {totalNetProfit > 0 && (
+                                {netProfitToday > 0 && (
                                     <div
                                         className="h-full bg-gradient-to-r from-[#a3d149] to-[#ccf381] rounded-full transition-all duration-1000 ease-out"
-                                        style={{ width: `${Math.min((totalNetProfit / (portSize * (goalPercent / 100))) * 100, 100)}%` }}
+                                        style={{ width: `${Math.min((netProfitToday / (portSize * (goalPercent / 100) / 20)) * 100, 100)}%` }}
                                     />
                                 )}
                             </div>
