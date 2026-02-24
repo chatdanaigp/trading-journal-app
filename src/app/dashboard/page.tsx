@@ -98,24 +98,26 @@ export default async function DashboardPage() {
                             <TrendingUp className="w-32 h-32 text-[#ccf381]" />
                         </div>
                         <CardContent className="p-6 relative z-30">
-                            <p className="text-gray-500 font-medium tracking-wide text-xs uppercase mb-1">{dict.dashboard.netProfit}</p>
+                            <div className="flex justify-between items-start mb-1">
+                                <p className="text-gray-500 font-medium tracking-wide text-xs uppercase">{dict.dashboard.netProfit}</p>
+                                {portSize > 0 && (
+                                    <p className="text-gray-500 font-medium tracking-wide text-[10px] uppercase text-right opacity-90 mt-0.5">
+                                        {dict.dashboard?.totalEquity || 'Total Balance'}
+                                    </p>
+                                )}
+                            </div>
 
-                            <div className="flex justify-between items-end mb-4">
+                            <div className="flex justify-between items-baseline mb-4">
                                 <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
                                     ${Number(stats.netProfit).toLocaleString()}
                                 </h3>
 
                                 {/* Total Equity (Capital + Profit) */}
                                 {portSize > 0 && (
-                                    <div className="text-right flex flex-col items-end opacity-90 mb-2">
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
-                                            {dict.dashboard?.totalEquity || 'Total Balance'}
-                                        </p>
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-xl font-bold text-white tracking-tight">
-                                                ${(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </span>
-                                        </div>
+                                    <div className="text-right opacity-90">
+                                        <span className="text-2xl font-bold text-white tracking-tight">
+                                            ${(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
                                     </div>
                                 )}
                             </div>
