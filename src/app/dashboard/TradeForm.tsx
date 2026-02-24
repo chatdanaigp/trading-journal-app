@@ -8,10 +8,13 @@ import { useState, useRef } from 'react'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CheckCircle2 } from 'lucide-react'
 
 export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number }) {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
 
     // Calculate total net profit
@@ -91,6 +94,10 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
             const result = await createTrade(formData)
 
             if (result?.success) {
+                // Show overlay for 2 seconds
+                setShowSuccessOverlay(true)
+                setTimeout(() => setShowSuccessOverlay(false), 2000)
+
                 setMessage({ type: 'success', text: 'Trade saved successfully!' })
                 formRef.current?.reset()
                 // Reset state
@@ -331,6 +338,30 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                     )}
                 </div>
             </div>
+
+            {/* Success Overlay */}
+            <AnimatePresence>
+                {showSuccessOverlay && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#1e1e1e]/90 backdrop-blur-sm rounded-2xl border border-[#ccf381]/30"
+                    >
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                            className="w-16 h-16 bg-[#ccf381]/20 rounded-full flex items-center justify-center mb-4"
+                        >
+                            <CheckCircle2 className="w-8 h-8 text-[#ccf381]" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold text-white mb-2">{dict?.tradeForm?.successTitle || 'Trade Recorded!'}</h3>
+                        <p className="text-gray-400 text-sm">{dict?.tradeForm?.successDesc || 'Your trade has been successfully logged.'}</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </form>
     )
 }
