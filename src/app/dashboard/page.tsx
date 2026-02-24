@@ -105,23 +105,16 @@ export default async function DashboardPage() {
                                     ${Number(stats.netProfit).toLocaleString()}
                                 </h3>
 
-                                {/* Progress vs Goal */}
-                                {portSize > 0 && goalPercent > 0 && (
-                                    <div className="text-right flex flex-col items-end opacity-90 mb-1">
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
-                                            {dict.challenge?.monthlyGoal || 'Monthly Goal'}
+                                {/* Total Equity (Capital + Profit) */}
+                                {portSize > 0 && (
+                                    <div className="text-right flex flex-col items-end opacity-90 mb-2">
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                                            {dict.dashboard?.totalEquity || 'Total Balance'}
                                         </p>
-                                        <div className="flex items-baseline gap-1 mb-1.5">
-                                            <span className="text-sm font-bold text-[#ccf381]">{((Number(stats.netProfit) / (portSize * (goalPercent / 100))) * 100).toFixed(1)}%</span>
-                                            <span className="text-xs text-gray-500">/ ${(portSize * (goalPercent / 100)).toLocaleString()}</span>
-                                        </div>
-                                        <div className="w-28 h-1.5 bg-[#0d0d0d] rounded-full overflow-hidden border border-white/5 relative shadow-inner">
-                                            {Number(stats.netProfit) > 0 && (
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-[#a3d149] to-[#ccf381] rounded-full transition-all duration-1000 ease-out"
-                                                    style={{ width: `${Math.min((Number(stats.netProfit) / (portSize * (goalPercent / 100))) * 100, 100)}%` }}
-                                                />
-                                            )}
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-xl font-bold text-white tracking-tight">
+                                                ${(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
                                         </div>
                                     </div>
                                 )}
