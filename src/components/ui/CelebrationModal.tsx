@@ -8,23 +8,45 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }:
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        // Only trigger if we meet the target and the quest is actually active
-        if (isQuestActive && netToday >= dailyTarget && dailyTarget > 0) {
-            const todayStr = new Date().toISOString().split('T')[0]
-            const lastCelebration = localStorage.getItem('tj_celebrated_date')
+        if (!isQuestActive || dailyTarget <= 0) return
 
-            if (lastCelebration !== todayStr) {
-                // We haven't celebrated today yet!
+        const todayStr = new Date().toISOString().split('T')[0]
+        const storedDate = localStorage.getItem('tj_celebrated_date')
+        const storedProfit = Number(localStorage.getItem('tj_celebrated_profit') || '-999999')
+
+        // If it's a new day, clear the old stored profit state
+        if (storedDate !== todayStr) {
+            localStorage.setItem('tj_celebrated_date', todayStr)
+            localStorage.setItem('tj_celebrated_profit', netToday.toString())
+
+            // If we start the day already above target (unlikely but possible), celebrate once
+            if (netToday >= dailyTarget) {
                 setIsOpen(true)
-                // Set the flag
-                localStorage.setItem('tj_celebrated_date', todayStr)
-
-                // Auto close after 7 seconds
                 const timer = setTimeout(() => setIsOpen(false), 7000)
                 return () => clearTimeout(timer)
             }
+            return
         }
-    }, [dailyTarget, netToday])
+
+        // It is the same day. Check if we just CROSSED the threshold from below to above.
+        // We triggered if current >= target AND previous wasn't (or previous was empty)
+        const previouslyBelowTarget = storedProfit < dailyTarget
+        const currentlyAboveTarget = netToday >= dailyTarget
+
+        if (currentlyAboveTarget && previouslyBelowTarget) {
+            setIsOpen(true)
+            const timer = setTimeout(() => setIsOpen(false), 7000)
+            // Save the new state so we don't trigger again until it dips
+            localStorage.setItem('tj_celebrated_profit', netToday.toString())
+            return () => clearTimeout(timer)
+        }
+
+        // Always update the stored profit state so we know if we dip below it later
+        if (netToday !== storedProfit) {
+            localStorage.setItem('tj_celebrated_profit', netToday.toString())
+        }
+
+    }, [dailyTarget, netToday, isQuestActive])
 
     return (
         <AnimatePresence>
