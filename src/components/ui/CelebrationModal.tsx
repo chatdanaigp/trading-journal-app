@@ -12,14 +12,16 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }:
 
         const todayStr = new Date().toISOString().split('T')[0]
         const storedDate = localStorage.getItem('tj_celebrated_date')
-        const storedProfit = Number(localStorage.getItem('tj_celebrated_profit') || '-999999')
+        const storedProfitStr = localStorage.getItem('tj_celebrated_profit')
+        // Default to a very low number if not set, so the first trade doesn't look like a drop
+        const storedProfit = storedProfitStr ? parseFloat(storedProfitStr) : -999999
 
-        // If it's a new day, clear the old stored profit state
+        // 1. New Day Reset
         if (storedDate !== todayStr) {
             localStorage.setItem('tj_celebrated_date', todayStr)
             localStorage.setItem('tj_celebrated_profit', netToday.toString())
 
-            // If we start the day already above target (unlikely but possible), celebrate once
+            // If we somehow start a new day already above target, celebrate
             if (netToday >= dailyTarget) {
                 setIsOpen(true)
                 const timer = setTimeout(() => setIsOpen(false), 7000)
@@ -28,20 +30,21 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }:
             return
         }
 
-        // It is the same day. Check if we just CROSSED the threshold from below to above.
-        // We triggered if current >= target AND previous wasn't (or previous was empty)
-        const previouslyBelowTarget = storedProfit < dailyTarget
-        const currentlyAboveTarget = netToday >= dailyTarget
+        // 2. Same Day Logic: Check for a crossover
+        // We trigger if the CURRENT profit is >= target AND the PREVIOUS local storage profit was < target
+        const isCurrentlyAbove = netToday >= dailyTarget
+        const wasPreviouslyBelow = storedProfit < dailyTarget
 
-        if (currentlyAboveTarget && previouslyBelowTarget) {
+        if (isCurrentlyAbove && wasPreviouslyBelow) {
             setIsOpen(true)
             const timer = setTimeout(() => setIsOpen(false), 7000)
-            // Save the new state so we don't trigger again until it dips
+
+            // Update storage to reflect we are now above target
             localStorage.setItem('tj_celebrated_profit', netToday.toString())
             return () => clearTimeout(timer)
         }
 
-        // Always update the stored profit state so we know if we dip below it later
+        // 3. Keep tracking the profit in local storage so we know if it dips below target later
         if (netToday !== storedProfit) {
             localStorage.setItem('tj_celebrated_profit', netToday.toString())
         }
