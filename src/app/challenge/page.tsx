@@ -5,6 +5,7 @@ import { getDictionary, getCurrentLanguage } from '@/utils/dictionaries'
 import { getProfileGoals, getTrades } from '@/app/dashboard/actions'
 import { Target, Trophy, Clock, Lock, CheckCircle2, TrendingUp, Sparkles } from 'lucide-react'
 import { PortfolioQuestClient } from './PortfolioQuestClient'
+import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function ChallengePage() {
     const supabase = await createClient()
@@ -98,6 +99,7 @@ export default async function ChallengePage() {
             {/* Main Content */}
             <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full">
                 <div className="max-w-7xl mx-auto space-y-8">
+                    <TopNavigation />
 
                     {/* Header */}
                     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] border border-[#2a2a2a] p-8 lg:p-12 mb-8">

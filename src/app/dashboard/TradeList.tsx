@@ -41,7 +41,9 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                             {trades.map((trade) => {
                                 // Calculate Points & Exit if missing (Reverse Calc for display)
                                 const lot = trade.lot_size || 0.01 // Fallback
-                                const profit = trade.profit || 0
+                                const rawProfit = trade.profit || 0
+                                // Round to 2 decimal places to prevent floating point inaccuracies (e.g., -0.0000001 showing as $0 but evaluating as < 0)
+                                const profit = Math.round(rawProfit * 100) / 100
                                 const points = lot !== 0 ? Math.round(profit / lot) : 0
 
                                 // Exit Price Display (Use stored if avail, else calc)
@@ -91,11 +93,11 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                         </td>
                                         <td className="px-5 py-4 transition-all duration-300">
                                             <div className={cn("transition-transform duration-300", isExpanded ? "-translate-x-20" : "translate-x-0")}>
-                                                <div className={`text-xl font-black tracking-tight whitespace-nowrap ${profit > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
-                                                    {profit > 0 ? `+$${profit.toLocaleString()}` : `$${profit.toLocaleString()}`}
+                                                <div className={`text-xl font-black tracking-tight whitespace-nowrap ${Math.abs(Number(profit)) < 0.01 ? 'text-white' : Number(profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
+                                                    {Math.abs(Number(profit)) < 0.01 ? `$0` : Number(profit) > 0 ? `+$${Number(profit).toLocaleString()}` : `$${Number(profit).toLocaleString()}`}
                                                 </div>
-                                                <div className={`text-xs font-bold mt-1 ${points > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
-                                                    {points > 0 ? '+' : ''}{points.toLocaleString()} pts
+                                                <div className={`text-xs font-bold mt-1 ${Math.abs(Number(points)) < 0.01 ? 'text-gray-400' : Number(points) > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
+                                                    {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
                                                 </div>
                                             </div>
                                         </td>

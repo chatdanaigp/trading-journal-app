@@ -5,6 +5,7 @@ import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
+import { TopNavigation } from '@/components/TopNavigation'
 
 // Rank Badge System
 function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
@@ -37,26 +38,31 @@ export default async function LeaderboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-8 relative overflow-hidden">
+        <div className="min-h-screen bg-[#050505] text-white p-4 lg:p-8 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
 
-            <StaggerContainer className="max-w-7xl mx-auto space-y-12 relative z-10">
+            <StaggerContainer className="relative z-10 max-w-7xl mx-auto space-y-12 pt-20 lg:pt-8 lg:ml-64">
+                <StaggerItem className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <TopNavigation />
+                </StaggerItem>
 
-                {/* Header */}
-                <StaggerItem className="text-center space-y-4">
-                    <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase sm:whitespace-nowrap bg-gradient-to-r from-white via-[#ccf381] to-white bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(204,243,129,0.3)]">
-                        🏆 {dict.leaderboard.title}
-                    </h1>
-                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                        {dict.leaderboard.subtitle}
-                    </p>
-                    <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:bg-white/10">
-                        <ArrowLeft className="w-4 h-4" />
-                        {dict.leaderboard.backToDashboard}
-                    </Link>
+                <StaggerItem className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-[#ccf381]/10 rounded-lg">
+                                <Trophy className="w-6 h-6 text-[#ccf381]" />
+                            </div>
+                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white flex items-center gap-2">
+                                {dict.leaderboard.title}
+                            </h1>
+                        </div>
+                        <p className="text-gray-400 font-medium tracking-wide">
+                            {dict.leaderboard.subtitle}
+                        </p>
+                    </div>
                 </StaggerItem>
 
                 {/* Top 3 Podium */}
@@ -113,7 +119,7 @@ export default async function LeaderboardPage() {
                                 </CardTitle>
                                 <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">{dict.leaderboard.champion}</p>
                                 <div className="mt-2">
-                                    <span className={`text-sm px-3 py-1 rounded bg-gradient-to-r ${getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).color} text-white font-bold shadow-lg`}>
+                                    <span className={`text-sm px-3 py-1.5 rounded-lg bg-gradient-to-r ${getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).color} text-white font-bold shadow-[0_0_15px_rgba(255,215,0,0.3)]`}>
                                         {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).badge} {getRankBadge(leaderboard[0].total_trades, leaderboard[0].net_profit, leaderboard[0].win_rate, dict).name}
                                     </span>
                                 </div>
@@ -203,10 +209,13 @@ export default async function LeaderboardPage() {
                                                             className="w-8 h-8 rounded-full border border-gray-600"
                                                         />
                                                     )}
-                                                    <span className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}>
+                                                    <Link
+                                                        href={`/public-profile/${trader.out_user_id}`}
+                                                        className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}
+                                                    >
                                                         {trader.username || trader.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
                                                         {isCurrentUser && <span className="ml-2 text-xs">({dict?.leaderboard?.you || 'You'})</span>}
-                                                    </span>
+                                                    </Link>
                                                 </div>
                                             </td>
                                             <td className="p-4">

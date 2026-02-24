@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Shield, ShieldAlert, Users, BarChart3, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -64,7 +65,10 @@ export default async function AdminPage() {
             <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-[#ccf381] blur-[150px] opacity-5 rounded-full pointer-events-none" />
             <div className="absolute bottom-10 left-10 w-[200px] h-[200px] bg-red-500 blur-[150px] opacity-5 rounded-full pointer-events-none" />
 
-            <div className="max-w-[1400px] mx-auto space-y-8 relative z-10">
+            {/* Main Content */}
+            <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto space-y-8">
+                <TopNavigation />
+
                 {/* Header */}
                 <div className="flex justify-between items-end border-b border-white/5 pb-6">
                     <div className="flex items-center gap-4">

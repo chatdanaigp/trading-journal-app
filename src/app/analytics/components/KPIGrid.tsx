@@ -111,7 +111,7 @@ export function KPIGrid({ stats, dict }: { stats: AnalyticsData['stats'], dict: 
 
             {/* Bottom Row: Avg Win & Avg Loss — Small accent cards */}
             <div className="col-span-12">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-[#1a1a1a] rounded-xl border border-white/5 p-4 flex items-center gap-4 group hover:border-[#ccf381]/20 transition-colors">
                         <div className="w-10 h-10 rounded-xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center flex-shrink-0">
                             <ArrowUpDown className="w-5 h-5 text-[#ccf381]" />

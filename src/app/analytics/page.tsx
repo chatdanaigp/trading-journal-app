@@ -6,6 +6,7 @@ import { AnalyticsCharts } from './components/AnalyticsCharts'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function AnalyticsPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -14,33 +15,36 @@ export default async function AnalyticsPage() {
     // Fetch Analytics Data
     const data = await getAnalyticsData()
     const lang = await getCurrentLanguage()
-    const dict = getDictionary(lang)
+    const dict = await getDictionary(lang)
 
     return (
-        <StaggerContainer className="space-y-8">
-            {/* Header */}
-            <StaggerItem>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.title}</h1>
-                        <p className="text-gray-500">{dict.analytics.subtitle}</p>
+        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto space-y-8">
+            <TopNavigation />
+
+            <StaggerContainer className="space-y-8">
+                <StaggerItem>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.title}</h1>
+                            <p className="text-gray-500">{dict.analytics.subtitle}</p>
+                        </div>
+
+                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
+                            {dict.analytics.allTimeView}
+                        </div>
                     </div>
+                </StaggerItem>
 
-                    <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
-                        {dict.analytics.allTimeView}
-                    </div>
-                </div>
-            </StaggerItem>
+                {/* Row 1: Hero KPIs (Bento 4 + 8 split) */}
+                <StaggerItem>
+                    <KPIGrid stats={data.stats} dict={dict} />
+                </StaggerItem>
 
-            {/* Row 1: Hero KPIs (Bento 4 + 8 split) */}
-            <StaggerItem>
-                <KPIGrid stats={data.stats} dict={dict} />
-            </StaggerItem>
-
-            {/* Row 2+: Charts (Bento layout) */}
-            <StaggerItem>
-                <AnalyticsCharts data={data} dict={dict} />
-            </StaggerItem>
-        </StaggerContainer>
+                {/* Row 2+: Charts (Bento layout) */}
+                <StaggerItem>
+                    <AnalyticsCharts data={data} dict={dict} />
+                </StaggerItem>
+            </StaggerContainer>
+        </div>
     )
 }

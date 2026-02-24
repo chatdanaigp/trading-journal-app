@@ -48,6 +48,16 @@ export async function createTrade(formData: FormData) {
         }
     }
 
+    let createdAt = new Date().toISOString()
+    if (tradeDate) {
+        if (tradeDate.length === 10) {
+            // Append 12:00 UTC to prevent timezone/midnight parsing issues with getTradingDay
+            createdAt = new Date(`${tradeDate}T12:00:00Z`).toISOString()
+        } else {
+            createdAt = new Date(tradeDate).toISOString()
+        }
+    }
+
     const { error } = await supabase.from('trades').insert({
         user_id: user.id,
         symbol: symbol.toUpperCase(),
@@ -58,7 +68,7 @@ export async function createTrade(formData: FormData) {
         profit: profit ? Number(profit) : null,
         notes: notes,
         screenshot_url: screenshotUrl,
-        created_at: tradeDate ? new Date(tradeDate).toISOString() : new Date().toISOString()
+        created_at: createdAt
     })
 
     if (error) {
@@ -94,7 +104,7 @@ export async function createTrade(formData: FormData) {
         }).catch(err => console.error('Discord Webhook Error:', err))
     }
 
-    revalidatePath('/dashboard')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 
@@ -119,6 +129,15 @@ export async function updateTrade(formData: FormData) {
     const profit = formData.get('profit')
     const notes = formData.get('notes') as string
 
+    let createdAt: string | undefined = undefined
+    if (tradeDate) {
+        if (tradeDate.length === 10) {
+            createdAt = new Date(`${tradeDate}T12:00:00Z`).toISOString()
+        } else {
+            createdAt = new Date(tradeDate).toISOString()
+        }
+    }
+
     // We are not handling screenshot updates in this version for simplicity, 
     // but we could add it later.
 
@@ -132,7 +151,7 @@ export async function updateTrade(formData: FormData) {
             exit_price: exitPrice ? Number(exitPrice) : null,
             profit: profit ? Number(profit) : null,
             notes: notes,
-            created_at: tradeDate ? new Date(tradeDate).toISOString() : undefined
+            created_at: createdAt
         })
         .eq('id', tradeId)
         .eq('user_id', user.id) // Ensure user owns the trade
@@ -142,7 +161,7 @@ export async function updateTrade(formData: FormData) {
         return { error: error.message }
     }
 
-    revalidatePath('/dashboard')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 
@@ -280,7 +299,7 @@ export async function analyzeTrade(tradeId: string) {
 
     if (updateError) return { error: updateError.message }
 
-    revalidatePath('/dashboard')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 
@@ -326,6 +345,6 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
 
     if (error) return { error: error.message }
 
-    revalidatePath('/dashboard')
+    revalidatePath('/', 'layout')
     return { success: true }
 }

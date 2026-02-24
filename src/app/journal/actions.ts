@@ -66,7 +66,7 @@ export async function createJournalEntry(formData: FormData) {
         return { error: error.message }
     }
 
-    revalidatePath('/journal')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 
@@ -105,7 +105,7 @@ export async function updateJournalEntry(formData: FormData) {
         return { error: error.message }
     }
 
-    revalidatePath('/journal')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 
@@ -126,7 +126,7 @@ export async function deleteJournalEntry(entryId: string) {
         return { error: error.message }
     }
 
-    revalidatePath('/journal')
+    revalidatePath('/', 'layout')
     return { success: true }
 }
 

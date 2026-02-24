@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { BookOpen, Flame, CheckCircle } from 'lucide-react'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function JournalPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -21,15 +22,14 @@ export default async function JournalPage() {
     const dict = await getDictionary(lang)
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto space-y-8">
+            <TopNavigation />
+
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">{dict.journal.title}</h1>
                     <p className="text-gray-500">{dict.journal.subtitle}</p>
-                </div>
-                <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </div>
             </div>
 
