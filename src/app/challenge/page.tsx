@@ -6,6 +6,8 @@ import { getProfileGoals, getTrades } from '@/app/dashboard/actions'
 import { Target, Trophy, Clock, Lock, CheckCircle2, TrendingUp, Sparkles } from 'lucide-react'
 import { PortfolioQuestClient } from './PortfolioQuestClient'
 import { TopNavigation } from '@/components/TopNavigation'
+import { isSameDay } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 
 export default async function ChallengePage() {
     const supabase = await createClient()
@@ -34,22 +36,13 @@ export default async function ChallengePage() {
     const isQuestActive = goals?.is_portfolio_quest_active || false
 
     // Today's Profit
-    const getTradingDay = (dateStr: string) => {
-        const d = new Date(dateStr)
-        const day = d.getDay()
-        if (day === 6) { d.setDate(d.getDate() - 1); d.setHours(23, 59, 59, 999) }
-        else if (day === 0) { d.setDate(d.getDate() - 2); d.setHours(23, 59, 59, 999) }
-        else if (d.getHours() >= 4) { d.setDate(d.getDate() + 1) }
-        return d.toISOString().split('T')[0]
-    }
-
-    const now = new Date()
-    const mockCreatedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0)
-    const currentTradingDayStr = getTradingDay(mockCreatedDate.toISOString())
+    // Get current date in Thailand time to ensure consistency with user's likely timezone
+    const nowBkk = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
+    const currentTradingDay = getTradingDay(nowBkk)
 
     const todayTrades = trades.filter((t: any) => {
         if (!t.created_at) return false
-        return getTradingDay(t.created_at) === currentTradingDayStr
+        return isSameDay(getTradingDay(t.created_at), currentTradingDay)
     })
 
     const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
