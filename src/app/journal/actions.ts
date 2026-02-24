@@ -27,6 +27,7 @@ export async function getJournalEntries(): Promise<JournalEntry[]> {
         .select('*')
         .eq('user_id', user.id)
         .order('trading_day', { ascending: false })
+        .order('id', { ascending: false })
 
     if (error) {
         console.error('Error fetching journal entries:', error)

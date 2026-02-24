@@ -176,6 +176,7 @@ export async function getTrades() {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
         .limit(50) // Limit to last 50 trades for now
 
     if (error) {

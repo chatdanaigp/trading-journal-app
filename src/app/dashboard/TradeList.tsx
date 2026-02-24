@@ -38,7 +38,12 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
-                            {[...trades].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((trade) => {
+                            {[...trades].sort((a, b) => {
+                                const timeA = new Date(a.created_at || 0).getTime()
+                                const timeB = new Date(b.created_at || 0).getTime()
+                                if (timeA !== timeB) return timeB - timeA
+                                return (b.id || '').localeCompare(a.id || '')
+                            }).map((trade) => {
                                 // Calculate Points & Exit if missing (Reverse Calc for display)
                                 const lot = trade.lot_size || 0.01 // Fallback
                                 const rawProfit = trade.profit || 0
