@@ -187,20 +187,28 @@ export default async function DashboardPage() {
                 </StaggerItem>
             </div>
 
-            {/* Bottom Section: Quick Trade, Calendar & Recent Trades */}
+            {/* Bottom Section: Quick Trade & Calendar */}
             <div className="flex flex-col gap-8">
                 {/* Row: Quick Trade & Calendar */}
-                <div className="grid grid-cols-12 gap-6">
-                    <StaggerItem className="col-span-12 lg:col-span-8">
-                        <div className="w-full">
-                            <h2 className="text-xl font-bold text-white mb-4">{dict.dashboard.quickTrade}</h2>
-                            <TradeForm dict={dict} />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* Quick Trade Form */}
+                    <StaggerItem className="col-span-1 lg:col-span-8 h-full">
+                        <div className="w-full h-full flex flex-col">
+                            <h2 className="text-xl font-bold text-white mb-4 shrink-0">{dict.dashboard.quickTrade}</h2>
+                            <div className="flex-grow">
+                                <TradeForm dict={dict} />
+                            </div>
                         </div>
                     </StaggerItem>
 
-                    <StaggerItem className="col-span-12 lg:col-span-4">
-                        <div className="h-full mt-11"> {/* mt-11 to align with form below header */}
-                            <CalendarWidget trades={trades} dict={dict} />
+                    {/* Calendar Widget */}
+                    <StaggerItem className="col-span-1 lg:col-span-4 h-full">
+                        <div className="w-full h-full flex flex-col">
+                            {/* Invisible spacer to match the Quick Trade header height (28px line-height + 16px margin-bottom = 44px) */}
+                            <div className="h-[44px] hidden lg:block shrink-0" aria-hidden="true"></div>
+                            <div className="flex-grow">
+                                <CalendarWidget trades={trades} dict={dict} />
+                            </div>
                         </div>
                     </StaggerItem>
                 </div>
