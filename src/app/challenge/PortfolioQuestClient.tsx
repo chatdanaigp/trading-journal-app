@@ -5,24 +5,34 @@ import { Target, Clock, Sparkles, DollarSign, Percent, Loader2, XCircle } from '
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { updateProfileGoals } from '@/app/dashboard/actions'
+import { isSameDay } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 
 export function PortfolioQuestClient({
     dict,
     initialPortSize,
     initialGoalPercent,
     isQuestActive,
-    netProfitToday
+    trades
 }: {
     dict: any
     initialPortSize: number
     initialGoalPercent: number
     isQuestActive: boolean
-    netProfitToday: number
+    trades: any[]
 }) {
     const [isActive, setIsActive] = useState(isQuestActive)
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [isLoading, setIsLoading] = useState(false)
+
+    // Calculate today's net profit on the client so it respects the user's browser timezone
+    const today = getTradingDay(new Date())
+    const todayTrades = trades.filter((t: any) => {
+        if (!t.created_at) return false
+        return isSameDay(getTradingDay(t.created_at), today)
+    })
+    const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
 
     const validPortSize = Number(portSize) || 0
     const validGoalPercent = Number(goalPercent) || 0

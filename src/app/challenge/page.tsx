@@ -35,19 +35,6 @@ export default async function ChallengePage() {
     const goalPercent = goals ? Number(goals.profit_goal_percent) : 10
     const isQuestActive = goals?.is_portfolio_quest_active || false
 
-    // Today's Profit
-    // Get current date in Thailand time to ensure consistency with user's likely timezone
-    const nowBkk = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
-    const currentTradingDay = getTradingDay(nowBkk)
-
-    const todayTrades = trades.filter((t: any) => {
-        if (!t.created_at) return false
-        return isSameDay(getTradingDay(t.created_at), currentTradingDay)
-    })
-
-    const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
-    const profitFactor = 0 // Mock calculation could be added if needed for challenges
-
     // Admin Quests (Hardcoded logic for MVP)
     const quests = [
         {
@@ -166,7 +153,7 @@ export default async function ChallengePage() {
                                 initialPortSize={portSize}
                                 initialGoalPercent={goalPercent}
                                 isQuestActive={isQuestActive}
-                                netProfitToday={netProfitToday}
+                                trades={trades}
                             />
                         </div>
                     </div>
