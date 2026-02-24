@@ -74,14 +74,8 @@ export default async function DashboardPage() {
             {/* Header */}
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
-                            <div className={`px-3 py-1 rounded-full border text-sm font-bold flex items-center gap-1.5 shadow-sm ${Number(stats.netProfit) >= 0 ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
-                                <span>{dict.dashboard.netProfit || 'Net Profit'}:</span>
-                                <span>${Number(stats.netProfit).toLocaleString()}</span>
-                            </div>
-                        </div>
+                    <div>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
                         <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
 
