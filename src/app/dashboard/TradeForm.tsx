@@ -6,11 +6,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
+import { isSameDay } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 
-export function TradeForm({ dict }: { dict?: any }) {
+export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number }) {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
+
+    // Calculate today's net profit
+    const today = getTradingDay(new Date())
+    const todayTrades = trades.filter((t: any) => {
+        if (!t.created_at) return false
+        return isSameDay(getTradingDay(t.created_at), today)
+    })
+    const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
 
     // Form State for Auto-Calculation
     const [type, setType] = useState('BUY')
@@ -278,6 +288,33 @@ export function TradeForm({ dict }: { dict?: any }) {
                             {loading ? (dict?.tradeForm?.logging || 'Logging Trade...') : `+ ${dict?.tradeForm?.addTrade || 'Log Trade'}`}
                         </Button>
                     </div>
+
+                    {/* Row 4: Challenge Daily Progress */}
+                    {portSize > 0 && goalPercent > 0 && (
+                        <div className="mt-4 pt-4 border-t border-[#333]">
+                            <div className="flex justify-between items-end mb-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{dict?.challenge?.dailyTarget || 'Daily Challenge Target'}</span>
+                                </div>
+                                <div className="text-right">
+                                    <span className={`text-sm font-bold ${netProfitToday >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                        ${netProfitToday.toFixed(2)}
+                                    </span>
+                                    <span className="text-xs text-gray-500 ml-1">
+                                        / ${(portSize * (goalPercent / 100) / 20).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="h-2 bg-[#0d0d0d] rounded-full overflow-hidden border border-white/5 relative">
+                                {netProfitToday > 0 && (
+                                    <div
+                                        className="h-full bg-gradient-to-r from-[#a3d149] to-[#ccf381] rounded-full transition-all duration-1000 ease-out"
+                                        style={{ width: `${Math.min((netProfitToday / (portSize * (goalPercent / 100) / 20)) * 100, 100)}%` }}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </form>

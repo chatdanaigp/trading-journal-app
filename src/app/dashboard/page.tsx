@@ -196,7 +196,7 @@ export default async function DashboardPage() {
                         <div className="w-full h-full flex flex-col">
                             <h2 className="text-xl font-bold text-white mb-4 shrink-0">{dict.dashboard.quickTrade}</h2>
                             <div className="flex-grow">
-                                <TradeForm dict={dict} />
+                                <TradeForm trades={trades} portSize={portSize} goalPercent={goalPercent} dict={dict} />
                             </div>
                         </div>
                     </StaggerItem>
