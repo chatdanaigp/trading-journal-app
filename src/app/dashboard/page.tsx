@@ -16,6 +16,7 @@ import { getTradingDay } from '@/utils/date-helpers'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
+import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function DashboardPage() {
     // Server-side check: redirects to /verify if user has no client_id
@@ -79,20 +80,7 @@ export default async function DashboardPage() {
                     </div>
 
                     {/* Quick Actions / Date? */}
-                    <div className="flex flex-wrap items-center gap-3">
-                        <LanguageToggle />
-                        {clientId && (
-                            <div className="bg-[#ccf381]/10 border border-[#ccf381]/20 rounded-full px-4 py-2 text-sm text-[#ccf381] font-mono font-semibold hidden sm:flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
-                                </svg>
-                                Connext ID: {clientId}
-                            </div>
-                        )}
-                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 hidden sm:block">
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </div>
-                    </div>
+                    <TopNavigation />
                 </div>
             </StaggerItem>
 
@@ -124,12 +112,12 @@ export default async function DashboardPage() {
                     </Card>
 
                     {/* Total Trades & Win Rate Split */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-3 lg:gap-6">
                         <Card className="relative overflow-hidden group border-0 shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-br from-[#1e1e1e] to-[#0d0d0d] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none group-hover:border-[#ccf381]/20 transition-colors duration-300" />
 
-                            <CardContent className="p-6 relative z-10">
+                            <CardContent className="p-4 lg:p-6 relative z-10">
                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] border border-[#333] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                                     <Activity className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                                 </div>
@@ -143,7 +131,7 @@ export default async function DashboardPage() {
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none group-hover:border-[#ccf381]/30 transition-colors duration-300" />
                             <div className="absolute -right-4 -top-4 w-20 h-20 bg-[#ccf381]/5 blur-2xl rounded-full group-hover:bg-[#ccf381]/10 transition-colors duration-500" />
 
-                            <CardContent className="p-6 relative z-10">
+                            <CardContent className="p-4 lg:p-6 relative z-10">
                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ccf381]/20 to-[#ccf381]/5 border border-[#ccf381]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(204,243,129,0.1)]">
                                     <BarChart2 className="w-5 h-5 text-[#ccf381]" />
                                 </div>
@@ -204,16 +192,18 @@ export default async function DashboardPage() {
                 </StaggerItem>
             </div>
 
-            {/* Bottom Grid: Recent Trades & Trade Form */}
-            <div className="grid grid-cols-12 gap-6">
-                <StaggerItem className="col-span-12 lg:col-span-8">
-                    <TradeList trades={trades} username={username} dict={dict} />
-                </StaggerItem>
-
-                <StaggerItem className="col-span-12 lg:col-span-4">
-                    <div className="sticky top-6">
+            {/* Bottom Section: Quick Trade & Recent Trades */}
+            <div className="flex flex-col gap-8">
+                <StaggerItem className="w-full">
+                    <div className="w-full">
                         <h2 className="text-xl font-bold text-white mb-4">{dict.dashboard.quickTrade}</h2>
                         <TradeForm dict={dict} />
+                    </div>
+                </StaggerItem>
+
+                <StaggerItem className="w-full">
+                    <div className="w-full">
+                        <TradeList trades={trades} username={username} dict={dict} />
                     </div>
                 </StaggerItem>
             </div>
