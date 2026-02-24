@@ -176,31 +176,36 @@ export default async function DashboardPage() {
                 </StaggerItem>
             </div>
 
-            {/* Middle Grid: Charts & Calendar */}
+            {/* Middle Grid: Charts */}
             <div className="grid grid-cols-12 gap-6">
                 <StaggerItem className="col-span-12">
                     <AdvancedStats stats={stats as any} dict={dict} />
                 </StaggerItem>
-                <StaggerItem className="col-span-12 lg:col-span-8">
-                    {/* Equity Chart */}
+                <StaggerItem className="col-span-12">
+                    {/* Equity Chart - Full Width */}
                     <EquityChart trades={trades} dict={dict} />
-                </StaggerItem>
-                <StaggerItem className="col-span-12 lg:col-span-4">
-                    <div className="h-full">
-                        <CalendarWidget trades={trades} dict={dict} />
-                    </div>
                 </StaggerItem>
             </div>
 
-            {/* Bottom Section: Quick Trade & Recent Trades */}
+            {/* Bottom Section: Quick Trade, Calendar & Recent Trades */}
             <div className="flex flex-col gap-8">
-                <StaggerItem className="w-full">
-                    <div className="w-full">
-                        <h2 className="text-xl font-bold text-white mb-4">{dict.dashboard.quickTrade}</h2>
-                        <TradeForm dict={dict} />
-                    </div>
-                </StaggerItem>
+                {/* Row: Quick Trade & Calendar */}
+                <div className="grid grid-cols-12 gap-6">
+                    <StaggerItem className="col-span-12 lg:col-span-8">
+                        <div className="w-full">
+                            <h2 className="text-xl font-bold text-white mb-4">{dict.dashboard.quickTrade}</h2>
+                            <TradeForm dict={dict} />
+                        </div>
+                    </StaggerItem>
 
+                    <StaggerItem className="col-span-12 lg:col-span-4">
+                        <div className="h-full mt-11"> {/* mt-11 to align with form below header */}
+                            <CalendarWidget trades={trades} dict={dict} />
+                        </div>
+                    </StaggerItem>
+                </div>
+
+                {/* Row: Recent Trades */}
                 <StaggerItem className="w-full">
                     <div className="w-full">
                         <TradeList trades={trades} username={username} dict={dict} />
