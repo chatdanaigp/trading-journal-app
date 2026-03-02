@@ -9,6 +9,7 @@ import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
 import { CheckCircle2 } from 'lucide-react'
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number }) {
     const [loading, setLoading] = useState(false)
@@ -339,15 +340,30 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
             </div>
 
             {/* Success Overlay */}
-            {showSuccessOverlay && (
-                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#1e1e1e]/90 backdrop-blur-sm rounded-2xl border border-[#ccf381]/30 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="w-16 h-16 bg-[#ccf381]/20 rounded-full flex items-center justify-center mb-4 animate-in zoom-in duration-300 delay-100 fill-mode-both">
-                        <CheckCircle2 className="w-8 h-8 text-[#ccf381]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{dict?.tradeForm?.successTitle || 'Trade Recorded!'}</h3>
-                    <p className="text-gray-400 text-sm">{dict?.tradeForm?.successDesc || 'Your trade has been successfully logged.'}</p>
-                </div>
-            )}
+            <AnimatePresence>
+                {showSuccessOverlay && (
+                    <LazyMotion features={domAnimation}>
+                        <m.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.05 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#1e1e1e]/90 backdrop-blur-sm rounded-2xl border border-[#ccf381]/30"
+                        >
+                            <m.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                className="w-16 h-16 bg-[#ccf381]/20 rounded-full flex items-center justify-center mb-4"
+                            >
+                                <CheckCircle2 className="w-8 h-8 text-[#ccf381]" />
+                            </m.div>
+                            <h3 className="text-xl font-bold text-white mb-2">{dict?.tradeForm?.successTitle || 'Trade Recorded!'}</h3>
+                            <p className="text-gray-400 text-sm">{dict?.tradeForm?.successDesc || 'Your trade has been successfully logged.'}</p>
+                        </m.div>
+                    </LazyMotion>
+                )}
+            </AnimatePresence>
         </form>
     )
 }
