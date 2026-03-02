@@ -18,7 +18,7 @@ export default async function AnalyticsPage() {
     const dict = await getDictionary(lang)
 
     return (
-        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto space-y-8">
+        <div className="space-y-8">
             <TopNavigation />
 
             <StaggerContainer className="space-y-8">

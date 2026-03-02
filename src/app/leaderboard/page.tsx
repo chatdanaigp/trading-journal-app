@@ -38,13 +38,13 @@ export default async function LeaderboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-4 lg:p-8 relative overflow-hidden">
+        <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
 
-            <StaggerContainer className="relative z-10 max-w-7xl mx-auto space-y-12 pt-20 lg:pt-8 lg:ml-64">
+            <StaggerContainer className="relative z-10 w-full mx-auto space-y-12 pb-12">
                 <StaggerItem className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <TopNavigation />
                 </StaggerItem>
