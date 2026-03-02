@@ -66,7 +66,7 @@ export default async function AdminPage() {
             <div className="absolute bottom-10 left-10 w-[200px] h-[200px] bg-red-500 blur-[150px] opacity-5 rounded-full pointer-events-none" />
 
             {/* Main Content Wrapper */}
-            <div className="flex-1 lg:ml-64 w-full h-full pt-16 lg:pt-8 min-h-screen">
+            <div className="flex-1 w-full h-full pt-16 lg:pt-8 min-h-screen">
                 {/* Centered Content Container */}
                 <div className="w-full max-w-[1600px] mx-auto p-4 lg:p-8 space-y-8">
                     <TopNavigation />
