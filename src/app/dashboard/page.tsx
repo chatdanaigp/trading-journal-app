@@ -11,7 +11,7 @@ import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
-import { isSameDay, isSameWeek, isSameMonth } from 'date-fns'
+import { isSameDay, isSameWeek, isSameMonth, startOfMonth, endOfMonth } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
@@ -33,9 +33,14 @@ export default async function DashboardPage() {
         || user.email?.split('@')[0]
         || 'Trader'
 
-    // Fetch data
-    const trades = await getTrades()
-    const stats = await getTradeStats()
+    // Determine current month boundary
+    const now = new Date()
+    const monthStart = startOfMonth(now).toISOString()
+    const monthEnd = endOfMonth(now).toISOString()
+
+    // Fetch data scoped to current month only
+    const trades = await getTrades(monthStart, monthEnd)
+    const stats = await getTradeStats(monthStart, monthEnd)
     const goals = await getProfileGoals()
 
     const portSize = goals?.port_size || 1000

@@ -165,19 +165,28 @@ export async function updateTrade(formData: FormData) {
     return { success: true }
 }
 
-export async function getTrades() {
+export async function getTrades(startDate?: string, endDate?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return []
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('trades')
         .select('*')
         .eq('user_id', user.id)
+
+    if (startDate) {
+        query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+        query = query.lte('created_at', endDate)
+    }
+
+    const { data, error } = await query
         .order('created_at', { ascending: false })
         .order('id', { ascending: false })
-        .limit(50) // Limit to last 50 trades for now
+        .limit(100) // Increased limit to ensure we get a full month's worth of typical trading activity
 
     if (error) {
         console.error('Error fetching trades:', error)
@@ -187,8 +196,8 @@ export async function getTrades() {
     return data
 }
 
-export async function getTradeStats() {
-    const trades = await getTrades()
+export async function getTradeStats(startDate?: string, endDate?: string) {
+    const trades = await getTrades(startDate, endDate)
 
     if (!trades.length) return {
         totalTrades: 0,
