@@ -38,10 +38,13 @@ export default async function DashboardPage() {
     const monthStart = startOfMonth(now).toISOString()
     const monthEnd = endOfMonth(now).toISOString()
 
-    // Fetch data scoped to current month only
+    // Fetch data scoped to current month only for the primary dashboard views
     const trades = await getTrades(monthStart, monthEnd)
     const stats = await getTradeStats(monthStart, monthEnd)
     const goals = await getProfileGoals()
+
+    // Fetch ALL trades exclusively for the Calendar Widget so historical browsing works
+    const allTrades = await getTrades()
 
     const portSize = goals?.port_size || 1000
     const goalPercent = goals?.profit_goal_percent || 10
@@ -232,7 +235,7 @@ export default async function DashboardPage() {
                             {/* Invisible spacer to match the Quick Trade header height (28px line-height + 16px margin-bottom = 44px) */}
                             <div className="h-[44px] hidden lg:block shrink-0" aria-hidden="true"></div>
                             <div className="flex-grow">
-                                <CalendarWidget trades={trades} dict={dict} />
+                                <CalendarWidget trades={allTrades} dict={dict} />
                             </div>
                         </div>
                     </StaggerItem>

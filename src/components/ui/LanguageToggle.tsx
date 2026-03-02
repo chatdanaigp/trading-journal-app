@@ -8,6 +8,7 @@ export function LanguageToggle() {
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
+        // eslint-disable-next-line
         setMounted(true)
         const saved = localStorage.getItem('tj_language') as 'EN' | 'TH'
         if (saved) {

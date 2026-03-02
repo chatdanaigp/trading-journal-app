@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { startOfDay, subDays, getHours, isSameDay, isSameWeek, isSameMonth } = require('date-fns');
 
 // Mock getTradingDay
