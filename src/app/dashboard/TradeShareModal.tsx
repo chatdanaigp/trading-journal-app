@@ -53,11 +53,11 @@ export function TradeShareModal({ trade, username, onClose, dict }: TradeShareMo
                 initial={{ scale: 0.85, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="flex flex-col items-center gap-5 w-full max-w-4xl"
+                className="flex flex-col items-center gap-4 sm:gap-5 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
             >
 
                 {/* Header */}
-                <div className="flex items-center justify-between w-full">
+                <div className="flex items-center justify-between w-full px-2 sm:px-0">
                     <div>
                         <h2 className="text-white font-bold text-xl">{dict?.dashboard?.shareTitle || 'Share Trade Card'}</h2>
                         <p className="text-gray-500 text-sm mt-0.5">{dict?.dashboard?.shareSubtitle || 'Preview → Download PNG → Post anywhere'}</p>
@@ -72,11 +72,11 @@ export function TradeShareModal({ trade, username, onClose, dict }: TradeShareMo
 
                 {/* Card Preview */}
                 <div
-                    className="rounded-2xl overflow-hidden shadow-2xl"
-                    style={{ maxWidth: '800px', width: '100%' }}
+                    className="rounded-2xl shadow-2xl overflow-x-auto w-full max-w-full"
+                    style={{ maxWidth: '800px' }}
                 >
                     {/* This ref is what gets captured */}
-                    <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0 }}>
+                    <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0, minWidth: 'min-content' }} className="w-full">
                         <TradeShareCard trade={trade} username={username} points={points} dict={dict} />
                     </div>
                 </div>

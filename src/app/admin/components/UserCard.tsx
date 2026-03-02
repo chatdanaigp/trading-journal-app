@@ -113,18 +113,18 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
             {expanded && (
                 <div className="border-t border-white/5 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
                     {/* Mobile Stats */}
-                    <div className="md:hidden grid grid-cols-3 gap-3">
-                        <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.trades}</p>
-                            <p className="text-lg font-bold text-white">{user.totalTrades}</p>
+                    <div className="md:hidden flex flex-wrap gap-2 sm:gap-3">
+                        <div className="flex-1 bg-[#0d0d0d] rounded-lg p-2 sm:p-3 text-center border border-white/5 min-w-[30%]">
+                            <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold truncate">{dict.admin.trades}</p>
+                            <p className="text-base sm:text-lg font-bold text-white truncate">{user.totalTrades}</p>
                         </div>
-                        <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.winRate}</p>
-                            <p className={`text-lg font-bold ${user.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{user.winRate.toFixed(0)}%</p>
+                        <div className="flex-1 bg-[#0d0d0d] rounded-lg p-2 sm:p-3 text-center border border-white/5 min-w-[30%]">
+                            <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold truncate">{dict.admin.winRate}</p>
+                            <p className={`text-base sm:text-lg font-bold truncate ${user.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{user.winRate.toFixed(0)}%</p>
                         </div>
-                        <div className="bg-[#0d0d0d] rounded-lg p-3 text-center border border-white/5">
-                            <p className="text-[10px] text-gray-500 uppercase font-bold">{dict.admin.pnl}</p>
-                            <p className={`text-lg font-bold ${user.totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${user.totalProfit.toLocaleString()}</p>
+                        <div className="flex-1 bg-[#0d0d0d] rounded-lg p-2 sm:p-3 text-center border border-white/5 min-w-[30%]">
+                            <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold truncate">{dict.admin.pnl}</p>
+                            <p className={`text-base sm:text-lg font-bold truncate ${user.totalProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>${user.totalProfit.toLocaleString()}</p>
                         </div>
                     </div>
 

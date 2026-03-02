@@ -65,35 +65,36 @@ export default async function AdminPage() {
             <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-[#ccf381] blur-[150px] opacity-5 rounded-full pointer-events-none" />
             <div className="absolute bottom-10 left-10 w-[200px] h-[200px] bg-red-500 blur-[150px] opacity-5 rounded-full pointer-events-none" />
 
-            {/* Main Content */}
-            <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto space-y-8">
-                <TopNavigation />
+            {/* Main Content Wrapper */}
+            <div className="flex-1 lg:ml-64 w-full h-full pt-16 lg:pt-8 min-h-screen">
+                {/* Centered Content Container */}
+                <div className="w-full max-w-[1600px] mx-auto p-4 lg:p-8 space-y-8">
+                    <TopNavigation />
 
-                {/* Header */}
-                <div className="flex justify-between items-end border-b border-white/5 pb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center shadow-lg shadow-[#ccf381]/5">
-                            <Shield className="w-6 h-6 text-[#ccf381]" />
+                    {/* Header */}
+                    <div className="flex justify-between items-end border-b border-white/5 pb-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-[#ccf381]/10 border border-[#ccf381]/20 flex items-center justify-center shadow-lg shadow-[#ccf381]/5">
+                                <Shield className="w-6 h-6 text-[#ccf381]" />
+                            </div>
+                            <div>
+                                <h1 className="text-3xl font-bold text-white tracking-tight">
+                                    {dict.admin.title}
+                                </h1>
+                                <p className="text-gray-500 text-sm">{dict.admin.subtitle}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight">
-                                {dict.admin.title}
-                            </h1>
-                            <p className="text-gray-500 text-sm">{dict.admin.subtitle}</p>
-                        </div>
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a1a] border border-white/5 text-sm text-gray-400 hover:text-white hover:border-white/10 transition-colors"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            {dict.admin.backToDashboard}
+                        </Link>
                     </div>
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a1a] border border-white/5 text-sm text-gray-400 hover:text-white hover:border-white/10 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        {dict.admin.backToDashboard}
-                    </Link>
-                </div>
 
-                {/* Stats Row */}
-                <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-12 md:col-span-4">
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Card className="relative overflow-hidden group border-0 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
@@ -107,8 +108,6 @@ export default async function AdminPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
-                    <div className="col-span-12 md:col-span-4">
                         <Card className="relative overflow-hidden group border-0 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
@@ -122,8 +121,6 @@ export default async function AdminPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
-                    <div className="col-span-12 md:col-span-4">
                         <Card className="relative overflow-hidden group border-0 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
                             <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
@@ -140,75 +137,75 @@ export default async function AdminPage() {
                             </CardContent>
                         </Card>
                     </div>
-                </div>
 
-                {/* User Management */}
-                <div>
-                    <div className="flex items-center gap-2 mb-4">
-                        <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
-                        <h2 className="text-xl font-bold text-white">{dict.admin.userManagement}</h2>
-                        <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} {dict.admin.users}</span>
-                    </div>
-                    <div className="space-y-3">
-                        {users.map((user: any) => (
-                            <UserCard key={user.id} user={user} dict={dict} />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Trade Activity */}
-                {trades && trades.length > 0 && (
+                    {/* User Management */}
                     <div>
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
-                            <h2 className="text-xl font-bold text-white">{dict.admin.recentTrades}</h2>
-                            <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalTrades} {dict.admin.trades}</span>
+                            <span className="w-1 h-6 bg-[#ccf381] rounded-full inline-block" />
+                            <h2 className="text-xl font-bold text-white">{dict.admin.userManagement}</h2>
+                            <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} {dict.admin.users}</span>
                         </div>
-                        <Card className="relative overflow-hidden border-0 shadow-2xl">
-                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1d1d1d] via-[#0d0d0d] to-[#000000] z-0" />
-                            <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none z-20" />
-                            <CardContent className="relative z-10 p-0 overflow-x-auto">
-                                <table className="w-full text-sm min-w-[600px]">
-                                    <thead>
-                                        <tr className="border-b border-white/5 text-gray-500 text-[10px] uppercase tracking-wider">
-                                            <th className="text-left p-4 font-medium">{dict.admin.trader}</th>
-                                            <th className="text-left p-4 font-medium">{dict.admin.symbol}</th>
-                                            <th className="text-left p-4 font-medium">{dict.admin.type}</th>
-                                            <th className="text-right p-4 font-medium">{dict.admin.profit}</th>
-                                            <th className="text-right p-4 font-medium">{dict.admin.date}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/5">
-                                        {trades.slice(0, 20).map((trade: any) => (
-                                            <tr key={trade.trade_id} className="hover:bg-white/[0.02] transition-colors">
-                                                <td className="p-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-7 h-7 rounded-lg bg-[#ccf381]/5 border border-[#ccf381]/10 flex items-center justify-center text-[#ccf381] text-xs font-bold">
-                                                            {(trade.trader_full_name || 'U')[0]}
-                                                        </div>
-                                                        <span className="text-white font-medium text-xs">{trade.trader_full_name || 'Unknown'}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 text-white font-bold">{trade.symbol}</td>
-                                                <td className="p-4">
-                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                                                        {trade.type}
-                                                    </span>
-                                                </td>
-                                                <td className={`p-4 text-right font-bold ${trade.profit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
-                                                    {trade.profit ? `${trade.profit > 0 ? '+' : ''}$${trade.profit.toLocaleString()}` : '-'}
-                                                </td>
-                                                <td className="p-4 text-right text-gray-500 text-xs">
-                                                    {new Date(trade.created_at).toLocaleDateString()}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </CardContent>
-                        </Card>
+                        <div className="space-y-3">
+                            {users.map((user: any) => (
+                                <UserCard key={user.id} user={user} dict={dict} />
+                            ))}
+                        </div>
                     </div>
-                )}
+
+                    {/* Trade Activity */}
+                    {trades && trades.length > 0 && (
+                        <div className="overflow-hidden">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
+                                <h2 className="text-xl font-bold text-white">{dict.admin.recentTrades}</h2>
+                                <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalTrades} {dict.admin.trades}</span>
+                            </div>
+                            <Card className="relative overflow-hidden border-0 shadow-2xl">
+                                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1d1d1d] via-[#0d0d0d] to-[#000000] z-0" />
+                                <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none z-20" />
+                                <CardContent className="relative z-10 p-0 overflow-x-auto w-full">
+                                    <table className="w-full text-sm min-w-[600px]">
+                                        <thead>
+                                            <tr className="border-b border-white/5 text-gray-500 text-[10px] uppercase tracking-wider">
+                                                <th className="text-left p-4 font-medium">{dict.admin.trader}</th>
+                                                <th className="text-left p-4 font-medium">{dict.admin.symbol}</th>
+                                                <th className="text-left p-4 font-medium">{dict.admin.type}</th>
+                                                <th className="text-right p-4 font-medium">{dict.admin.profit}</th>
+                                                <th className="text-right p-4 font-medium">{dict.admin.date}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {trades.slice(0, 20).map((trade: any) => (
+                                                <tr key={trade.trade_id} className="hover:bg-white/[0.02] transition-colors">
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-7 h-7 rounded-lg bg-[#ccf381]/5 border border-[#ccf381]/10 flex items-center justify-center text-[#ccf381] text-xs font-bold">
+                                                                {(trade.trader_full_name || 'U')[0]}
+                                                            </div>
+                                                            <span className="text-white font-medium text-xs">{trade.trader_full_name || 'Unknown'}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-white font-bold">{trade.symbol}</td>
+                                                    <td className="p-4">
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                                            {trade.type}
+                                                        </span>
+                                                    </td>
+                                                    <td className={`p-4 text-right font-bold ${trade.profit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                                        {trade.profit ? `${trade.profit > 0 ? '+' : ''}$${trade.profit.toLocaleString()}` : '-'}
+                                                    </td>
+                                                    <td className="p-4 text-right text-gray-500 text-xs">
+                                                        {new Date(trade.created_at).toLocaleDateString()}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )
