@@ -131,8 +131,9 @@ export function Sidebar({ dict }: { dict: any }) {
                             <Link
                                 key={link.name}
                                 href={link.href}
+                                prefetch={true}
                                 className={cn(
-                                    "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group",
+                                    "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group active:scale-[0.98]",
                                     isActive
                                         ? "bg-[#ccf381] text-black font-semibold shadow-lg shadow-[#ccf381]/20"
                                         : "text-gray-400 hover:text-white hover:bg-[#1f1f1f]"
@@ -148,8 +149,9 @@ export function Sidebar({ dict }: { dict: any }) {
                     {isUserAdmin && (
                         <Link
                             href="/admin"
+                            prefetch={true}
                             className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group mt-4 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10",
+                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group mt-4 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 active:scale-[0.98]",
                                 pathname === '/admin' ? "opacity-100" : "opacity-90"
                             )}
                         >
@@ -166,7 +168,8 @@ export function Sidebar({ dict }: { dict: any }) {
                         <Link
                             key={link.name}
                             href={link.href}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#1f1f1f] transition-all"
+                            prefetch={true}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#1f1f1f] transition-all active:scale-[0.98]"
                         >
                             <link.icon className="w-5 h-5" />
                             <span>{link.name}</span>
@@ -178,7 +181,7 @@ export function Sidebar({ dict }: { dict: any }) {
                             await supabase.auth.signOut()
                             window.location.href = '/login'
                         }}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all w-full"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all w-full active:scale-[0.98]"
                     >
                         <LogOut className="w-5 h-5" />
                         <span>{dict.sidebar.logout}</span>
