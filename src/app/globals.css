@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f8fb;
+  --foreground: #1c1c1e;
+  --primary: #34c759;
+  /* iOS Green */
+  --accent: #007aff;
+  /* iOS Blue */
 }
 
 @theme inline {
@@ -14,8 +18,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #151515;
+    --foreground: #f2f2f7;
+    --primary: #30d158;
+    /* Dark Mode iOS Green */
+    --accent: #0a84ff;
+    /* Dark Mode iOS Blue */
   }
 }
 
@@ -27,8 +35,47 @@ body.lang-th {
   --font-primary: var(--font-sarabun);
 }
 
+/* MacOS / iOS Premium Aesthetics */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-primary), Arial, Helvetica, sans-serif;
+  font-family: var(--font-primary), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Subtle sleek Scrollbar like MacOS */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 120, 0.4);
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 120, 0.6);
+}
+
+/* Smooth selection matches accent color */
+::selection {
+  background: rgba(0, 122, 255, 0.2);
+  /* Soft blend */
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
