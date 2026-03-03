@@ -62,12 +62,37 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
 
                                 const isExpanded = expandedAnalysisId === trade.id
 
+                                // Color code based on Day of Week
+                                const tradeDate = new Date(trade.created_at || Date.now())
+                                const dayOfWeek = tradeDate.getDay() // 0 = Sunday, 1 = Monday, etc.
+                                let dayBorderColor = "border-l-transparent"
+
+                                switch (dayOfWeek) {
+                                    case 1: // Monday = Yellow
+                                        dayBorderColor = "border-l-[4px] border-l-[#facc15]"
+                                        break
+                                    case 2: // Tuesday = Pink
+                                        dayBorderColor = "border-l-[4px] border-l-[#f472b6]"
+                                        break
+                                    case 3: // Wednesday = Green
+                                        dayBorderColor = "border-l-[4px] border-l-[#4ade80]"
+                                        break
+                                    case 4: // Thursday = Orange
+                                        dayBorderColor = "border-l-[4px] border-l-[#fb923c]"
+                                        break
+                                    case 5: // Friday = Blue
+                                        dayBorderColor = "border-l-[4px] border-l-[#60a5fa]"
+                                        break
+                                    default: // Weekend/Fallback
+                                        dayBorderColor = "border-l-[4px] border-l-gray-600"
+                                }
+
                                 return (
-                                    <tr key={trade.id} className="hover:bg-[#252525] transition-colors group border-b border-[#252525] last:border-0 text-sm">
+                                    <tr key={trade.id} className={cn("hover:bg-[#252525] transition-colors group border-b border-r border-b-[#252525] border-r-transparent last:border-b-0 text-sm", dayBorderColor)}>
                                         <td className="px-5 py-4 transition-all duration-300">
                                             <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
                                                 <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
-                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{new Date(trade.created_at).toLocaleDateString()}</div>
+                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">{tradeDate.toLocaleDateString()}</div>
                                                 {trade.notes && (
                                                     <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
                                                         <span className="text-gray-600 shrink-0">📝</span>

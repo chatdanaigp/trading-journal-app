@@ -6,14 +6,26 @@ import { AnalyticsCharts } from './components/AnalyticsCharts'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
 import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function AnalyticsPage() {
     // Server-side check: redirects to /verify if user has no client_id
     const { user } = await requireVerifiedUser()
 
-    // Fetch Analytics Data
-    const data = await getAnalyticsData()
+    // Time Boundaries
+    const now = new Date()
+    const monthStart = startOfMonth(now).toISOString()
+    const monthEnd = endOfMonth(now).toISOString()
+    const yearStart = startOfYear(now).toISOString()
+    const yearEnd = endOfYear(now).toISOString()
+
+    // Fetch Analytics Data (Dual Scope)
+    const [monthlyData, yearlyData] = await Promise.all([
+        getAnalyticsData(monthStart, monthEnd),
+        getAnalyticsData(yearStart, yearEnd)
+    ])
+
     const lang = await getCurrentLanguage()
     const dict = await getDictionary(lang)
 
@@ -23,26 +35,48 @@ export default async function AnalyticsPage() {
 
             <StaggerContainer className="space-y-8">
                 <StaggerItem>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.title}</h1>
-                            <p className="text-gray-500">{dict.analytics.subtitle}</p>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{(dict as any)?.analytics?.monthlyTitle || 'Monthly Analytics'} ({now.toLocaleString('default', { month: 'long' })})</h1>
+                            <p className="text-gray-500">{(dict as any)?.analytics?.monthlySubtitle || 'Performance for the current month'}</p>
                         </div>
-
-                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400">
-                            {dict.analytics.allTimeView}
+                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-[#ccf381] font-bold shadow-[0_0_10px_rgba(204,243,129,0.1)]">
+                            Month-To-Date (MTD)
                         </div>
                     </div>
                 </StaggerItem>
 
-                {/* Row 1: Hero KPIs (Bento 4 + 8 split) */}
+                {/* Monthly Hero KPIs */}
                 <StaggerItem>
-                    <KPIGrid stats={data.stats} dict={dict} />
+                    <KPIGrid stats={monthlyData.stats} dict={dict} />
                 </StaggerItem>
 
-                {/* Row 2+: Charts (Bento layout) */}
+                {/* Monthly Charts */}
                 <StaggerItem>
-                    <AnalyticsCharts data={data} dict={dict} />
+                    <AnalyticsCharts data={monthlyData} dict={dict} />
+                </StaggerItem>
+
+                {/* Yearly Section Header */}
+                <StaggerItem className="pt-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{(dict as any)?.analytics?.yearlyTitle || 'Yearly Overview'} ({now.getFullYear()})</h1>
+                            <p className="text-gray-500">{(dict as any)?.analytics?.yearlySubtitle || 'Comprehensive performance for the current year'}</p>
+                        </div>
+                        <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 font-bold">
+                            Year-To-Date (YTD)
+                        </div>
+                    </div>
+                </StaggerItem>
+
+                {/* Yearly Hero KPIs */}
+                <StaggerItem>
+                    <KPIGrid stats={yearlyData.stats} dict={dict} />
+                </StaggerItem>
+
+                {/* Yearly Charts */}
+                <StaggerItem>
+                    <AnalyticsCharts data={yearlyData} dict={dict} />
                 </StaggerItem>
             </StaggerContainer>
         </div>

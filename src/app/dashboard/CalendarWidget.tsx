@@ -16,6 +16,7 @@ import { cn } from '@/utils/cn'
 import { getTradingDay } from '@/utils/date-helpers'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Local cn helper if not imported
 function localCn(...classes: (string | undefined | null | false)[]) {
@@ -29,7 +30,17 @@ type Trade = {
 }
 
 export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }) {
-    const [currentDate, setCurrentDate] = useState(new Date())
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    // Read initial month/year from URL, or default to now
+    const urlMonth = searchParams.get('month')
+    const urlYear = searchParams.get('year')
+    const initialDate = (urlMonth && urlYear)
+        ? new Date(Number(urlYear), Number(urlMonth) - 1, 1)
+        : new Date()
+
+    const [currentDate, setCurrentDate] = useState(initialDate)
     const [selectedDay, setSelectedDay] = useState<Date | null>(null)
 
     // Get all days in the current month
@@ -41,9 +52,25 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
     const startDayConfig = getDay(monthStart) // 0 = Sunday
     const emptyDays = Array(startDayConfig).fill(null)
 
-    // Navigate months
-    const nextMonth = () => setCurrentDate(addMonths(currentDate, 1))
-    const prevMonth = () => setCurrentDate(subMonths(currentDate, 1))
+    // Navigate months with URL sync
+    const updateUrlParams = (date: Date) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('month', (date.getMonth() + 1).toString())
+        params.set('year', date.getFullYear().toString())
+        router.push(`?${params.toString()}`, { scroll: false })
+    }
+
+    const nextMonth = () => {
+        const next = addMonths(currentDate, 1)
+        setCurrentDate(next)
+        updateUrlParams(next)
+    }
+
+    const prevMonth = () => {
+        const prev = subMonths(currentDate, 1)
+        setCurrentDate(prev)
+        updateUrlParams(prev)
+    }
 
     // Group trades by date and calculate daily PnL
     const getDayStats = (day: Date) => {

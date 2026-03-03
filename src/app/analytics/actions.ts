@@ -33,7 +33,7 @@ export type AnalyticsData = {
     }[]
 }
 
-export async function getAnalyticsData(range: string = 'all'): Promise<AnalyticsData> {
+export async function getAnalyticsData(startDate?: string, endDate?: string): Promise<AnalyticsData> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -46,10 +46,12 @@ export async function getAnalyticsData(range: string = 'all'): Promise<Analytics
         .eq('user_id', user.id)
         .order('created_at', { ascending: true }) // Oldest first for Equity Curve
 
-    // Simple date filtering (can be expanded)
-    if (range === 'month') {
-        const start = startOfMonth(new Date()).toISOString()
-        query = query.gte('created_at', start)
+    // Date filtering
+    if (startDate) {
+        query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+        query = query.lte('created_at', endDate)
     }
 
     const { data: trades, error } = await query

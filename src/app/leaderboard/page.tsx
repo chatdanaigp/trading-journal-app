@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
+import { startOfMonth, endOfMonth } from 'date-fns'
 
 // Rank Badge System
 function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
@@ -30,8 +31,16 @@ export default async function LeaderboardPage() {
     const lang = await getCurrentLanguage()
     const dict = await getDictionary(lang)
 
-    // Call the enhanced RPC function
-    const { data: leaderboard, error } = await supabase.rpc('get_leaderboard')
+    // Calculate current month boundaries for the RPC
+    const now = new Date()
+    const monthStart = startOfMonth(now).toISOString()
+    const monthEnd = endOfMonth(now).toISOString()
+
+    // Call the enhanced RPC function with date filters
+    const { data: leaderboard, error } = await supabase.rpc('get_leaderboard', {
+        start_date: monthStart,
+        end_date: monthEnd
+    })
 
     if (error) {
         console.error('Error fetching leaderboard:', error)

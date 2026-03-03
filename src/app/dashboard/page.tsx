@@ -18,7 +18,7 @@ import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
 import { TopNavigation } from '@/components/TopNavigation'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ month?: string, year?: string }> }) {
     // Server-side check: redirects to /verify if user has no client_id
     const { user, clientId, isAdmin } = await requireVerifiedUser()
     const lang = await getCurrentLanguage()
@@ -33,12 +33,24 @@ export default async function DashboardPage() {
         || user.email?.split('@')[0]
         || 'Trader'
 
-    // Determine current month boundary
-    const now = new Date()
-    const monthStart = startOfMonth(now).toISOString()
-    const monthEnd = endOfMonth(now).toISOString()
+    // Parse URL params for dynamic month selection
+    const params = await searchParams
+    let targetDate = new Date()
 
-    // Fetch data scoped to current month only for the primary dashboard views
+    if (params.month && params.year) {
+        // Javascript dates are 0-indexed for months
+        const parsedMonth = parseInt(params.month, 10) - 1
+        const parsedYear = parseInt(params.year, 10)
+        if (!isNaN(parsedMonth) && !isNaN(parsedYear)) {
+            targetDate = new Date(parsedYear, parsedMonth, 1)
+        }
+    }
+
+    // Determine target month boundaries
+    const monthStart = startOfMonth(targetDate).toISOString()
+    const monthEnd = endOfMonth(targetDate).toISOString()
+
+    // Fetch data scoped to target month only for the primary dashboard views
     const trades = await getTrades(monthStart, monthEnd)
     const stats = await getTradeStats(monthStart, monthEnd)
     const goals = await getProfileGoals()
@@ -50,9 +62,12 @@ export default async function DashboardPage() {
     const goalPercent = goals?.profit_goal_percent || 10
 
     // Points aggregation logic
+    // We use the active targetDate for relative aggregations instead of hardcoded 'today' everywhere
     const today = getTradingDay(new Date())
+    const isCurrentMonth = isSameMonth(targetDate, today)
+
     let monthlyPoints = 0
-    let weeklyPoints = 0
+    let weeklyPoints = 0 // Only relevant if viewing current month practically, but calculated anyway
     let dailyPoints = 0
     let dailyProfit = 0
 
@@ -62,12 +77,17 @@ export default async function DashboardPage() {
         const points = lot !== 0 ? Math.round(profit / lot) : 0
         const tradeDay = getTradingDay(trade.created_at)
 
-        if (isSameMonth(tradeDay, today)) monthlyPoints += points
-        // weekStartsOn 1 = Monday
-        if (isSameWeek(tradeDay, today, { weekStartsOn: 1 })) weeklyPoints += points
-        if (isSameDay(tradeDay, today)) {
-            dailyPoints += points
-            dailyProfit += profit
+        // Count all trades towards the monthly total (since the query already bounds them)
+        monthlyPoints += points
+
+        // Only calculate today/this week if we are looking at the current active month and the trade is actually this week
+        if (isCurrentMonth) {
+            // weekStartsOn 1 = Monday
+            if (isSameWeek(tradeDay, today, { weekStartsOn: 1 })) weeklyPoints += points
+            if (isSameDay(tradeDay, today)) {
+                dailyPoints += points
+                dailyProfit += profit
+            }
         }
     })
 
