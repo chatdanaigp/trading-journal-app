@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Target, Clock, Sparkles, DollarSign, Percent, Loader2, XCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -49,7 +50,12 @@ export function PortfolioQuestClient({
 
     if (!isActive) {
         return (
-            <div className="bg-[#151515] border border-[#2a2a2a] rounded-3xl p-6 lg:p-8 sticky top-8 animate-in fade-in duration-500">
+            <motion.div
+                initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                className="bg-[#151515] border border-[#2a2a2a] rounded-3xl p-6 lg:p-8 sticky top-8"
+            >
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-[#ccf381]/20 border border-[#ccf381]/30 flex items-center justify-center">
                         <Target className="w-5 h-5 text-[#ccf381]" />
@@ -99,19 +105,27 @@ export function PortfolioQuestClient({
                     </div>
                 </div>
 
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     onClick={() => handleToggleQuest(true)}
                     disabled={isLoading}
-                    className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-[#ccf381] text-black font-bold text-lg hover:bg-[#d4f78e] transition-all disabled:opacity-50"
+                    className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-[#ccf381] text-black font-bold text-lg hover:bg-[#d4f78e] transition-colors disabled:opacity-50"
                 >
                     {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : dict.challenge.startQuest}
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
         )
     }
 
     return (
-        <div className="bg-[#151515] border border-[#ccf381]/30 shadow-[0_0_40px_rgba(204,243,129,0.05)] rounded-3xl p-6 lg:p-8 sticky top-8 animate-in fade-in duration-500">
+        <motion.div
+            initial={{ opacity: 0, y: 15, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            className="bg-[#151515] border border-[#ccf381]/30 shadow-[0_0_40px_rgba(204,243,129,0.05)] rounded-3xl p-6 lg:p-8 sticky top-8"
+        >
             <div className="flex justify-between items-start mb-8">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
@@ -127,7 +141,10 @@ export function PortfolioQuestClient({
                 </div>
 
                 {/* Cancel Quest Button */}
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     onClick={() => {
                         if (confirm(dict.challenge.cancelConfirm)) {
                             handleToggleQuest(false)
@@ -138,7 +155,7 @@ export function PortfolioQuestClient({
                     title={dict.challenge.cancelQuest}
                 >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-5 h-5" />}
-                </button>
+                </motion.button>
             </div>
 
             {/* Math Config Display */}
@@ -202,6 +219,6 @@ export function PortfolioQuestClient({
                     </p>
                 )}
             </div>
-        </div>
+        </motion.div>
     )
 }

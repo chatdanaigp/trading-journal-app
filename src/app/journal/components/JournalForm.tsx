@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { createJournalEntry } from '../actions'
+import { motion } from 'framer-motion'
 
 const MOOD_OPTIONS = [
     { value: 'great', emoji: '🔥', label: 'Great' },
@@ -84,18 +85,27 @@ export function JournalForm({ dict }: { dict: any }) {
                     <label className="text-sm font-medium text-gray-300">{dict.journalForm.howFeel}</label>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {MOOD_OPTIONS.map((m) => (
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.95 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
                                 key={m.value}
                                 type="button"
                                 onClick={() => setSelectedMood(m.value)}
-                                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${selectedMood === m.value
-                                    ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
-                                    : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300'
+                                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-colors ${selectedMood === m.value
+                                    ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_15px_rgba(204,243,129,0.1)]'
+                                    : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300 hover:bg-[#1a1a1a]'
                                     }`}
                             >
-                                <span className="text-2xl mb-1">{m.emoji}</span>
-                                <span className="text-xs font-medium">{dict.journalForm[m.value]}</span>
-                            </button>
+                                <motion.span
+                                    animate={{ scale: selectedMood === m.value ? 1.2 : 1 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                    className="text-2xl mb-1 origin-bottom"
+                                >
+                                    {m.emoji}
+                                </motion.span>
+                                <span className={`text-xs font-medium ${selectedMood === m.value ? 'text-[#ccf381]' : ''}`}>{dict.journalForm[m.value]}</span>
+                            </motion.button>
                         ))}
                     </div>
                 </div>
@@ -119,26 +129,32 @@ export function JournalForm({ dict }: { dict: any }) {
                     <p className="text-xs text-gray-500">{dict.journalForm.followedPlanSub}</p>
                 </div>
                 <div className="flex gap-3">
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
                         type="button"
                         onClick={() => setFollowedPlan(true)}
-                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${followedPlan
-                            ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
-                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors border ${followedPlan
+                            ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_15px_rgba(204,243,129,0.1)]'
+                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:bg-[#1a1a1a]'
                             }`}
                     >
                         ✅ {dict.journalForm.yes}
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
                         type="button"
                         onClick={() => setFollowedPlan(false)}
-                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${!followedPlan
-                            ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10'
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors border ${!followedPlan
+                            ? 'bg-red-500/15 border-red-500/40 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                            : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:bg-[#1a1a1a]'
                             }`}
                     >
                         ❌ {dict.journalForm.no}
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 
@@ -147,29 +163,35 @@ export function JournalForm({ dict }: { dict: any }) {
                 <label className="text-sm font-medium text-gray-300">{dict.journalForm.tagsLabel}</label>
                 <div className="flex flex-wrap gap-2">
                     {TAG_PRESETS.map(tag => (
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
                             key={tag}
                             type="button"
                             onClick={() => toggleTag(tag)}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedTags.includes(tag)
-                                ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]'
-                                : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300'
+                                ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_10px_rgba(204,243,129,0.1)]'
+                                : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300 hover:bg-[#1a1a1a]'
                                 }`}
                         >
                             #{dict.journalForm.tagOptions[tag.replace(/\s/g, '')]}
-                        </button>
+                        </motion.button>
                     ))}
                 </div>
             </div>
 
             {/* Submit */}
-            <button
+            <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-[#ccf381] text-black font-bold text-sm hover:bg-[#d4f78e] transition-all disabled:opacity-50 shadow-lg shadow-[#ccf381]/10"
+                className="w-full py-3 rounded-xl bg-[#ccf381] text-black font-bold text-sm hover:bg-[#d4f78e] transition-colors disabled:opacity-50 shadow-lg shadow-[#ccf381]/10"
             >
                 {loading ? 'Saving...' : '📝 Save Journal Entry'}
-            </button>
+            </motion.button>
 
             {/* Status Message */}
             {message && (
