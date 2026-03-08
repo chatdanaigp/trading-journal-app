@@ -1,4 +1,5 @@
-import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { getDictionary } from '@/utils/dictionaries'
+import { getCurrentLanguage } from '@/utils/dictionaries-server'
 import VerifyClient from './VerifyClient'
 
 export default async function VerifyPage() {

@@ -1,4 +1,5 @@
-import { cookies } from 'next/headers'
+// Client-safe dictionary data. No server-only imports here.
+// For getCurrentLanguage(), import from '@/utils/dictionaries-server'
 
 export type Language = 'EN' | 'TH'
 
@@ -617,8 +618,3 @@ export function getDictionary(lang: Language) {
     return dictionaries[lang]
 }
 
-export async function getCurrentLanguage(): Promise<Language> {
-    const cookieStore = await cookies()
-    const tjsLang = cookieStore.get('tj_language')?.value as Language
-    return tjsLang === 'TH' ? 'TH' : 'EN'
-}

@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/Sidebar'
-import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { getDictionary } from '@/utils/dictionaries'
+import { getCurrentLanguage } from '@/utils/dictionaries-server'
 
 export default async function LeaderboardLayout({
     children,

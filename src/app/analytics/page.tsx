@@ -1,33 +1,47 @@
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import { getAnalyticsData } from './actions'
+'use client'
+
+import { useAnalyticsData } from '@/hooks/usePageData'
 import { KPIGrid } from './components/KPIGrid'
 import { AnalyticsCharts } from './components/AnalyticsCharts'
-import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
-import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
-import { startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
 import { TopNavigation } from '@/components/TopNavigation'
+import { CardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui/Skeleton'
+import { useEffect, useState } from 'react'
 
-export default async function AnalyticsPage() {
-    // Server-side check: redirects to /verify if user has no client_id
-    const { user } = await requireVerifiedUser()
+function useLang() {
+    const [dict, setDict] = useState<any>(null)
+    useEffect(() => {
+        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
+        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
+    }, [])
+    return dict
+}
 
-    // Time Boundaries
+function AnalyticsSkeleton() {
+    return (
+        <div className="space-y-8 animate-in fade-in duration-300">
+            <div><Skeleton className="h-8 w-48 mb-2" /><Skeleton className="h-4 w-72" /></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
+            </div>
+            <ChartSkeleton />
+            <div><Skeleton className="h-8 w-48 mb-2" /><Skeleton className="h-4 w-72" /></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
+            </div>
+            <ChartSkeleton />
+        </div>
+    )
+}
+
+export default function AnalyticsPage() {
+    const { data, isLoading } = useAnalyticsData()
+    const dict = useLang()
     const now = new Date()
-    const monthStart = startOfMonth(now).toISOString()
-    const monthEnd = endOfMonth(now).toISOString()
-    const yearStart = startOfYear(now).toISOString()
-    const yearEnd = endOfYear(now).toISOString()
 
-    // Fetch Analytics Data (Dual Scope)
-    const [monthlyData, yearlyData] = await Promise.all([
-        getAnalyticsData(monthStart, monthEnd),
-        getAnalyticsData(yearStart, yearEnd)
-    ])
+    if (isLoading || !data || !dict) return <AnalyticsSkeleton />
 
-    const lang = await getCurrentLanguage()
-    const dict = await getDictionary(lang)
+    const { monthlyData, yearlyData } = data
 
     return (
         <div className="space-y-8">
@@ -46,17 +60,13 @@ export default async function AnalyticsPage() {
                     </div>
                 </StaggerItem>
 
-                {/* Monthly Hero KPIs */}
                 <StaggerItem>
                     <KPIGrid stats={monthlyData.stats} dict={dict} />
                 </StaggerItem>
-
-                {/* Monthly Charts */}
                 <StaggerItem>
                     <AnalyticsCharts data={monthlyData} dict={dict} />
                 </StaggerItem>
 
-                {/* Yearly Section Header */}
                 <StaggerItem className="pt-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
@@ -69,12 +79,9 @@ export default async function AnalyticsPage() {
                     </div>
                 </StaggerItem>
 
-                {/* Yearly Hero KPIs */}
                 <StaggerItem>
                     <KPIGrid stats={yearlyData.stats} dict={dict} />
                 </StaggerItem>
-
-                {/* Yearly Charts */}
                 <StaggerItem>
                     <AnalyticsCharts data={yearlyData} dict={dict} />
                 </StaggerItem>

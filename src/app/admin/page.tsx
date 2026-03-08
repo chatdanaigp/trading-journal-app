@@ -5,7 +5,8 @@ import { UserCard } from './components/UserCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Shield, ShieldAlert, Users, BarChart3, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
+import { getDictionary } from '@/utils/dictionaries'
+import { getCurrentLanguage } from '@/utils/dictionaries-server'
 import { TopNavigation } from '@/components/TopNavigation'
 
 export default async function AdminPage() {

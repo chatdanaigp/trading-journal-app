@@ -1,67 +1,58 @@
-import { createClient } from '@/utils/supabase/server'
-import { Trophy, TrendingUp, Search, Crown, ArrowLeft, Activity, Target, Zap } from 'lucide-react'
+'use client'
+
+import { useLeaderboardData } from '@/hooks/usePageData'
+import { Trophy } from 'lucide-react'
 import Link from 'next/link'
-import { getCurrentLanguage, getDictionary } from '@/utils/dictionaries'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { requireVerifiedUser } from '@/utils/verify-client-id'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
-import { startOfMonth, endOfMonth } from 'date-fns'
+import { CardSkeleton, TableSkeleton, Skeleton } from '@/components/ui/Skeleton'
+import { useEffect, useState } from 'react'
 
-// Rank Badge System
-function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
-    if (totalTrades >= 200 && netProfit >= 10000 && winRate >= 75) {
-        return { badge: '🌟', name: dict?.leaderboard?.badges?.master || 'Master', color: 'from-yellow-400 to-yellow-600' }
-    } else if (totalTrades >= 100 && netProfit >= 5000 && winRate >= 70) {
-        return { badge: '👑', name: dict?.leaderboard?.badges?.diamond || 'Diamond', color: 'from-cyan-400 to-blue-600' }
-    } else if (totalTrades >= 50 && netProfit >= 2000 && winRate >= 60) {
-        return { badge: '💎', name: dict?.leaderboard?.badges?.platinum || 'Platinum', color: 'from-purple-400 to-purple-600' }
-    } else if (totalTrades >= 20 && netProfit >= 500 && winRate >= 50) {
-        return { badge: '⚡', name: dict?.leaderboard?.badges?.gold || 'Gold', color: 'from-yellow-500 to-yellow-700' }
-    } else if (totalTrades >= 10 && netProfit >= 100) {
-        return { badge: '🔵', name: dict?.leaderboard?.badges?.silver || 'Silver', color: 'from-gray-300 to-gray-500' }
-    } else {
-        return { badge: '🔴', name: dict?.leaderboard?.badges?.bronze || 'Bronze', color: 'from-orange-600 to-orange-800' }
-    }
+function useLang() {
+    const [dict, setDict] = useState<any>(null)
+    useEffect(() => {
+        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
+        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
+    }, [])
+    return dict
 }
 
-export default async function LeaderboardPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    const lang = await getCurrentLanguage()
-    const dict = await getDictionary(lang)
+function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
+    if (totalTrades >= 200 && netProfit >= 10000 && winRate >= 75) return { badge: '🌟', name: dict?.leaderboard?.badges?.master || 'Master', color: 'from-yellow-400 to-yellow-600' }
+    if (totalTrades >= 100 && netProfit >= 5000 && winRate >= 70) return { badge: '👑', name: dict?.leaderboard?.badges?.diamond || 'Diamond', color: 'from-cyan-400 to-blue-600' }
+    if (totalTrades >= 50 && netProfit >= 2000 && winRate >= 60) return { badge: '💎', name: dict?.leaderboard?.badges?.platinum || 'Platinum', color: 'from-purple-400 to-purple-600' }
+    if (totalTrades >= 20 && netProfit >= 500 && winRate >= 50) return { badge: '⚡', name: dict?.leaderboard?.badges?.gold || 'Gold', color: 'from-yellow-500 to-yellow-700' }
+    if (totalTrades >= 10 && netProfit >= 100) return { badge: '🔵', name: dict?.leaderboard?.badges?.silver || 'Silver', color: 'from-gray-300 to-gray-500' }
+    return { badge: '🔴', name: dict?.leaderboard?.badges?.bronze || 'Bronze', color: 'from-orange-600 to-orange-800' }
+}
 
-    // Calculate current month boundaries for the RPC
-    const now = new Date()
-    const monthStart = startOfMonth(now).toISOString()
-    const monthEnd = endOfMonth(now).toISOString()
+function LeaderboardSkeleton() {
+    return (
+        <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden p-8 space-y-8 animate-in fade-in duration-300">
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-72" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <CardSkeleton /><CardSkeleton /><CardSkeleton />
+            </div>
+            <TableSkeleton rows={5} />
+        </div>
+    )
+}
 
-    // Call the enhanced RPC function with date filters
-    let { data: leaderboard, error } = await supabase.rpc('get_leaderboard', {
-        start_date: monthStart,
-        end_date: monthEnd
-    })
+export default function LeaderboardPage() {
+    const { data, isLoading } = useLeaderboardData()
+    const dict = useLang()
 
-    // FALLBACK: If the migration (20260303000000) hasn't been pushed to Supabase yet
-    // the RPC call above will fail with "function ... does not exist". 
-    // We gracefully fall back to the old function signature.
-    if (error && error.message?.includes('does not exist')) {
-        const fallback = await supabase.rpc('get_leaderboard')
-        leaderboard = fallback.data
-        error = fallback.error
-    }
+    if (isLoading || !data || !dict) return <LeaderboardSkeleton />
 
-    if (error) {
-        console.error('Error fetching leaderboard:', error)
-    }
-
-    const firstPlace = leaderboard?.[0] || null;
-    const secondPlace = leaderboard?.[1] || null;
-    const thirdPlace = leaderboard?.[2] || null;
+    const { leaderboard, currentUserId } = data
+    const firstPlace = leaderboard?.[0] || null
+    const secondPlace = leaderboard?.[1] || null
+    const thirdPlace = leaderboard?.[2] || null
 
     return (
         <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
-            {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#ccf381] blur-[150px] opacity-10 rounded-full pointer-events-none" />
@@ -74,128 +65,60 @@ export default async function LeaderboardPage() {
                 <StaggerItem className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-[#ccf381]/10 rounded-lg">
-                                <Trophy className="w-6 h-6 text-[#ccf381]" />
-                            </div>
-                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white flex items-center gap-2">
-                                {dict.leaderboard.title}
-                            </h1>
+                            <div className="p-2 bg-[#ccf381]/10 rounded-lg"><Trophy className="w-6 h-6 text-[#ccf381]" /></div>
+                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white flex items-center gap-2">{dict.leaderboard.title}</h1>
                         </div>
-                        <p className="text-gray-400 font-medium tracking-wide">
-                            {dict.leaderboard.subtitle}
-                        </p>
+                        <p className="text-gray-400 font-medium tracking-wide">{dict.leaderboard.subtitle}</p>
                     </div>
                 </StaggerItem>
 
                 {/* Top 3 Podium */}
                 {leaderboard && leaderboard.length > 0 && (
                     <StaggerItem className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 items-end">
-                        {/* Rank 2 */}
                         {secondPlace && (
                             <Card key={secondPlace.out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥈</div>
                                 <CardHeader className="text-center pt-10 pb-2">
-                                    {secondPlace.avatar_url && (
-                                        <img
-                                            src={secondPlace.avatar_url}
-                                            alt={secondPlace.username || secondPlace.full_name || dict?.leaderboard?.traderDefault || 'Trader'}
-                                            className="w-16 h-16 rounded-full border-2 border-gray-400 mx-auto mb-3"
-                                        />
-                                    )}
-                                    <CardTitle className="text-xl font-bold text-gray-200">
-                                        {secondPlace.username || secondPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
-                                    </CardTitle>
+                                    {secondPlace.avatar_url && <img src={secondPlace.avatar_url} alt={secondPlace.username || 'Trader'} className="w-16 h-16 rounded-full border-2 border-gray-400 mx-auto mb-3" />}
+                                    <CardTitle className="text-xl font-bold text-gray-200">{secondPlace.username || secondPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.runnerUp}</p>
-                                    <div className="mt-2">
-                                        <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(secondPlace.total_trades, secondPlace.net_profit, secondPlace.win_rate, dict).color} text-white font-bold`}>
-                                            {getRankBadge(secondPlace.total_trades, secondPlace.net_profit, secondPlace.win_rate, dict).badge} {getRankBadge(secondPlace.total_trades, secondPlace.net_profit, secondPlace.win_rate, dict).name}
-                                        </span>
-                                    </div>
                                 </CardHeader>
                                 <CardContent className="text-center space-y-2 pb-6">
-                                    <div className="text-3xl font-black text-white">
-                                        ${secondPlace.net_profit?.toLocaleString()}
-                                    </div>
-                                    <div className="text-xs text-gray-400 flex justify-center gap-2 flex-wrap">
-                                        <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.winRateShort || 'WR'}: {secondPlace.win_rate}%</span>
-                                        <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.tradesLabel || 'Trades'}: {secondPlace.total_trades}</span>
-                                    </div>
+                                    <div className="text-3xl font-black text-white">${secondPlace.net_profit?.toLocaleString()}</div>
                                 </CardContent>
                             </Card>
                         )}
-
-                        {/* Rank 1 (Champion) */}
                         {firstPlace && (
                             <Card key={firstPlace.out_user_id} className="border-[#ccf381] bg-[#1a1a1a]/80 backdrop-blur-md relative scale-110 z-10 shadow-[0_0_50px_rgba(204,243,129,0.15)] group hover:-translate-y-3 transition-transform duration-300">
                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-7xl drop-shadow-[0_0_20px_rgba(255,215,0,0.5)]">👑</div>
                                 <div className="absolute inset-0 bg-gradient-to-b from-[#ccf381]/10 to-transparent pointer-events-none rounded-xl" />
                                 <CardHeader className="text-center pt-12 pb-2">
-                                    {firstPlace.avatar_url && (
-                                        <img
-                                            src={firstPlace.avatar_url}
-                                            alt={firstPlace.username || firstPlace.full_name || dict?.leaderboard?.championDefault || 'Champion'}
-                                            className="w-20 h-20 rounded-full border-4 border-[#ccf381] mx-auto mb-3 shadow-lg shadow-[#ccf381]/30"
-                                        />
-                                    )}
-                                    <CardTitle className="text-2xl font-black text-[#ccf381] drop-shadow-md">
-                                        {firstPlace.username || firstPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
-                                    </CardTitle>
+                                    {firstPlace.avatar_url && <img src={firstPlace.avatar_url} alt={firstPlace.username || 'Champion'} className="w-20 h-20 rounded-full border-4 border-[#ccf381] mx-auto mb-3 shadow-lg shadow-[#ccf381]/30" />}
+                                    <CardTitle className="text-2xl font-black text-[#ccf381] drop-shadow-md">{firstPlace.username || firstPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">{dict.leaderboard.champion}</p>
-                                    <div className="mt-2">
-                                        <span className={`text-sm px-3 py-1.5 rounded-lg bg-gradient-to-r ${getRankBadge(firstPlace.total_trades, firstPlace.net_profit, firstPlace.win_rate, dict).color} text-white font-bold shadow-[0_0_15px_rgba(255,215,0,0.3)]`}>
-                                            {getRankBadge(firstPlace.total_trades, firstPlace.net_profit, firstPlace.win_rate, dict).badge} {getRankBadge(firstPlace.total_trades, firstPlace.net_profit, firstPlace.win_rate, dict).name}
-                                        </span>
-                                    </div>
                                 </CardHeader>
                                 <CardContent className="text-center space-y-2 pb-8">
-                                    <div className="text-4xl font-black text-white drop-shadow-md">
-                                        ${firstPlace.net_profit?.toLocaleString()}
-                                    </div>
-                                    <div className="text-sm text-gray-300 flex justify-center gap-2 flex-wrap">
-                                        <span className="bg-[#ccf381]/20 text-[#ccf381] px-3 py-1 rounded border border-[#ccf381]/20">{dict.leaderboard.winRate}: {firstPlace.win_rate}%</span>
-                                        <span className="bg-[#333] px-3 py-1 rounded border border-[#333]">{dict.leaderboard.trades}: {firstPlace.total_trades}</span>
-                                    </div>
+                                    <div className="text-4xl font-black text-white drop-shadow-md">${firstPlace.net_profit?.toLocaleString()}</div>
                                 </CardContent>
                             </Card>
                         )}
-
-                        {/* Rank 3 */}
                         {thirdPlace && (
                             <Card key={thirdPlace.out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥉</div>
                                 <CardHeader className="text-center pt-10 pb-2">
-                                    {thirdPlace.avatar_url && (
-                                        <img
-                                            src={thirdPlace.avatar_url}
-                                            alt={thirdPlace.username || thirdPlace.full_name || dict?.leaderboard?.traderDefault || 'Trader'}
-                                            className="w-16 h-16 rounded-full border-2 border-orange-600 mx-auto mb-3"
-                                        />
-                                    )}
-                                    <CardTitle className="text-xl font-bold text-gray-200">
-                                        {thirdPlace.username || thirdPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
-                                    </CardTitle>
+                                    {thirdPlace.avatar_url && <img src={thirdPlace.avatar_url} alt={thirdPlace.username || 'Trader'} className="w-16 h-16 rounded-full border-2 border-orange-600 mx-auto mb-3" />}
+                                    <CardTitle className="text-xl font-bold text-gray-200">{thirdPlace.username || thirdPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.thirdPlace}</p>
-                                    <div className="mt-2">
-                                        <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${getRankBadge(thirdPlace.total_trades, thirdPlace.net_profit, thirdPlace.win_rate, dict).color} text-white font-bold`}>
-                                            {getRankBadge(thirdPlace.total_trades, thirdPlace.net_profit, thirdPlace.win_rate, dict).badge} {getRankBadge(thirdPlace.total_trades, thirdPlace.net_profit, thirdPlace.win_rate, dict).name}
-                                        </span>
-                                    </div>
                                 </CardHeader>
                                 <CardContent className="text-center space-y-2 pb-6">
-                                    <div className="text-3xl font-black text-white">
-                                        ${thirdPlace.net_profit?.toLocaleString()}
-                                    </div>
-                                    <div className="text-xs text-gray-400 flex justify-center gap-2 flex-wrap">
-                                        <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.winRateShort || 'WR'}: {thirdPlace.win_rate}%</span>
-                                        <span className="bg-[#333] px-2 py-1 rounded">{dict?.leaderboard?.tradesLabel || 'Trades'}: {thirdPlace.total_trades}</span>
-                                    </div>
+                                    <div className="text-3xl font-black text-white">${thirdPlace.net_profit?.toLocaleString()}</div>
                                 </CardContent>
                             </Card>
                         )}
                     </StaggerItem>
                 )}
 
-                {/* Full Leaderboard Table */}
+                {/* Full Table */}
                 <StaggerItem className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-2xl border border-[#333] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left min-w-[800px]">
@@ -215,60 +138,26 @@ export default async function LeaderboardPage() {
                             <tbody className="divide-y divide-[#222]">
                                 {leaderboard?.map((trader: any, index: number) => {
                                     const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate, dict)
-                                    const isCurrentUser = trader.out_user_id === user?.id
+                                    const isCurrentUser = trader.out_user_id === currentUserId
                                     return (
-                                        <tr
-                                            key={trader.out_user_id}
-                                            className={`hover:bg-[#ccf381]/5 transition-colors group ${isCurrentUser ? 'bg-[#ccf381]/10 border-l-4 border-l-[#ccf381]' : ''}`}
-                                        >
-                                            <td className="p-4 font-mono text-gray-500 group-hover:text-[#ccf381] font-bold">
-                                                #{index + 1}
-                                            </td>
+                                        <tr key={trader.out_user_id} className={`hover:bg-[#ccf381]/5 transition-colors group ${isCurrentUser ? 'bg-[#ccf381]/10 border-l-4 border-l-[#ccf381]' : ''}`}>
+                                            <td className="p-4 font-mono text-gray-500 group-hover:text-[#ccf381] font-bold">#{index + 1}</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">
-                                                    {trader.avatar_url && (
-                                                        <img
-                                                            src={trader.avatar_url}
-                                                            alt={trader.username || trader.full_name}
-                                                            className="w-8 h-8 rounded-full border border-gray-600"
-                                                        />
-                                                    )}
-                                                    <Link
-                                                        href={`/public-profile/${trader.out_user_id}`}
-                                                        className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}
-                                                    >
+                                                    {trader.avatar_url && <img src={trader.avatar_url} alt={trader.username || trader.full_name} className="w-8 h-8 rounded-full border border-gray-600" />}
+                                                    <Link href={`/public-profile/${trader.out_user_id}`} className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}>
                                                         {trader.username || trader.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
                                                         {isCurrentUser && <span className="ml-2 text-xs">({dict?.leaderboard?.you || 'You'})</span>}
                                                     </Link>
                                                 </div>
                                             </td>
-                                            <td className="p-4">
-                                                <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${rank.color} text-white font-bold`}>
-                                                    {rank.badge} {rank.name}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-center text-gray-400">
-                                                {trader.total_trades}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                <span className="bg-[#222] px-2 py-1 rounded text-xs text-gray-300">
-                                                    {trader.win_rate}%
-                                                </span>
-                                            </td>
-                                            <td className={`p-4 text-right font-black ${trader.net_profit >= 0 ? 'text-[#ccf381]' : 'text-red-500'}`}>
-                                                ${trader.net_profit?.toLocaleString()}
-                                            </td>
-                                            <td className={`p-4 text-right text-sm ${trader.avg_trade >= 0 ? 'text-gray-300' : 'text-red-400'}`}>
-                                                ${trader.avg_trade?.toLocaleString()}
-                                            </td>
-                                            <td className="p-4 text-right text-sm text-green-400">
-                                                ${trader.best_trade?.toLocaleString()}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                <span className="bg-[#222] px-2 py-1 rounded text-xs text-[#ccf381]">
-                                                    {trader.current_streak > 0 ? `🔥 ${trader.current_streak}` : '-'}
-                                                </span>
-                                            </td>
+                                            <td className="p-4"><span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${rank.color} text-white font-bold`}>{rank.badge} {rank.name}</span></td>
+                                            <td className="p-4 text-center text-gray-400">{trader.total_trades}</td>
+                                            <td className="p-4 text-center"><span className="bg-[#222] px-2 py-1 rounded text-xs text-gray-300">{trader.win_rate}%</span></td>
+                                            <td className={`p-4 text-right font-black ${trader.net_profit >= 0 ? 'text-[#ccf381]' : 'text-red-500'}`}>${trader.net_profit?.toLocaleString()}</td>
+                                            <td className={`p-4 text-right text-sm ${trader.avg_trade >= 0 ? 'text-gray-300' : 'text-red-400'}`}>${trader.avg_trade?.toLocaleString()}</td>
+                                            <td className="p-4 text-right text-sm text-green-400">${trader.best_trade?.toLocaleString()}</td>
+                                            <td className="p-4 text-center"><span className="bg-[#222] px-2 py-1 rounded text-xs text-[#ccf381]">{trader.current_streak > 0 ? `🔥 ${trader.current_streak}` : '-'}</span></td>
                                         </tr>
                                     )
                                 })}
@@ -276,12 +165,9 @@ export default async function LeaderboardPage() {
                         </table>
                     </div>
                     {(!leaderboard || leaderboard.length === 0) && (
-                        <div className="p-12 text-center text-gray-600 italic">
-                            {dict.leaderboard.noRanked}
-                        </div>
+                        <div className="p-12 text-center text-gray-600 italic">{dict.leaderboard.noRanked}</div>
                     )}
                 </StaggerItem>
-
             </StaggerContainer>
         </div>
     )
