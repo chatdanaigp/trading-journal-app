@@ -94,8 +94,10 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
         const tradeDateStr = formData.get('tradeDate') as string;
         if (tradeDateStr) {
             const [year, month, day] = tradeDateStr.split('-').map(Number);
-            const exactDate = new Date();
-            exactDate.setFullYear(year, month - 1, day);
+            const now = new Date();
+            // Create a new date object keeping the exact current local Hour/Minute/Second 
+            // but mapped to the selected Calendar Year/Month/Day
+            const exactDate = new Date(year, month - 1, day, now.getHours(), now.getMinutes(), now.getSeconds());
             formData.append('exactCreatedAt', exactDate.toISOString());
         }
 

@@ -76,8 +76,8 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
             // If it's already an existing trade, maybe try using its original time
             const originalDate = new Date(initialData.created_at || new Date());
-            originalDate.setFullYear(year, month - 1, day);
-            formData.append('exactCreatedAt', originalDate.toISOString());
+            const exactDate = new Date(year, month - 1, day, originalDate.getHours(), originalDate.getMinutes(), originalDate.getSeconds());
+            formData.append('exactCreatedAt', exactDate.toISOString());
         }
 
         try {
