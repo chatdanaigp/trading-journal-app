@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 interface EditTradeFormProps {
@@ -129,21 +129,42 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
             {/* Row 2: Type */}
             <div className="grid gap-2">
                 <Label htmlFor="type" className="text-gray-400">Type</Label>
-                <div className="relative">
-                    <select
-                        name="type"
-                        className="flex h-11 w-full rounded-xl border border-[#333] bg-[#0d0d0d] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#ccf381] appearance-none"
-                        required
-                        value={type}
-                        onChange={(e) => {
-                            setType(e.target.value)
-                            handleCalculation('type', e.target.value)
+                <div className="flex relative rounded-xl overflow-hidden border border-[#333] h-11 w-full shrink-0 bg-[#0a0a0a] p-1">
+                    <LazyMotion features={domAnimation}>
+                        <AnimatePresence>
+                            <m.div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${type === 'BUY' ? 'bg-[#ccf381]/20' : 'bg-red-500/20'}`}
+                                animate={{
+                                    left: type === 'BUY' ? '4px' : 'calc(50%)',
+                                    backgroundColor: type === 'BUY' ? 'rgba(204, 243, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            />
+                        </AnimatePresence>
+                    </LazyMotion>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setType('BUY')
+                            handleCalculation('type', 'BUY')
                         }}
+                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${type === 'BUY' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
                     >
-                        <option value="BUY">BUY</option>
-                        <option value="SELL">SELL</option>
-                    </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</div>
+                        <ArrowUpRight className="w-4 h-4" />
+                        <span>BUY</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setType('SELL')
+                            handleCalculation('type', 'SELL')
+                        }}
+                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${type === 'SELL' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
+                    >
+                        <ArrowDownRight className="w-4 h-4" />
+                        <span>SELL</span>
+                    </button>
+                    <input type="hidden" name="type" value={type} />
                 </div>
             </div>
 
