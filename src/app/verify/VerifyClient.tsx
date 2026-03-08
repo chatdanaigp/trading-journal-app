@@ -46,7 +46,7 @@ export default function VerifyClient({ dict }: { dict: any }) {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.replace(/\D/g, '').slice(0, 5)
+        const value = e.target.value.replace(/\D/g, '')
         setClientId(value)
         if (error) setError('')
     }
@@ -89,8 +89,7 @@ export default function VerifyClient({ dict }: { dict: any }) {
                                 value={clientId}
                                 onChange={handleInputChange}
                                 disabled={loading || success}
-                                maxLength={5}
-                                className="h-14 text-center text-2xl font-mono font-bold tracking-[0.5em] bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-600 placeholder:tracking-normal placeholder:text-base focus:border-[#ccf381] focus:ring-[#ccf381]/20 transition-all"
+                                className="h-14 text-center text-2xl font-mono font-bold tracking-[0.3em] bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-600 placeholder:tracking-normal placeholder:text-base focus:border-[#ccf381] focus:ring-[#ccf381]/20 transition-all"
                             />
                             <p className="text-xs text-gray-500 text-center">
                                 {dict.verify.helpText}
@@ -116,7 +115,7 @@ export default function VerifyClient({ dict }: { dict: any }) {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            disabled={clientId.length !== 5 || loading || success}
+                            disabled={clientId.length === 0 || loading || success}
                             className="w-full h-12 bg-[#ccf381] hover:bg-[#b8e060] text-black font-bold text-base transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#ccf381]/20 hover:shadow-[#ccf381]/30"
                         >
                             {loading ? (
