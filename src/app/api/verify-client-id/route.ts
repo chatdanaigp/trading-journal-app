@@ -36,10 +36,10 @@ export async function POST(request: Request) {
             )
         }
 
-        // Validate format: must be 5 digits
-        if (!/^\d{5}$/.test(clientId.trim())) {
+        // Validate format: must be numbers only
+        if (!/^\d+$/.test(clientId.trim())) {
             return NextResponse.json(
-                { error: 'Client ID ต้องเป็นตัวเลข 5 หลักเท่านั้น' },
+                { error: 'Client ID ต้องเป็นตัวเลขเท่านั้น' },
                 { status: 400 }
             )
         }
