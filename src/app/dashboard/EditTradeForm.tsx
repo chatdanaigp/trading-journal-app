@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 interface EditTradeFormProps {
     initialData: any
@@ -194,20 +196,30 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
             <div className="grid gap-2">
                 <Label className="text-gray-400">Profit / Loss ($)</Label>
-                {/* Profit/Loss Toggle */}
-                <div className="flex rounded-xl overflow-hidden border border-[#333] h-10">
+                {/* Animated Profit/Loss Toggle */}
+                <div className="flex relative rounded-xl overflow-hidden border border-[#333] h-10 w-full shrink-0 bg-[#0a0a0a] p-1">
+                    <LazyMotion features={domAnimation}>
+                        <AnimatePresence>
+                            <m.div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${profitSign === '+' ? 'bg-[#ccf381]/20' : 'bg-red-500/20'}`}
+                                animate={{
+                                    left: profitSign === '+' ? '4px' : 'calc(50%)',
+                                    backgroundColor: profitSign === '+' ? 'rgba(204, 243, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            />
+                        </AnimatePresence>
+                    </LazyMotion>
                     <button
                         type="button"
                         onClick={() => {
                             setProfitSign('+')
                             handleCalculation('sign', '+')
                         }}
-                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '+'
-                                ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
-                                : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
-                            }`}
+                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${profitSign === '+' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
                     >
-                        ✅ Profit
+                        <TrendingUp className="w-4 h-4" />
+                        <span>Profit</span>
                     </button>
                     <button
                         type="button"
@@ -215,12 +227,10 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                             setProfitSign('-')
                             handleCalculation('sign', '-')
                         }}
-                        className={`flex-1 text-sm font-bold transition-all ${profitSign === '-'
-                                ? 'bg-red-500/20 text-red-400'
-                                : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
-                            }`}
+                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${profitSign === '-' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
                     >
-                        ❌ Loss
+                        <TrendingDown className="w-4 h-4" />
+                        <span>Loss</span>
                     </button>
                 </div>
                 {/* Amount Input */}

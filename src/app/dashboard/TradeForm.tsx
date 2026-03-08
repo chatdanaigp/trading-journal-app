@@ -8,7 +8,7 @@ import { useState, useRef } from 'react'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number }) {
@@ -235,20 +235,30 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                 )}
                             </div>
                             <div className="flex gap-2 h-11">
-                                {/* Toggle Container */}
-                                <div className="flex rounded-xl overflow-hidden border border-[#333] w-1/3 shrink-0">
+                                {/* Animated Toggle Container */}
+                                <div className="flex relative rounded-xl overflow-hidden border border-[#333] w-1/3 shrink-0 bg-[#0a0a0a] p-1">
+                                    <LazyMotion features={domAnimation}>
+                                        <AnimatePresence>
+                                            <m.div
+                                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${profitSign === '+' ? 'bg-[#ccf381]/20' : 'bg-red-500/20'}`}
+                                                animate={{
+                                                    left: profitSign === '+' ? '4px' : 'calc(50%)',
+                                                    backgroundColor: profitSign === '+' ? 'rgba(204, 243, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                                }}
+                                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                            />
+                                        </AnimatePresence>
+                                    </LazyMotion>
                                     <button
                                         type="button"
                                         onClick={() => {
                                             setProfitSign('+')
                                             handleCalculation('sign', '+')
                                         }}
-                                        className={`flex-1 text-[11px] font-bold transition-all ${profitSign === '+'
-                                            ? 'bg-[#ccf381]/20 text-[#ccf381] border-r border-[#333]'
-                                            : 'bg-[#0d0d0d] text-gray-500 border-r border-[#333] hover:bg-[#1a1a1a]'
-                                            }`}
+                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] font-bold transition-colors duration-200 rounded-lg ${profitSign === '+' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
-                                        ✅ {dict?.tradeForm?.profitBtn || 'Profit'}
+                                        <TrendingUp className="w-3.5 h-3.5" />
+                                        <span>{dict?.tradeForm?.profitBtn || 'Profit'}</span>
                                     </button>
                                     <button
                                         type="button"
@@ -256,12 +266,10 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                             setProfitSign('-')
                                             handleCalculation('sign', '-')
                                         }}
-                                        className={`flex-1 text-[11px] font-bold transition-all ${profitSign === '-'
-                                            ? 'bg-red-500/20 text-red-400'
-                                            : 'bg-[#0d0d0d] text-gray-500 hover:bg-[#1a1a1a]'
-                                            }`}
+                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] font-bold transition-colors duration-200 rounded-lg ${profitSign === '-' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
-                                        ❌ {dict?.tradeForm?.lossBtn || 'Loss'}
+                                        <TrendingDown className="w-3.5 h-3.5" />
+                                        <span>{dict?.tradeForm?.lossBtn || 'Loss'}</span>
                                     </button>
                                 </div>
 
