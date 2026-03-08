@@ -18,13 +18,14 @@ export async function GET() {
         end_date: monthEnd
     })
 
-    if (error && error.message?.includes('does not exist')) {
+    if (error) {
+        console.log('[Leaderboard API] Monthly RPC failed:', error.message, '...falling back to all-time RPC')
         const fallback = await supabase.rpc('get_leaderboard')
         leaderboard = fallback.data
-        error = fallback.error
+        if (fallback.error) {
+            console.error('[Leaderboard API] Fallback RPC also failed:', fallback.error.message)
+        }
     }
-
-    if (error) console.error('Error fetching leaderboard:', error)
 
     return NextResponse.json({
         leaderboard: leaderboard || [],
