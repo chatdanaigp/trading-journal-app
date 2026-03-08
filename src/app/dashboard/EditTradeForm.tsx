@@ -69,6 +69,17 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
         setLoading(true)
         setMessage(null)
 
+        // Capture exact local time for the selected date
+        const tradeDateStr = formData.get('tradeDate') as string;
+        if (tradeDateStr) {
+            const [year, month, day] = tradeDateStr.split('-').map(Number);
+
+            // If it's already an existing trade, maybe try using its original time
+            const originalDate = new Date(initialData.created_at || new Date());
+            originalDate.setFullYear(year, month - 1, day);
+            formData.append('exactCreatedAt', originalDate.toISOString());
+        }
+
         try {
             // Append tradeId manually since it's not an input field
             formData.append('tradeId', initialData.id)

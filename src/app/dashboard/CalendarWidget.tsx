@@ -27,6 +27,7 @@ type Trade = {
     id: string
     created_at: string
     profit: number | null
+    lot_size: number | null
 }
 
 export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }) {
@@ -81,11 +82,16 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
         if (dailyTrades.length === 0) return null
 
         const dailyProfit = dailyTrades.reduce((sum, t) => sum + (t.profit || 0), 0)
+        const dailyPoints = dailyTrades.reduce((sum, t) => {
+            const lot = t.lot_size || 0.01;
+            const profit = t.profit || 0;
+            return sum + (lot !== 0 ? Math.round(profit / lot) : 0);
+        }, 0)
         const winCount = dailyTrades.filter(t => (t.profit || 0) >= 0).length
         const lossCount = dailyTrades.filter(t => (t.profit || 0) < 0).length
         const tradeCount = dailyTrades.length
 
-        return { dailyProfit, winCount, lossCount, tradeCount, dailyTrades }
+        return { dailyProfit, dailyPoints, winCount, lossCount, tradeCount, dailyTrades }
     }
 
     const selectedDayStats = selectedDay ? getDayStats(selectedDay) : null;
@@ -214,20 +220,26 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                                 {/* Modal Body */}
                                 <div className="p-6 space-y-6">
                                     {/* Stats Grid */}
-                                    <div className="grid grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPnl || 'Net P&L'}</p>
-                                            <p className={cn("text-2xl font-black", selectedDayStats.dailyProfit >= 0 ? "text-[#ccf381]" : "text-red-400")}>
+                                            <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPnl || 'Net P&L'}</p>
+                                            <p className={cn("text-xl md:text-2xl font-black", selectedDayStats.dailyProfit >= 0 ? "text-[#ccf381]" : "text-red-400")}>
                                                 {selectedDayStats.dailyProfit >= 0 ? '+' : ''}${selectedDayStats.dailyProfit.toLocaleString()}
                                             </p>
                                         </div>
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.totalTrades || 'Total Trades'}</p>
-                                            <p className="text-2xl font-black text-white">{selectedDayStats.tradeCount}</p>
+                                            <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPts || 'Net Points'}</p>
+                                            <p className={cn("text-xl md:text-2xl font-black", selectedDayStats.dailyPoints >= 0 ? "text-[#ccf381]" : "text-red-400")}>
+                                                {selectedDayStats.dailyPoints >= 0 ? '+' : ''}{selectedDayStats.dailyPoints.toLocaleString()}
+                                            </p>
                                         </div>
                                         <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
-                                            <p className="text-gray-500 text-xs font-bold uppercase mb-1">{dict?.dashboard?.winRate || 'Win Rate'}</p>
-                                            <p className="text-2xl font-black text-blue-400">
+                                            <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.totalTrades || 'Total Trades'}</p>
+                                            <p className="text-xl md:text-2xl font-black text-white">{selectedDayStats.tradeCount}</p>
+                                        </div>
+                                        <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
+                                            <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.winRate || 'Win Rate'}</p>
+                                            <p className="text-xl md:text-2xl font-black text-blue-400">
                                                 {Math.round((selectedDayStats.winCount / selectedDayStats.tradeCount) * 100)}%
                                             </p>
                                         </div>

@@ -90,6 +90,15 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
         setLoading(true)
         setMessage(null)
 
+        // Capture exact local time for the selected date
+        const tradeDateStr = formData.get('tradeDate') as string;
+        if (tradeDateStr) {
+            const [year, month, day] = tradeDateStr.split('-').map(Number);
+            const exactDate = new Date();
+            exactDate.setFullYear(year, month - 1, day);
+            formData.append('exactCreatedAt', exactDate.toISOString());
+        }
+
         try {
             const result = await createTrade(formData)
 

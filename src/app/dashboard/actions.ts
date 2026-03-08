@@ -48,10 +48,14 @@ export async function createTrade(formData: FormData) {
         }
     }
 
+    const exactCreatedAt = formData.get('exactCreatedAt') as string
+
     let createdAt = new Date().toISOString()
-    if (tradeDate) {
+    if (exactCreatedAt) {
+        createdAt = exactCreatedAt
+    } else if (tradeDate) {
         if (tradeDate.length === 10) {
-            // Append 12:00 UTC to prevent timezone/midnight parsing issues with getTradingDay
+            // Fallback for old forms
             createdAt = new Date(`${tradeDate}T12:00:00Z`).toISOString()
         } else {
             createdAt = new Date(tradeDate).toISOString()
@@ -129,8 +133,12 @@ export async function updateTrade(formData: FormData) {
     const profit = formData.get('profit')
     const notes = formData.get('notes') as string
 
+    const exactCreatedAt = formData.get('exactCreatedAt') as string
+
     let createdAt: string | undefined = undefined
-    if (tradeDate) {
+    if (exactCreatedAt) {
+        createdAt = exactCreatedAt
+    } else if (tradeDate) {
         if (tradeDate.length === 10) {
             createdAt = new Date(`${tradeDate}T12:00:00Z`).toISOString()
         } else {
