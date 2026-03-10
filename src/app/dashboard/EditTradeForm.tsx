@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
+import { useSWRConfig } from 'swr'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
@@ -16,6 +17,7 @@ interface EditTradeFormProps {
 export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const { mutate } = useSWRConfig()
 
     // Form State (initialized with props)
     const [type, setType] = useState(initialData.type || 'BUY')
@@ -88,6 +90,10 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
             if (result?.success) {
                 setMessage({ type: 'success', text: 'Trade updated successfully!' })
+                
+                // Invalidate all dashboard SWR keys instantly
+                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/dashboard'))
+
                 setTimeout(() => {
                     onSuccess() // Close modal
                 }, 1000)

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
+import { useSWRConfig } from 'swr'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
@@ -16,6 +17,7 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
+    const { mutate } = useSWRConfig()
 
     // Calculate total net profit
     const totalNetProfit = trades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
@@ -111,6 +113,10 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
 
                 setMessage({ type: 'success', text: 'Trade saved successfully!' })
                 formRef.current?.reset()
+
+                // Invalidate all dashboard SWR keys instantly
+                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/dashboard'))
+
                 // Reset state
                 setSymbol('XAUUSD')
                 setTradeDate(new Date().toISOString().split('T')[0])
