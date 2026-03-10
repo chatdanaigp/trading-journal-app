@@ -1,5 +1,4 @@
-import { startOfDay, subDays, getHours } from 'date-fns'
-
+// Removed unneeded date-fns imports
 /**
  * Calculates the "Trading Day" for a given date.
  * A Trading Day starts at 06:00 AM and ends at 05:59 AM the next calendar day.
@@ -17,13 +16,36 @@ import { startOfDay, subDays, getHours } from 'date-fns'
 export function getTradingDay(dateInput: string | Date): Date {
     const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
 
-    const hour = getHours(d);
+    // Format the date to Thailand time explicitly to avoid Vercel UTC shifts
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hour12: false
+    });
 
-    // If the hour is before 06:00 AM, it belongs to the previous trading day
+    const parts = formatter.formatToParts(d);
+    const p: Record<string, string> = {};
+    for (const part of parts) p[part.type] = part.value;
+
+    const hour = parseInt(p.hour, 10);
+
+    // Construct the date components
+    let year = parseInt(p.year, 10);
+    let month = parseInt(p.month, 10);
+    let day = parseInt(p.day, 10);
+
     if (hour < 6) {
-        return startOfDay(subDays(d, 1));
+        // Shift back 1 day in UTC safely
+        const shifted = new Date(Date.UTC(year, month - 1, day - 1));
+        year = shifted.getUTCFullYear();
+        month = shifted.getUTCMonth() + 1;
+        day = shifted.getUTCDate();
     }
 
-    // Otherwise, it belongs to the current calendar day
-    return startOfDay(d);
+    // Return a guaranteed UTC Date representing midnight of this trading day.
+    // This ensures isSameDay compares correctly regardless of the runtime environment.
+    return new Date(Date.UTC(year, month - 1, day));
 }
