@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getTradingDayStr } from '@/utils/date-helpers'
 
 // Security: Check if user is an authorized admin
 export async function isAdmin(): Promise<boolean> {
@@ -30,25 +31,46 @@ export async function getAllUsers() {
 
     if (!(await isAdmin())) return []
 
-    const { data, error } = await supabase.rpc('admin_get_all_users')
+    // Fetch all profiles and trades from the Admin RPCs that just return raw rows
+    // Since we cannot run complex timezone logic reliably in raw PG safely without service keys or DB changes,
+    // we fetch raw data and aggregate it here using our strict getTradingDayStr logic.
+    
+    // We already have `get_all_trades_admin` which returns all trades.
+    const [{ data: profiles }, { data: allTrades }] = await Promise.all([
+        supabase.from('profiles').select('*'),
+        supabase.rpc('get_all_trades_admin')
+    ]);
 
-    if (error) {
-        console.error('Error fetching users:', error)
-        return []
-    }
+    if (!profiles) return [];
+    
+    const trades = allTrades || [];
 
-    return (data || []).map((u: any) => ({
-        id: u.user_id,
-        username: u.username,
-        full_name: u.full_name,
-        avatar_url: u.avatar_url,
-        port_size: u.port_size,
-        profit_goal_percent: u.profit_goal_percent,
-        client_id: u.client_id,
-        totalTrades: Number(u.total_trades) || 0,
-        totalProfit: Number(u.total_profit) || 0,
-        winRate: Number(u.win_rate) || 0,
-    }))
+    return profiles.map((u: any) => {
+        const userTrades = trades.filter((t: any) => t.user_id === u.id)
+        const totalTrades = userTrades.length
+        
+        // Calculate Win Rate strictly based on profit > 0
+        const winCount = userTrades.filter((t: any) => (Number(t.profit) || 0) > 0).length
+        const lossCount = userTrades.filter((t: any) => (Number(t.profit) || 0) < 0).length
+        const classifiedTrades = winCount + lossCount;
+        const winRate = classifiedTrades > 0 ? (winCount / classifiedTrades) * 100 : 0;
+        
+        // Total Profit
+        const totalProfit = userTrades.reduce((sum: number, t: any) => sum + (Number(t.profit) || 0), 0)
+
+        return {
+            id: u.id,
+            username: u.username,
+            full_name: u.full_name,
+            avatar_url: u.avatar_url,
+            port_size: u.port_size,
+            profit_goal_percent: u.profit_goal_percent,
+            client_id: u.client_id,
+            totalTrades,
+            totalProfit,
+            winRate,
+        }
+    })
 }
 
 // Update a user's profile via SECURITY DEFINER function

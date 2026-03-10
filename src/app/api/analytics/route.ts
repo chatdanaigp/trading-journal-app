@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
-import { startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
-import { getTradingDay } from '@/utils/date-helpers'
+import { getTradingDayStr, getTradingDay } from '@/utils/date-helpers'
 
 function calculateAnalytics(trades: any[]) {
     let netProfit = 0, grossWin = 0, grossLoss = 0, winCount = 0, lossCount = 0, maxDrawdown = 0, peakEquity = 0
@@ -21,7 +20,7 @@ function calculateAnalytics(trades: any[]) {
         const currentDrawdown = peakEquity - netProfit
         if (currentDrawdown > maxDrawdown) maxDrawdown = currentDrawdown
 
-        return { date: getTradingDay(trade.created_at).toLocaleDateString(), profit: netProfit, drawdown: currentDrawdown }
+        return { date: getTradingDayStr(trade.created_at), profit: netProfit, drawdown: currentDrawdown }
     })
 
     const totalTrades = trades.length
@@ -54,13 +53,12 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-    const now = new Date()
-    const monthStart = startOfMonth(now).toISOString()
-    const monthEnd = endOfMonth(now).toISOString()
-    const yearStart = startOfYear(now).toISOString()
-    const yearEnd = endOfYear(now).toISOString()
+    // Filter trades using robust UTC-safe THAI strings (YYYY-MM and YYYY)
+    const todayStr = getTradingDayStr(new Date()) 
+    const currentMonthPrefix = todayStr.substring(0, 7) // "YYYY-MM"
+    const currentYearPrefix = todayStr.substring(0, 4) // "YYYY"
 
-    // Fetch all trades once, then filter
+    // Fetch all trades once
     const { data: allTrades, error } = await supabase
         .from('trades')
         .select('*')
@@ -72,8 +70,8 @@ export async function GET() {
         return NextResponse.json({ monthlyData: emptyData, yearlyData: emptyData })
     }
 
-    const monthlyTrades = allTrades.filter(t => t.created_at >= monthStart && t.created_at <= monthEnd)
-    const yearlyTrades = allTrades.filter(t => t.created_at >= yearStart && t.created_at <= yearEnd)
+    const monthlyTrades = allTrades.filter(t => getTradingDayStr(t.created_at).startsWith(currentMonthPrefix))
+    const yearlyTrades = allTrades.filter(t => getTradingDayStr(t.created_at).startsWith(currentYearPrefix))
 
     return NextResponse.json({
         monthlyData: calculateAnalytics(monthlyTrades),
