@@ -13,7 +13,7 @@ import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
 import { getTradingDay } from '@/utils/date-helpers'
 
-export function TradeList({ trades, username, dict }: { trades: any[], username?: string, dict?: any }) {
+export function TradeList({ trades, username, dict, className, hideHeader }: { trades: any[], username?: string, dict?: any, className?: string, hideHeader?: boolean }) {
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null)
@@ -30,12 +30,14 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
 
     return (
         <>
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
-                <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
-            </div>
+            {!hideHeader && (
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-white">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
+                    <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
+                </div>
+            )}
 
-            <div className="bg-[#1a1a1a] rounded-2xl overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
+            <div className={cn("bg-[#1a1a1a] rounded-2xl overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar", className)}>
                 {trades.length === 0 ? (
                     <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                 ) : (

@@ -42,3 +42,7 @@ export function useLeaderboardData() {
 export function useChallengeData() {
     return useSWR('/api/challenge', fetcher, swrConfig)
 }
+
+export function useHistoryData() {
+    return useSWR('/api/history', fetcher, swrConfig)
+}
