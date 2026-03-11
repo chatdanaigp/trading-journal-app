@@ -26,6 +26,7 @@ export async function createTrade(formData: FormData) {
     const screenshot = formData.get('screenshot') as File
     const stopLoss = formData.get('stopLoss')
     const takeProfit = formData.get('takeProfit')
+    const strategy = formData.get('strategy') as string
 
     let screenshotUrl = null
 
@@ -77,6 +78,7 @@ export async function createTrade(formData: FormData) {
         created_at: createdAt,
         stop_loss: stopLoss ? Number(stopLoss) : null,
         take_profit: takeProfit ? Number(takeProfit) : null,
+        strategy: strategy || null,
     })
 
     if (error) {
@@ -138,6 +140,7 @@ export async function updateTrade(formData: FormData) {
     const notes = formData.get('notes') as string
     const stopLoss = formData.get('stopLoss')
     const takeProfit = formData.get('takeProfit')
+    const strategy = formData.get('strategy') as string
 
     const exactCreatedAt = formData.get('exactCreatedAt') as string
 
@@ -168,6 +171,7 @@ export async function updateTrade(formData: FormData) {
             created_at: createdAt,
             stop_loss: stopLoss ? Number(stopLoss) : null,
             take_profit: takeProfit ? Number(takeProfit) : null,
+            strategy: strategy || null,
         })
         .eq('id', tradeId)
         .eq('user_id', user.id) // Ensure user owns the trade

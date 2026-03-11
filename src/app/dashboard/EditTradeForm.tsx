@@ -41,6 +41,9 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     })
     const [sl, setSl] = useState(initialData.stop_loss || '')
     const [tp, setTp] = useState(initialData.take_profit || '')
+    const [strategy, setStrategy] = useState(initialData.strategy || '')
+
+    const STRATEGY_PRESETS = ['Breakout', 'Reversal', 'Trend', 'Scalping', 'News', 'Range', 'Other']
 
     // Compute Planned Risk:Reward Ratio
     const computeRR = () => {
@@ -355,6 +358,28 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                     </span>
                 </div>
             )}
+
+            {/* Strategy Tags */}
+            <div className="grid gap-2">
+                <Label className="text-gray-400">Strategy</Label>
+                <div className="flex flex-wrap gap-1.5">
+                    {STRATEGY_PRESETS.map((tag) => (
+                        <button
+                            key={tag}
+                            type="button"
+                            onClick={() => setStrategy(strategy === tag ? '' : tag)}
+                            className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all duration-200 ${
+                                strategy === tag
+                                    ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381]'
+                                    : 'bg-[#0d0d0d] border-[#333] text-gray-500 hover:border-[#555] hover:text-gray-300'
+                            }`}
+                        >
+                            #{tag}
+                        </button>
+                    ))}
+                </div>
+                <input type="hidden" name="strategy" value={strategy} />
+            </div>
 
             <div className="grid gap-2">
                 <Label htmlFor="notes" className="text-gray-400">Note</Label>

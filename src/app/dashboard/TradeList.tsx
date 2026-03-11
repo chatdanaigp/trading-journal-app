@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useState } from 'react'
 import { AIAnalysis } from './AIAnalysis'
-import { Pencil, Share2, Trash2 } from 'lucide-react'
+import { Pencil, Share2, Trash2, ImageIcon } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { useSWRConfig } from 'swr'
 import { deleteTrade } from './actions'
@@ -18,6 +18,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [viewingScreenshot, setViewingScreenshot] = useState<string | null>(null)
     const { mutate } = useSWRConfig()
 
     async function handleDelete(tradeId: string) {
@@ -126,6 +127,24 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                         <span>{trade.notes}</span>
                                                     </div>
                                                 )}
+                                                {/* Strategy + Screenshot badges */}
+                                                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                                    {trade.strategy && (
+                                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[#ccf381]/10 border border-[#ccf381]/25 text-[#ccf381]">
+                                                            #{trade.strategy}
+                                                        </span>
+                                                    )}
+                                                    {trade.screenshot_url && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setViewingScreenshot(trade.screenshot_url)}
+                                                            className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/25 text-blue-400 flex items-center gap-0.5 hover:bg-blue-500/20 transition-colors"
+                                                        >
+                                                            <ImageIcon size={9} />
+                                                            Chart
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 transition-all duration-300">
@@ -247,6 +266,21 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     onClose={() => setSharingTrade(null)}
                     dict={dict}
                 />
+            )}
+
+            {/* Screenshot Lightbox */}
+            {viewingScreenshot && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
+                    onClick={() => setViewingScreenshot(null)}
+                >
+                    <img
+                        src={viewingScreenshot}
+                        alt="Trade Chart"
+                        className="max-w-full max-h-[90vh] rounded-xl border border-[#333] shadow-2xl object-contain"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
             )}
         </>
     )

@@ -9,7 +9,7 @@ import { useSWRConfig } from 'swr'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
-import { CheckCircle2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { CheckCircle2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ImagePlus, X } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number }) {
@@ -42,6 +42,12 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
     const [points, setPoints] = useState<number | null>(null)
     const [sl, setSl] = useState('')
     const [tp, setTp] = useState('')
+    const [strategy, setStrategy] = useState('')
+    const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
+    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const STRATEGY_PRESETS = ['Breakout', 'Reversal', 'Trend', 'Scalping', 'News', 'Range', 'Other']
 
     // Compute Planned Risk:Reward Ratio
     const computeRR = () => {
@@ -143,6 +149,9 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                 setPoints(null)
                 setSl('')
                 setTp('')
+                setStrategy('')
+                setScreenshotFile(null)
+                setScreenshotPreview(null)
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
             }
@@ -454,7 +463,75 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         </div>
                     </div>
 
-                    {/* Row 4: Notes & Submit */}
+                    {/* Row 4: Strategy Tags + Screenshot */}
+                    <div className="flex flex-col md:flex-row gap-4 items-start">
+                        <div className="flex-grow grid gap-2">
+                            <Label className="text-gray-400 text-xs">{dict?.tradeForm?.strategy || 'Strategy'}</Label>
+                            <div className="flex flex-wrap gap-1.5">
+                                {STRATEGY_PRESETS.map((tag) => (
+                                    <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => setStrategy(strategy === tag ? '' : tag)}
+                                        className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all duration-200 ${
+                                            strategy === tag
+                                                ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_8px_rgba(204,243,129,0.15)]'
+                                                : 'bg-[#0d0d0d] border-[#333] text-gray-500 hover:border-[#555] hover:text-gray-300'
+                                        }`}
+                                    >
+                                        #{tag}
+                                    </button>
+                                ))}
+                            </div>
+                            <input type="hidden" name="strategy" value={strategy} />
+                        </div>
+
+                        {/* Screenshot Upload */}
+                        <div className="grid gap-2 shrink-0">
+                            <Label className="text-gray-400 text-xs">{dict?.tradeForm?.screenshot || 'Chart'}</Label>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                name="screenshot"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                        setScreenshotFile(file)
+                                        setScreenshotPreview(URL.createObjectURL(file))
+                                    }
+                                }}
+                            />
+                            {screenshotPreview ? (
+                                <div className="relative w-20 h-14 rounded-lg overflow-hidden border border-[#333] group">
+                                    <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setScreenshotFile(null)
+                                            setScreenshotPreview(null)
+                                            if (fileInputRef.current) fileInputRef.current.value = ''
+                                        }}
+                                        className="absolute top-0.5 right-0.5 p-0.5 bg-black/70 rounded-full text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <X size={10} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-20 h-14 rounded-lg border border-dashed border-[#333] bg-[#0d0d0d] flex flex-col items-center justify-center gap-0.5 text-gray-600 hover:border-[#555] hover:text-gray-400 transition-colors"
+                                >
+                                    <ImagePlus size={16} />
+                                    <span className="text-[8px] font-bold">📷</span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Row 5: Notes & Submit */}
                     <div className="flex flex-col md:flex-row gap-4 items-end mt-2">
                         <div className="flex-grow grid gap-2">
                             <Label htmlFor="notes" className="text-gray-400 text-xs">{dict?.tradeForm?.notes || "Note"}</Label>

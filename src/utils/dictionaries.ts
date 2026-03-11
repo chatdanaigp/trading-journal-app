@@ -93,7 +93,12 @@ export const dictionaries = {
             stopLoss: "Stop Loss",
             takeProfit: "Take Profit",
             riskReward: "RR",
-            plannedRR: "Planned RR"
+            plannedRR: "Planned RR",
+            strategy: "Strategy",
+            screenshot: "Chart Screenshot",
+            viewScreenshot: "View Chart",
+            uploadImage: "Upload Image",
+            changeImage: "Change Image"
         },
         sidebar: {
             dashboardLabel: "DASHBOARD",
@@ -402,7 +407,12 @@ export const dictionaries = {
             stopLoss: "จุดตัดขาดทุน",
             takeProfit: "เป้าหมายกำไร",
             riskReward: "RR",
-            plannedRR: "RR ที่ตั้งไว้"
+            plannedRR: "RR ที่ตั้งไว้",
+            strategy: "กลยุทธ์",
+            screenshot: "ภาพกราฟ",
+            viewScreenshot: "ดูกราฟ",
+            uploadImage: "อัพโหลดรูป",
+            changeImage: "เปลี่ยนรูป"
         },
         sidebar: {
             dashboardLabel: "แดชบอร์ด",
