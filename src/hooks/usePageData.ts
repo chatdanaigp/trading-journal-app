@@ -43,6 +43,15 @@ export function useChallengeData() {
     return useSWR('/api/challenge', fetcher, swrConfig)
 }
 
-export function useHistoryData() {
-    return useSWR('/api/history', fetcher, swrConfig)
+export function useHistoryData(month?: number, year?: number) {
+    const params = new URLSearchParams()
+    if (month !== undefined) params.set('month', month.toString())
+    if (year !== undefined) params.set('year', year.toString())
+    const query = params.toString()
+
+    return useSWR(
+        `/api/history${query ? `?${query}` : ''}`,
+        fetcher,
+        swrConfig
+    )
 }
