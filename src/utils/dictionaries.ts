@@ -149,7 +149,8 @@ export const dictionaries = {
             maxLossStreak: "Worst Loss Streak",
             consecutiveWins: "consecutive wins",
             consecutiveLosses: "consecutive losses",
-            noStrategyData: "No strategy tags yet"
+            noStrategyData: "No strategy tags yet",
+            aiInsightsTitle: "AI Monthly Review"
         },
         import: {
             title: "📥 Import Trades from CSV",
@@ -162,6 +163,9 @@ export const dictionaries = {
         portfolio: {
             allTrades: "All Trades",
             create: "New Portfolio"
+        },
+        calendar: {
+            title: "Economic Calendar"
         },
         leaderboard: {
             title: "Global Leaderboard",
@@ -485,7 +489,8 @@ export const dictionaries = {
             maxLossStreak: "แพ้ติดต่อกันสูงสุด",
             consecutiveWins: "ชนะติดต่อกัน",
             consecutiveLosses: "แพ้ติดต่อกัน",
-            noStrategyData: "ยังไม่มีข้อมูลกลยุทธ์"
+            noStrategyData: "ยังไม่มีข้อมูลกลยุทธ์",
+            aiInsightsTitle: "AI สรุปผลรายเดือน"
         },
         import: {
             title: "📥 นำเข้าข้อมูลจาก CSV",
@@ -498,6 +503,9 @@ export const dictionaries = {
         portfolio: {
             allTrades: "ทุกออเดอร์",
             create: "สร้างพอร์ตใหม่"
+        },
+        calendar: {
+            title: "ปฏิทินเศรษฐกิจ"
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",

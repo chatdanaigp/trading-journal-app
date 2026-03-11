@@ -11,6 +11,7 @@ import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { ImportModal } from './ImportModal'
 import { PortfolioSelector } from '@/components/PortfolioSelector'
+import { EconomicCalendar } from './EconomicCalendar'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
 import { TopNavigation } from '@/components/TopNavigation'
@@ -199,6 +200,11 @@ export default function DashboardPage() {
                         </div>
                     </StaggerItem>
                 </div>
+
+                {/* Economic Calendar */}
+                <StaggerItem className="w-full">
+                    <EconomicCalendar dict={dict} />
+                </StaggerItem>
 
                 <StaggerItem className="w-full">
                     <div className="w-full">

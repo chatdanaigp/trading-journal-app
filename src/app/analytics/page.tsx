@@ -4,6 +4,7 @@ import { useAnalyticsData } from '@/hooks/usePageData'
 import { KPIGrid } from './components/KPIGrid'
 import { AnalyticsCharts } from './components/AnalyticsCharts'
 import { SessionStrategyCharts } from './components/SessionStrategyCharts'
+import { MonthlyInsight } from './components/MonthlyInsight'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui/Skeleton'
@@ -49,6 +50,9 @@ export default function AnalyticsPage() {
             <TopNavigation />
 
             <StaggerContainer className="space-y-8">
+                <StaggerItem>
+                    <MonthlyInsight dict={dict} />
+                </StaggerItem>
                 <StaggerItem>
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
