@@ -13,7 +13,7 @@ import {
 } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/utils/cn'
-import { getTradingDay } from '@/utils/date-helpers'
+import { getTradingDayStr } from '@/utils/date-helpers'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -75,8 +75,11 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
 
     // Group trades by date and calculate daily PnL
     const getDayStats = (day: Date) => {
+        // Format the calendar cell date to a locally constructed YYYY-MM-DD string
+        const cellDayStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+
         const dailyTrades = trades.filter(trade =>
-            isSameDay(getTradingDay(trade.created_at), day)
+            getTradingDayStr(trade.created_at) === cellDayStr
         )
 
         if (dailyTrades.length === 0) return null

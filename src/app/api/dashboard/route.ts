@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
-import { startOfMonth, endOfMonth, isSameDay, isSameWeek, isSameMonth } from 'date-fns'
-import { getTradingDay } from '@/utils/date-helpers'
+import { startOfMonth, endOfMonth, isSameWeek } from 'date-fns'
+import { getTradingDayStr, getTradingDay } from '@/utils/date-helpers'
 
 export async function GET(request: Request) {
     const supabase = await createClient()
@@ -97,19 +97,37 @@ export async function GET(request: Request) {
     const portSize = profile?.port_size || 1000
     const goalPercent = profile?.profit_goal_percent || 10
     const isQuestActive = profile?.is_portfolio_quest_active || false
-    const today = getTradingDay(new Date())
-    const isCurrentMonth = isSameMonth(targetDate, today)
+    
+    // Evaluate pure localized strings for exact matching to bypass Vercel UTC shifts
+    const todayStr = getTradingDayStr(new Date()) 
+    const todayMonthStr = todayStr.substring(0, 7) // "YYYY-MM"
+    const targetMonthStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`
+
+    // Weekly approximation: since we can't use isSameWeek easily on string, 
+    // we fallback to 'is this week' logic using date-fns on the explicit Midnight Thai Date
+    const todaySafeDate = getTradingDay(new Date())
+    const isCurrentMonth = todayMonthStr === targetMonthStr
 
     let monthlyPoints = 0, weeklyPoints = 0, dailyPoints = 0, dailyProfit = 0
     tradeList.forEach((trade: any) => {
         const lot = trade.lot_size || 0.01
         const profit = trade.profit || 0
         const points = lot !== 0 ? Math.round(profit / lot) : 0
-        const tradeDay = getTradingDay(trade.created_at)
+        
+        const tradeDayStr = getTradingDayStr(trade.created_at) // "YYYY-MM-DD"
+        const tradeSafeDate = getTradingDay(trade.created_at) 
+        
         monthlyPoints += points
         if (isCurrentMonth) {
-            if (isSameWeek(tradeDay, today, { weekStartsOn: 1 })) weeklyPoints += points
-            if (isSameDay(tradeDay, today)) { dailyPoints += points; dailyProfit += profit }
+            // Check same week
+            if (isSameWeek(tradeSafeDate, todaySafeDate, { weekStartsOn: 1 })) {
+                weeklyPoints += points
+            }
+            // Check same exact daily string
+            if (tradeDayStr === todayStr) { 
+                dailyPoints += points; 
+                dailyProfit += profit;
+            }
         }
     })
 

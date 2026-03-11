@@ -49,3 +49,39 @@ export function getTradingDay(dateInput: string | Date): Date {
     // This ensures isSameDay compares correctly regardless of the runtime environment.
     return new Date(Date.UTC(year, month - 1, day));
 }
+
+/**
+ * Foolproof string-based evaluation of a Trading Day.
+ * Bypasses all JS Date object timezone runtime evaluations.
+ * @returns "YYYY-MM-DD"
+ */
+export function getTradingDayStr(dateInput: string | Date): string {
+    const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hour12: false
+    });
+
+    const parts = formatter.formatToParts(d);
+    const p: Record<string, string> = {};
+    for (const part of parts) p[part.type] = part.value;
+
+    const hour = parseInt(p.hour, 10);
+    let year = parseInt(p.year, 10);
+    let month = parseInt(p.month, 10);
+    let day = parseInt(p.day, 10);
+
+    if (hour < 6) {
+        const shifted = new Date(Date.UTC(year, month - 1, day - 1));
+        year = shifted.getUTCFullYear();
+        month = shifted.getUTCMonth() + 1;
+        day = shifted.getUTCDate();
+    }
+
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
