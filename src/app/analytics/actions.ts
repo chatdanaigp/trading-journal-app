@@ -31,6 +31,28 @@ export type AnalyticsData = {
         value: number
         color: string
     }[]
+    sessionPerformance?: {
+        session: string
+        profit: number
+        count: number
+        winRate: number
+    }[]
+    strategyPerformance?: {
+        strategy: string
+        profit: number
+        count: number
+        winRate: number
+    }[]
+    dayOfWeekPerformance?: {
+        day: string
+        profit: number
+        count: number
+        winRate: number
+    }[]
+    streaks?: {
+        maxWinStreak: number
+        maxLossStreak: number
+    }
 }
 
 export async function getAnalyticsData(startDate?: string, endDate?: string): Promise<AnalyticsData> {

@@ -139,7 +139,17 @@ export const dictionaries = {
             symbol: "Symbol",
             trades: "Trades",
             pnl: "P&L",
-            tradesPlural: "trades"
+            tradesPlural: "trades",
+            insightsTitle: "Trading Insights",
+            insightsSubtitle: "Session, Strategy & Pattern Analysis",
+            dayOfWeekTitle: "Day of Week Performance",
+            sessionTitle: "Session Performance",
+            strategyTitle: "Strategy Performance",
+            maxWinStreak: "Best Win Streak",
+            maxLossStreak: "Worst Loss Streak",
+            consecutiveWins: "consecutive wins",
+            consecutiveLosses: "consecutive losses",
+            noStrategyData: "No strategy tags yet"
         },
         leaderboard: {
             title: "Global Leaderboard",
@@ -453,7 +463,17 @@ export const dictionaries = {
             symbol: "คู่เงิน",
             trades: "ออเดอร์",
             pnl: "กำไร/ขาดทุน",
-            tradesPlural: "ออเดอร์"
+            tradesPlural: "ออเดอร์",
+            insightsTitle: "เจาะลึกการเทรด",
+            insightsSubtitle: "วิเคราะห์ Session, กลยุทธ์ และ Pattern",
+            dayOfWeekTitle: "ผลงานแยกตามวัน",
+            sessionTitle: "ผลงานแยกตาม Session",
+            strategyTitle: "ผลงานแยกตามกลยุทธ์",
+            maxWinStreak: "ชนะติดต่อกันสูงสุด",
+            maxLossStreak: "แพ้ติดต่อกันสูงสุด",
+            consecutiveWins: "ชนะติดต่อกัน",
+            consecutiveLosses: "แพ้ติดต่อกัน",
+            noStrategyData: "ยังไม่มีข้อมูลกลยุทธ์"
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",

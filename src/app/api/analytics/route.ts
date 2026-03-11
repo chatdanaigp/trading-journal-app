@@ -6,6 +6,15 @@ function calculateAnalytics(trades: any[]) {
     let netProfit = 0, grossWin = 0, grossLoss = 0, winCount = 0, lossCount = 0, maxDrawdown = 0, peakEquity = 0
     const assetMap = new Map<string, { profit: number, count: number, wins: number }>()
 
+    // Session/Strategy/DayOfWeek maps
+    const sessionMap = new Map<string, { profit: number, count: number, wins: number }>()
+    const strategyMap = new Map<string, { profit: number, count: number, wins: number }>()
+    const dayMap = new Map<number, { profit: number, count: number, wins: number, dayName: string }>()
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+    // Streak tracking
+    let currentStreak = 0, maxWinStreak = 0, maxLossStreak = 0, streakType: 'win' | 'loss' | null = null
+
     const equityCurve = trades.map(trade => {
         const profit = Number(trade.profit) || 0
         netProfit += profit
@@ -19,6 +28,43 @@ function calculateAnalytics(trades: any[]) {
         if (netProfit > peakEquity) peakEquity = netProfit
         const currentDrawdown = peakEquity - netProfit
         if (currentDrawdown > maxDrawdown) maxDrawdown = currentDrawdown
+
+        // Session analysis (UTC hour based)
+        const tradeDate = new Date(trade.created_at)
+        const utcHour = tradeDate.getUTCHours()
+        let session = 'Off-hours'
+        if (utcHour >= 0 && utcHour < 8) session = 'Asian'
+        else if (utcHour >= 7 && utcHour < 16) session = 'London'
+        else if (utcHour >= 13 && utcHour < 22) session = 'New York'
+
+        const sess = sessionMap.get(session) || { profit: 0, count: 0, wins: 0 }
+        sess.profit += profit; sess.count++; if (profit > 0) sess.wins++
+        sessionMap.set(session, sess)
+
+        // Strategy analysis
+        if (trade.strategy) {
+            const strat = strategyMap.get(trade.strategy) || { profit: 0, count: 0, wins: 0 }
+            strat.profit += profit; strat.count++; if (profit > 0) strat.wins++
+            strategyMap.set(trade.strategy, strat)
+        }
+
+        // Day-of-week analysis
+        const tradingDay = getTradingDay(trade.created_at)
+        const dow = tradingDay.getDay()
+        const day = dayMap.get(dow) || { profit: 0, count: 0, wins: 0, dayName: dayNames[dow] }
+        day.profit += profit; day.count++; if (profit > 0) day.wins++
+        dayMap.set(dow, day)
+
+        // Streak tracking
+        if (profit > 0) {
+            if (streakType === 'win') { currentStreak++ }
+            else { currentStreak = 1; streakType = 'win' }
+            if (currentStreak > maxWinStreak) maxWinStreak = currentStreak
+        } else if (profit < 0) {
+            if (streakType === 'loss') { currentStreak++ }
+            else { currentStreak = 1; streakType = 'loss' }
+            if (currentStreak > maxLossStreak) maxLossStreak = currentStreak
+        }
 
         return { date: getTradingDayStr(trade.created_at), profit: netProfit, drawdown: currentDrawdown }
     })
@@ -41,9 +87,25 @@ function calculateAnalytics(trades: any[]) {
         { name: 'Breakeven', value: totalTrades - winCount - lossCount, color: '#9ca3af' }
     ].filter(d => d.value > 0)
 
+    // Build new analysis arrays
+    const sessionPerformance = Array.from(sessionMap.entries()).map(([session, data]) => ({
+        session, profit: Math.round(data.profit * 100) / 100, count: data.count, winRate: data.count > 0 ? Math.round((data.wins / data.count) * 100) : 0
+    })).sort((a, b) => b.profit - a.profit)
+
+    const strategyPerformance = Array.from(strategyMap.entries()).map(([strategy, data]) => ({
+        strategy, profit: Math.round(data.profit * 100) / 100, count: data.count, winRate: data.count > 0 ? Math.round((data.wins / data.count) * 100) : 0
+    })).sort((a, b) => b.profit - a.profit)
+
+    const dayOfWeekPerformance = [1, 2, 3, 4, 5].map(dow => {
+        const data = dayMap.get(dow) || { profit: 0, count: 0, wins: 0, dayName: dayNames[dow] }
+        return { day: data.dayName, profit: Math.round(data.profit * 100) / 100, count: data.count, winRate: data.count > 0 ? Math.round((data.wins / data.count) * 100) : 0 }
+    })
+
     return {
         stats: { netProfit, winRate, profitFactor, maxDrawdown, totalTrades, avgWin, avgLoss, expectancy },
-        equityCurve, assetPerformance, winRateDistribution
+        equityCurve, assetPerformance, winRateDistribution,
+        sessionPerformance, strategyPerformance, dayOfWeekPerformance,
+        streaks: { maxWinStreak, maxLossStreak }
     }
 }
 
