@@ -10,6 +10,7 @@ import { TrendingUp, Activity, BarChart2, Upload } from 'lucide-react'
 import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
 import { ImportModal } from './ImportModal'
+import { PortfolioSelector } from '@/components/PortfolioSelector'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
 import { TopNavigation } from '@/components/TopNavigation'
@@ -34,6 +35,7 @@ export default function DashboardPage() {
     const { data, isLoading } = useDashboardData(month, year)
     const dict = useLang()
     const [importOpen, setImportOpen] = useState(false)
+    const [portfolioId, setPortfolioId] = useState<string | null>(null)
 
     if (isLoading || !data || !dict) return <PageSkeleton />
 
@@ -51,6 +53,7 @@ export default function DashboardPage() {
                         <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <PortfolioSelector value={portfolioId} onChange={setPortfolioId} dict={dict} />
                         <button
                             onClick={() => setImportOpen(true)}
                             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-[#1a1a1a] border border-[#333] text-gray-400 hover:border-[#ccf381]/40 hover:text-[#ccf381] transition-all"

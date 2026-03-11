@@ -159,6 +159,10 @@ export const dictionaries = {
             importBtn: "Import Trades",
             importing: "Importing..."
         },
+        portfolio: {
+            allTrades: "All Trades",
+            create: "New Portfolio"
+        },
         leaderboard: {
             title: "Global Leaderboard",
             subtitle: "Compete with traders worldwide. Climb the ranks and earn prestigious badges!",
@@ -490,6 +494,10 @@ export const dictionaries = {
             dropzoneSub: "หรือคลิกเพื่อเลือกไฟล์",
             importBtn: "นำเข้าข้อมูล",
             importing: "กำลังนำเข้า..."
+        },
+        portfolio: {
+            allTrades: "ทุกออเดอร์",
+            create: "สร้างพอร์ตใหม่"
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",
