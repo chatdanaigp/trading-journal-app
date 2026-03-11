@@ -96,9 +96,8 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                         <td className="px-5 py-4 transition-all duration-300">
                                             <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
                                                 <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
-                                                <div className="text-xs mt-1 whitespace-nowrap flex flex-col gap-0.5">
-                                                    <span className="text-[#ccf381]/80 font-bold">Day: {tradingDay.toLocaleDateString()}</span>
-                                                    <span className="text-gray-500">Log: {tradeDate.toLocaleDateString()} • {tradeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">
+                                                    {tradeDate.toLocaleDateString()} • {tradeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                                 {trade.notes && (
                                                     <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
