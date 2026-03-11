@@ -173,6 +173,29 @@ export async function updateTrade(formData: FormData) {
     return { success: true }
 }
 
+export async function deleteTrade(tradeId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+        return { error: 'Not authenticated' }
+    }
+
+    const { error } = await supabase
+        .from('trades')
+        .delete()
+        .eq('id', tradeId)
+        .eq('user_id', user.id)
+
+    if (error) {
+        console.error('Failed to delete trade:', error)
+        return { error: error.message }
+    }
+
+    revalidatePath('/', 'layout')
+    return { success: true }
+}
+
 export async function getTrades(startDate?: string, endDate?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

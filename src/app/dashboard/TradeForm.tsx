@@ -114,8 +114,8 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                 setMessage({ type: 'success', text: 'Trade saved successfully!' })
                 formRef.current?.reset()
 
-                // Invalidate all dashboard SWR keys instantly
-                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/dashboard'))
+                // Invalidate all SWR keys instantly across Dashboard, Analytics, Journal, etc.
+                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
 
                 // Reset state
                 setSymbol('XAUUSD')

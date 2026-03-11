@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { createJournalEntry } from '../actions'
 import { motion } from 'framer-motion'
+import { useSWRConfig } from 'swr'
 
 const MOOD_OPTIONS = [
     { value: 'great', emoji: '🔥', label: 'Great' },
@@ -25,6 +26,7 @@ export function JournalForm({ dict }: { dict: any }) {
     const [followedPlan, setFollowedPlan] = useState(true)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
+    const { mutate } = useSWRConfig()
 
     function toggleTag(tag: string) {
         setSelectedTags(prev =>
@@ -45,6 +47,9 @@ export function JournalForm({ dict }: { dict: any }) {
         if (result.error) {
             setMessage({ type: 'error', text: result.error })
         } else {
+            // Globally refresh all SWR cached API routes (dashboard, journal, analytics, etc)
+            mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+
             setMessage({ type: 'success', text: 'Entry saved!' })
             formRef.current?.reset()
             setSelectedMood('')

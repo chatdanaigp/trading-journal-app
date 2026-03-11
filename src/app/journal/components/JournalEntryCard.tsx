@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { JournalEntry } from '../actions'
-import { deleteJournalEntry } from '../actions'
+import { JournalEntry, deleteJournalEntry } from '../actions'
 import { Trash2, ChevronDown, ChevronUp, CheckCircle, XCircle, Calendar } from 'lucide-react'
+import { useSWRConfig } from 'swr'
 
 const MOOD_EMOJI: Record<string, string> = {
     great: '🔥',
@@ -16,11 +16,16 @@ const MOOD_EMOJI: Record<string, string> = {
 export function JournalEntryCard({ entry }: { entry: JournalEntry }) {
     const [expanded, setExpanded] = useState(false)
     const [deleting, setDeleting] = useState(false)
+    const { mutate } = useSWRConfig()
 
     async function handleDelete() {
         if (!confirm('Are you sure you want to delete this entry?')) return
         setDeleting(true)
         await deleteJournalEntry(entry.id)
+        
+        // Globally refresh all SWR cached API routes instantly
+        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        
         setDeleting(false)
     }
 

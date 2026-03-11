@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { updateUserProfile, deleteUserProfile, deleteUserTrades } from '../actions'
 import { Trash2, Save, ChevronDown, ChevronUp, AlertTriangle, User, BarChart3, DollarSign, Loader2 } from 'lucide-react'
+import { useSWRConfig } from 'swr'
 
 type UserData = {
     id: string
@@ -28,6 +29,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     const [fullName, setFullName] = useState(user.full_name || '')
     const [portSize, setPortSize] = useState(user.port_size || 1000)
     const [goalPercent, setGoalPercent] = useState(user.profit_goal_percent || 10)
+    const { mutate } = useSWRConfig()
 
     async function handleSave() {
         setSaving(true)
@@ -37,6 +39,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
             port_size: portSize,
             profit_goal_percent: goalPercent,
         })
+        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
         setSaving(false)
         setEditing(false)
     }
@@ -44,6 +47,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     async function handleDeleteUser() {
         setDeleting(true)
         await deleteUserProfile(user.id)
+        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
         setDeleting(false)
         setConfirmDelete(false)
     }
@@ -51,6 +55,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     async function handleDeleteTrades() {
         if (!confirm('Delete ALL trades for this user? This cannot be undone.')) return
         await deleteUserTrades(user.id)
+        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
     }
 
     return (

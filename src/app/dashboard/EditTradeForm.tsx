@@ -91,8 +91,8 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
             if (result?.success) {
                 setMessage({ type: 'success', text: 'Trade updated successfully!' })
                 
-                // Invalidate all dashboard SWR keys instantly
-                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/dashboard'))
+                // Invalidate all API keys instantly
+                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
 
                 setTimeout(() => {
                     onSuccess() // Close modal

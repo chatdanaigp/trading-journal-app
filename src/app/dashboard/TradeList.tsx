@@ -4,8 +4,10 @@ import React from 'react'
 
 import { useState } from 'react'
 import { AIAnalysis } from './AIAnalysis'
-import { Pencil, Share2 } from 'lucide-react'
+import { Pencil, Share2, Trash2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
+import { useSWRConfig } from 'swr'
+import { deleteTrade } from './actions'
 import { EditTradeForm } from './EditTradeForm'
 import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
@@ -15,6 +17,16 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const { mutate } = useSWRConfig()
+
+    async function handleDelete(tradeId: string) {
+        if (!confirm('Are you sure you want to delete this trade?')) return
+        setDeletingId(tradeId)
+        await deleteTrade(tradeId)
+        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        setDeletingId(null)
+    }
 
     return (
         <>
@@ -160,6 +172,14 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                                     title="Edit Trade"
                                                 >
                                                     <Pencil size={15} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(trade.id)}
+                                                    disabled={deletingId === trade.id}
+                                                    className={`p-1.5 rounded-lg transition-all ${deletingId === trade.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
+                                                    title="Delete Trade"
+                                                >
+                                                    <Trash2 size={15} />
                                                 </button>
                                             </div>
                                         </td>
