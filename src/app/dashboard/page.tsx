@@ -166,7 +166,7 @@ export default function DashboardPage() {
             {/* Bottom: Trade Form + Calendar */}
             <div className="flex flex-col gap-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <StaggerItem className="col-span-1 lg:col-span-8 h-full">
+                    <StaggerItem className="col-span-1 lg:col-span-6 h-full">
                         <div className="w-full h-full flex flex-col">
                             <h2 className="text-xl font-bold text-white mb-4 shrink-0">{dict.dashboard.quickTrade}</h2>
                             <div className="flex-grow">
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
                     </StaggerItem>
-                    <StaggerItem className="col-span-1 lg:col-span-4 h-full">
+                    <StaggerItem className="col-span-1 lg:col-span-6 h-full">
                         <div className="w-full h-full flex flex-col">
                             <div className="h-[44px] hidden lg:block shrink-0" aria-hidden="true"></div>
                             <div className="flex-grow">
