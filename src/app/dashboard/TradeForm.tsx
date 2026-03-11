@@ -178,17 +178,19 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="type" className="text-gray-400 text-xs">{dict?.tradeForm?.type || "Type"}</Label>
-                            <div className="flex relative rounded-xl overflow-hidden border border-[#333] h-11 w-full shrink-0 bg-[#0a0a0a] p-1">
+                            <div className="flex relative rounded-[14px] overflow-hidden border border-[#222] h-11 w-full shrink-0 bg-[#0d0d0d] p-1 shadow-inner">
                                 <LazyMotion features={domAnimation}>
                                     <AnimatePresence>
                                         <m.div
-                                            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${type === 'BUY' ? 'bg-[#ccf381]/20' : 'bg-red-500/20'}`}
+                                            className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg shadow-sm"
                                             animate={{
                                                 left: type === 'BUY' ? '4px' : 'calc(50%)',
-                                                backgroundColor: type === 'BUY' ? 'rgba(204, 243, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                                backgroundColor: type === 'BUY' ? 'rgba(204, 243, 129, 0.15)' : 'rgba(248, 113, 113, 0.15)'
                                             }}
-                                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                        />
+                                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                        >
+                                            <div className={`absolute inset-0 rounded-lg border ${type === 'BUY' ? 'border-[#ccf381]/30' : 'border-red-400/30'}`} />
+                                        </m.div>
                                     </AnimatePresence>
                                 </LazyMotion>
                                 <button
@@ -197,10 +199,23 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                         setType('BUY')
                                         handleCalculation('type', 'BUY')
                                     }}
-                                    className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${type === 'BUY' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
+                                    className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-black tracking-widest transition-colors duration-300 rounded-lg ${type === 'BUY' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
                                 >
-                                    <ArrowUpRight className="w-4 h-4" />
-                                    <span>BUY</span>
+                                    <LazyMotion features={domAnimation}>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                                            <m.path 
+                                                d="M7 17L17 7M17 7H7M17 7V17" 
+                                                initial={false}
+                                                animate={{ 
+                                                    pathLength: type === 'BUY' ? 1 : 0.01, 
+                                                    opacity: type === 'BUY' ? 1 : 0.4,
+                                                    scale: type === 'BUY' ? 1 : 0.8
+                                                }}
+                                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                            />
+                                        </svg>
+                                    </LazyMotion>
+                                    BUY
                                 </button>
                                 <button
                                     type="button"
@@ -208,10 +223,23 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                         setType('SELL')
                                         handleCalculation('type', 'SELL')
                                     }}
-                                    className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors duration-200 rounded-lg ${type === 'SELL' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
+                                    className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-black tracking-widest transition-colors duration-300 rounded-lg ${type === 'SELL' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
                                 >
-                                    <ArrowDownRight className="w-4 h-4" />
-                                    <span>SELL</span>
+                                    <LazyMotion features={domAnimation}>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                                            <m.path 
+                                                d="M7 7L17 17M17 17H7M17 17V7" 
+                                                initial={false}
+                                                animate={{ 
+                                                    pathLength: type === 'SELL' ? 1 : 0.01, 
+                                                    opacity: type === 'SELL' ? 1 : 0.4,
+                                                    scale: type === 'SELL' ? 1 : 0.8
+                                                }}
+                                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                            />
+                                        </svg>
+                                    </LazyMotion>
+                                    SELL
                                 </button>
                                 <input type="hidden" name="type" value={type} />
                             </div>
@@ -274,17 +302,19 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                             </div>
                             <div className="flex gap-2 h-11">
                                 {/* Animated Toggle Container */}
-                                <div className="flex relative rounded-xl overflow-hidden border border-[#333] w-1/3 shrink-0 bg-[#0a0a0a] p-1">
+                                <div className="flex relative rounded-[14px] overflow-hidden border border-[#222] min-w-[140px] w-2/5 shrink-0 bg-[#0d0d0d] p-1 shadow-inner h-11">
                                     <LazyMotion features={domAnimation}>
                                         <AnimatePresence>
                                             <m.div
-                                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${profitSign === '+' ? 'bg-[#ccf381]/20' : 'bg-red-500/20'}`}
+                                                className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg shadow-sm"
                                                 animate={{
                                                     left: profitSign === '+' ? '4px' : 'calc(50%)',
-                                                    backgroundColor: profitSign === '+' ? 'rgba(204, 243, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                                    backgroundColor: profitSign === '+' ? 'rgba(204, 243, 129, 0.15)' : 'rgba(248, 113, 113, 0.15)'
                                                 }}
-                                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                            />
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                            >
+                                                <div className={`absolute inset-0 rounded-lg border ${profitSign === '+' ? 'border-[#ccf381]/30' : 'border-red-400/30'}`} />
+                                            </m.div>
                                         </AnimatePresence>
                                     </LazyMotion>
                                     <button
@@ -293,10 +323,23 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                             setProfitSign('+')
                                             handleCalculation('sign', '+')
                                         }}
-                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] font-bold transition-colors duration-200 rounded-lg ${profitSign === '+' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
+                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1 transition-colors duration-300 rounded-lg ${profitSign === '+' ? 'text-[#ccf381]' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
-                                        <TrendingUp className="w-3.5 h-3.5" />
-                                        <span>{dict?.tradeForm?.profitBtn || 'Profit'}</span>
+                                        <LazyMotion features={domAnimation}>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                                                <m.path 
+                                                    d="M3 17L9 11L13 15L21 7M21 7H15M21 7V13" 
+                                                    initial={false}
+                                                    animate={{ 
+                                                        pathLength: profitSign === '+' ? 1 : 0.01,
+                                                        opacity: profitSign === '+' ? 1 : 0.4,
+                                                        scale: profitSign === '+' ? 1 : 0.8
+                                                    }}
+                                                    transition={{ duration: 0.4, ease: "easeOut" }}
+                                                />
+                                            </svg>
+                                        </LazyMotion>
+                                        <span className="text-[10px] xl:text-xs font-black tracking-widest">{dict?.tradeForm?.profitBtn || 'Profit'}</span>
                                     </button>
                                     <button
                                         type="button"
@@ -304,15 +347,27 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                                             setProfitSign('-')
                                             handleCalculation('sign', '-')
                                         }}
-                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1.5 text-[11px] font-bold transition-colors duration-200 rounded-lg ${profitSign === '-' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
+                                        className={`flex-1 relative z-10 flex items-center justify-center gap-1 transition-colors duration-300 rounded-lg ${profitSign === '-' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
-                                        <TrendingDown className="w-3.5 h-3.5" />
-                                        <span>{dict?.tradeForm?.lossBtn || 'Loss'}</span>
+                                        <LazyMotion features={domAnimation}>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                                                <m.path 
+                                                    d="M3 7L9 13L13 9L21 17M21 17H15M21 17V11" 
+                                                    initial={false}
+                                                    animate={{ 
+                                                        pathLength: profitSign === '-' ? 1 : 0.01,
+                                                        opacity: profitSign === '-' ? 1 : 0.4,
+                                                        scale: profitSign === '-' ? 1 : 0.8
+                                                    }}
+                                                    transition={{ duration: 0.4, ease: "easeOut" }}
+                                                />
+                                            </svg>
+                                        </LazyMotion>
+                                        <span className="text-[10px] xl:text-xs font-black tracking-widest">{dict?.tradeForm?.lossBtn || 'Loss'}</span>
                                     </button>
                                 </div>
 
-                                {/* Amount Input Container */}
-                                <div className="relative w-2/3">
+                                <div className="relative w-3/5">
                                     <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-bold ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>
                                         {profitSign === '+' ? '+$' : '-$'}
                                     </span>
