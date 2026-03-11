@@ -40,6 +40,21 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
     const [profitAmount, setProfitAmount] = useState('')
     const [profitSign, setProfitSign] = useState<'+' | '-'>('+')
     const [points, setPoints] = useState<number | null>(null)
+    const [sl, setSl] = useState('')
+    const [tp, setTp] = useState('')
+
+    // Compute Planned Risk:Reward Ratio
+    const computeRR = () => {
+        const entryVal = parseFloat(entry)
+        const slVal = parseFloat(sl)
+        const tpVal = parseFloat(tp)
+        if (isNaN(entryVal) || isNaN(slVal) || isNaN(tpVal)) return null
+        const risk = Math.abs(entryVal - slVal)
+        const reward = Math.abs(tpVal - entryVal)
+        if (risk === 0) return null
+        return (reward / risk).toFixed(1)
+    }
+    const plannedRR = computeRR()
 
     // The actual profit value with sign applied
     const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''
@@ -126,6 +141,8 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                 setProfitAmount('')
                 setProfitSign('+')
                 setPoints(null)
+                setSl('')
+                setTp('')
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
             }
@@ -294,11 +311,22 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         <div className="grid gap-2 md:col-span-2">
                             <div className="flex justify-between items-center h-[16px]">
                                 <Label className="text-gray-400 text-xs">{dict?.tradeForm?.profitLoss || "Profit / Loss ($)"}</Label>
-                                {points !== null && (
-                                    <span className={`text-[10px] font-mono font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
-                                        {dict?.tradeForm?.tpSl || 'TP/SL'}: {points > 0 ? '+' : ''}{points.toLocaleString()} {dict?.tradeForm?.pts || 'pts'}
-                                    </span>
-                                )}
+                                <div className="flex items-center gap-2">
+                                    {plannedRR && (
+                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
+                                            Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]' :
+                                            Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
+                                            'bg-red-500/10 border-red-500/30 text-red-400'
+                                        }`}>
+                                            {dict?.tradeForm?.riskReward || 'RR'} 1:{plannedRR}
+                                        </span>
+                                    )}
+                                    {points !== null && (
+                                        <span className={`text-[10px] font-mono font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                            {dict?.tradeForm?.tpSl || 'TP/SL'}: {points > 0 ? '+' : ''}{points.toLocaleString()} {dict?.tradeForm?.pts || 'pts'}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex gap-2 h-11">
                                 {/* Animated Toggle Container */}
@@ -390,7 +418,43 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         </div>
                     </div>
 
-                    {/* Row 3: Notes & Submit */}
+                    {/* Row 3: SL & TP */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="stopLoss" className="text-gray-400 text-xs flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+                                {dict?.tradeForm?.stopLoss || "Stop Loss"}
+                            </Label>
+                            <Input
+                                id="stopLoss"
+                                name="stopLoss"
+                                type="number"
+                                step="0.01"
+                                placeholder="1995.00"
+                                className="bg-[#0d0d0d] border-[#333] focus:border-red-400 text-white placeholder:text-gray-700 h-11 rounded-xl"
+                                value={sl}
+                                onChange={(e) => setSl(e.target.value)}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="takeProfit" className="text-gray-400 text-xs flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#ccf381] inline-block"></span>
+                                {dict?.tradeForm?.takeProfit || "Take Profit"}
+                            </Label>
+                            <Input
+                                id="takeProfit"
+                                name="takeProfit"
+                                type="number"
+                                step="0.01"
+                                placeholder="2010.00"
+                                className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl"
+                                value={tp}
+                                onChange={(e) => setTp(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Row 4: Notes & Submit */}
                     <div className="flex flex-col md:flex-row gap-4 items-end mt-2">
                         <div className="flex-grow grid gap-2">
                             <Label htmlFor="notes" className="text-gray-400 text-xs">{dict?.tradeForm?.notes || "Note"}</Label>

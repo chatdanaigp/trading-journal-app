@@ -89,7 +89,11 @@ export const dictionaries = {
             lossBtn: "Loss",
             tpSl: "TP/SL",
             pts: "pts",
-            rationale: "Trade rationale..."
+            rationale: "Trade rationale...",
+            stopLoss: "Stop Loss",
+            takeProfit: "Take Profit",
+            riskReward: "RR",
+            plannedRR: "Planned RR"
         },
         sidebar: {
             dashboardLabel: "DASHBOARD",
@@ -394,7 +398,11 @@ export const dictionaries = {
             lossBtn: "ขาดทุน",
             tpSl: "เป้า TP/SL",
             pts: "จุด",
-            rationale: "เหตุผลที่เข้าเทรด..."
+            rationale: "เหตุผลที่เข้าเทรด...",
+            stopLoss: "จุดตัดขาดทุน",
+            takeProfit: "เป้าหมายกำไร",
+            riskReward: "RR",
+            plannedRR: "RR ที่ตั้งไว้"
         },
         sidebar: {
             dashboardLabel: "แดชบอร์ด",

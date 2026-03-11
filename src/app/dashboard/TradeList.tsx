@@ -66,13 +66,20 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 const profit = Math.round(rawProfit * 100) / 100
                                 const points = lot !== 0 ? Math.round(profit / lot) : 0
 
-                                // Exit Price Display (Use stored if avail, else calc)
                                 let exitPrice = trade.exit_price
                                 if (!exitPrice && trade.entry_price) {
                                     const priceDiff = profit / (lot * 100)
                                     exitPrice = trade.type === 'BUY'
                                         ? trade.entry_price + priceDiff
                                         : trade.entry_price - priceDiff
+                                }
+
+                                // Compute Planned RR
+                                let plannedRR: string | null = null
+                                if (trade.stop_loss && trade.take_profit && trade.entry_price) {
+                                    const risk = Math.abs(trade.entry_price - trade.stop_loss)
+                                    const reward = Math.abs(trade.take_profit - trade.entry_price)
+                                    if (risk > 0) plannedRR = (reward / risk).toFixed(1)
                                 }
 
                                 const isExpanded = expandedAnalysisId === trade.id
@@ -139,6 +146,22 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                     <span className="text-gray-500 text-[10px] uppercase">Ex:</span>
                                                     <span className="text-gray-300">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
+                                                {(trade.stop_loss || trade.take_profit) && (
+                                                    <div className="flex items-center gap-2 mt-1.5 text-[10px]">
+                                                        {trade.stop_loss && (
+                                                            <span className="text-red-400/70 flex items-center gap-0.5">
+                                                                <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span>
+                                                                SL: {trade.stop_loss?.toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                        {trade.take_profit && (
+                                                            <span className="text-[#ccf381]/70 flex items-center gap-0.5">
+                                                                <span className="w-1 h-1 rounded-full bg-[#ccf381] inline-block"></span>
+                                                                TP: {trade.take_profit?.toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 transition-all duration-300">
@@ -149,6 +172,15 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                 <div className={`text-xs font-bold mt-1 ${Math.abs(Number(points)) < 0.01 ? 'text-gray-400' : Number(points) > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
                                                     {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
                                                 </div>
+                                                {plannedRR && (
+                                                    <span className={`inline-block text-[9px] font-bold mt-1 px-1.5 py-0.5 rounded border ${
+                                                        Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]' :
+                                                        Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
+                                                        'bg-red-500/10 border-red-500/30 text-red-400'
+                                                    }`}>
+                                                        RR 1:{plannedRR}
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 relative transition-all duration-300">

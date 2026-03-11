@@ -39,6 +39,21 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
         }
         return new Date().toISOString().split('T')[0]
     })
+    const [sl, setSl] = useState(initialData.stop_loss || '')
+    const [tp, setTp] = useState(initialData.take_profit || '')
+
+    // Compute Planned Risk:Reward Ratio
+    const computeRR = () => {
+        const entryVal = parseFloat(String(entry))
+        const slVal = parseFloat(String(sl))
+        const tpVal = parseFloat(String(tp))
+        if (isNaN(entryVal) || isNaN(slVal) || isNaN(tpVal)) return null
+        const risk = Math.abs(entryVal - slVal)
+        const reward = Math.abs(tpVal - entryVal)
+        if (risk === 0) return null
+        return (reward / risk).toFixed(1)
+    }
+    const plannedRR = computeRR()
 
     // The actual profit value with sign applied
     const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''
@@ -291,6 +306,55 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                     <input type="hidden" name="profit" value={actualProfit} />
                 </div>
             </div>
+
+            {/* SL & TP Row */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                    <Label htmlFor="stopLoss" className="text-gray-400 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+                        Stop Loss
+                    </Label>
+                    <Input
+                        id="stopLoss"
+                        name="stopLoss"
+                        type="number"
+                        step="0.01"
+                        placeholder="1995.00"
+                        className="bg-[#0d0d0d] border-[#333] focus:border-red-400 text-white"
+                        value={sl}
+                        onChange={(e) => setSl(e.target.value)}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="takeProfit" className="text-gray-400 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#ccf381] inline-block"></span>
+                        Take Profit
+                    </Label>
+                    <Input
+                        id="takeProfit"
+                        name="takeProfit"
+                        type="number"
+                        step="0.01"
+                        placeholder="2010.00"
+                        className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white"
+                        value={tp}
+                        onChange={(e) => setTp(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            {/* RR Badge */}
+            {plannedRR && (
+                <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-lg border ${
+                        Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]' :
+                        Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
+                        'bg-red-500/10 border-red-500/30 text-red-400'
+                    }`}>
+                        Planned RR 1:{plannedRR}
+                    </span>
+                </div>
+            )}
 
             <div className="grid gap-2">
                 <Label htmlFor="notes" className="text-gray-400">Note</Label>
