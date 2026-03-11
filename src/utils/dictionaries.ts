@@ -151,6 +151,14 @@ export const dictionaries = {
             consecutiveLosses: "consecutive losses",
             noStrategyData: "No strategy tags yet"
         },
+        import: {
+            title: "📥 Import Trades from CSV",
+            csvBtn: "Import CSV",
+            dropzone: "Drag & drop your CSV file here",
+            dropzoneSub: "or click to browse",
+            importBtn: "Import Trades",
+            importing: "Importing..."
+        },
         leaderboard: {
             title: "Global Leaderboard",
             subtitle: "Compete with traders worldwide. Climb the ranks and earn prestigious badges!",
@@ -474,6 +482,14 @@ export const dictionaries = {
             consecutiveWins: "ชนะติดต่อกัน",
             consecutiveLosses: "แพ้ติดต่อกัน",
             noStrategyData: "ยังไม่มีข้อมูลกลยุทธ์"
+        },
+        import: {
+            title: "📥 นำเข้าข้อมูลจาก CSV",
+            csvBtn: "นำเข้า CSV",
+            dropzone: "ลากไฟล์ CSV มาวางที่นี่",
+            dropzoneSub: "หรือคลิกเพื่อเลือกไฟล์",
+            importBtn: "นำเข้าข้อมูล",
+            importing: "กำลังนำเข้า..."
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",

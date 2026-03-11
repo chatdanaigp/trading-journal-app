@@ -6,9 +6,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { EquityChart } from './EquityChart'
 import { CalendarWidget } from './CalendarWidget'
 import { ProfitTree } from './ProfitTree'
-import { TrendingUp, Activity, BarChart2 } from 'lucide-react'
+import { TrendingUp, Activity, BarChart2, Upload } from 'lucide-react'
 import { TradeList } from './TradeList'
 import { AdvancedStats } from './AdvancedStats'
+import { ImportModal } from './ImportModal'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
 import { TopNavigation } from '@/components/TopNavigation'
@@ -32,6 +33,7 @@ export default function DashboardPage() {
 
     const { data, isLoading } = useDashboardData(month, year)
     const dict = useLang()
+    const [importOpen, setImportOpen] = useState(false)
 
     if (isLoading || !data || !dict) return <PageSkeleton />
 
@@ -48,9 +50,20 @@ export default function DashboardPage() {
                         <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
                         <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
-                    <TopNavigation />
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setImportOpen(true)}
+                            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-[#1a1a1a] border border-[#333] text-gray-400 hover:border-[#ccf381]/40 hover:text-[#ccf381] transition-all"
+                        >
+                            <Upload size={14} />
+                            {dict?.import?.csvBtn || 'Import CSV'}
+                        </button>
+                        <TopNavigation />
+                    </div>
                 </div>
             </StaggerItem>
+
+            <ImportModal isOpen={importOpen} onClose={() => setImportOpen(false)} dict={dict} />
 
             {/* Top Grid: Stats & Profit Tree */}
             <div className="grid grid-cols-12 gap-6">
