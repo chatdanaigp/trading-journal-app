@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal'
 import { EditTradeForm } from './EditTradeForm'
 import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
+import { getTradingDay } from '@/utils/date-helpers'
 
 export function TradeList({ trades, username, dict }: { trades: any[], username?: string, dict?: any }) {
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
@@ -62,9 +63,12 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
 
                                 const isExpanded = expandedAnalysisId === trade.id
 
-                                // Color code based on Day of Week
+                                // Get actual trading day (adjusts for < 06:00 AM rules)
                                 const tradeDate = new Date(trade.created_at || Date.now())
-                                const dayOfWeek = tradeDate.getDay() // 0 = Sunday, 1 = Monday, etc.
+                                const tradingDay = getTradingDay(trade.created_at || Date.now())
+                                
+                                // Color code based on Trading Day instead of chronological day
+                                const dayOfWeek = tradingDay.getDay() // 0 = Sunday, 1 = Monday, etc.
                                 let dayBorderColor = "border-l-transparent"
 
                                 switch (dayOfWeek) {
@@ -92,8 +96,9 @@ export function TradeList({ trades, username, dict }: { trades: any[], username?
                                         <td className="px-5 py-4 transition-all duration-300">
                                             <div className={cn("transition-transform duration-300 md:translate-x-0 md:opacity-100", isExpanded ? "-translate-x-2 opacity-50" : "translate-x-0")}>
                                                 <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
-                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">
-                                                    {tradeDate.toLocaleDateString()} • {tradeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                <div className="text-xs mt-1 whitespace-nowrap flex flex-col gap-0.5">
+                                                    <span className="text-[#ccf381]/80 font-bold">Day: {tradingDay.toLocaleDateString()}</span>
+                                                    <span className="text-gray-500">Log: {tradeDate.toLocaleDateString()} • {tradeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </div>
                                                 {trade.notes && (
                                                     <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
