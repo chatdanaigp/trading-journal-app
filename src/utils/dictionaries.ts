@@ -110,6 +110,8 @@ export const dictionaries = {
             journal: "Journal",
             history: "History",
             challenge: "Challenge",
+            calendar: "Calendar",
+            profile: "My Profile",
             adminPanel: "Admin Panel",
             settings: "Settings",
             help: "Help",
@@ -165,7 +167,30 @@ export const dictionaries = {
             create: "New Portfolio"
         },
         calendar: {
-            title: "Economic Calendar"
+            title: "Economic Calendar",
+            subtitle: "Track high-impact economic events that move the markets",
+            dailySummary: "📋 Today's Summary",
+            todayTitle: "📅 Today's Events",
+            upcomingTitle: "📆 Upcoming Events",
+            totalEvents: "Total Events",
+            highImpact: "High Impact",
+            currencies: "Currencies",
+            warning: "⚠️ High Impact Events Today",
+            warningDesc: "Be cautious around event times. Consider reducing position sizes or waiting for volatility to settle.",
+            noEvents: "No major events today",
+            noEventsSub: "Good day for technical-based trading"
+        },
+        profile: {
+            myProfileTitle: "My Public Profile",
+            myProfileSubtitle: "Control what the world sees about your trading",
+            publicToggle: "Public Profile",
+            publicDesc: "Anyone can view your stats",
+            privateDesc: "Profile is hidden",
+            bioLabel: "Bio / Description",
+            bioPlaceholder: "Tell the world about your trading journey...",
+            saveBio: "Save Bio",
+            infoTitle: "🔒 Privacy Note",
+            infoDesc: "Your public profile only shows percentages (Win Rate, Profit Factor) and streaks. Dollar amounts and account balances are NEVER exposed."
         },
         leaderboard: {
             title: "Global Leaderboard",
@@ -450,6 +475,8 @@ export const dictionaries = {
             journal: "สมุดบันทึก",
             history: "ประวัติการเทรด",
             challenge: "ภารกิจท้าทาย",
+            calendar: "ปฏิทินเศรษฐกิจ",
+            profile: "โปรไฟล์ของฉัน",
             adminPanel: "จัดการระบบ",
             settings: "ตั้งค่าระบบ",
             help: "ช่วยเหลือ",
@@ -505,7 +532,30 @@ export const dictionaries = {
             create: "สร้างพอร์ตใหม่"
         },
         calendar: {
-            title: "ปฏิทินเศรษฐกิจ"
+            title: "ปฏิทินเศรษฐกิจ",
+            subtitle: "ติดตามข่าวเศรษฐกิจสำคัญที่ส่งผลต่อตลาด",
+            dailySummary: "📋 สรุปข่าววันนี้",
+            todayTitle: "📅 ข่าววันนี้",
+            upcomingTitle: "📆 ข่าวที่กำลังจะมาถึง",
+            totalEvents: "ข่าวทั้งหมด",
+            highImpact: "ผลกระทบสูง",
+            currencies: "สกุลเงิน",
+            warning: "⚠️ ข่าวผลกระทบสูงวันนี้",
+            warningDesc: "ระวังช่วงเวลาข่าวออก ลดขนาด Lot หรือรอความผันผวนสงบก่อนเทรด",
+            noEvents: "วันนี้ไม่มีข่าวสำคัญ",
+            noEventsSub: "เหมาะสำหรับเทรดตามเทคนิคอล"
+        },
+        profile: {
+            myProfileTitle: "โปรไฟล์สาธารณะของฉัน",
+            myProfileSubtitle: "ควบคุมว่าคนอื่นเห็นอะไรบ้างเกี่ยวกับการเทรดของคุณ",
+            publicToggle: "โปรไฟล์สาธารณะ",
+            publicDesc: "ทุกคนสามารถดูสถิติของคุณได้",
+            privateDesc: "โปรไฟล์ถูกซ่อนไว้",
+            bioLabel: "ประวัติย่อ",
+            bioPlaceholder: "เล่าเรื่องการเทรดของคุณให้โลกรู้...",
+            saveBio: "บันทึก",
+            infoTitle: "🔒 หมายเหตุความเป็นส่วนตัว",
+            infoDesc: "โปรไฟล์สาธารณะแสดงเฉพาะเปอร์เซ็นต์ (Win Rate, Profit Factor) และ Streak เท่านั้น ยอดเงินและยอดบัญชีจะไม่ถูกเปิดเผย"
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",

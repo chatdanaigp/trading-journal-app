@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Briefcase, Plus, ChevronDown, X } from 'lucide-react'
+import { Briefcase, Plus, ChevronDown, X, Trash2 } from 'lucide-react'
 import useSWR, { mutate as globalMutate } from 'swr'
 
 const fetcher = (url: string) => fetch(url).then(r => r.json())
@@ -25,6 +25,7 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setIsOpen(false)
                 setIsCreating(false)
+                setNewName('')
             }
         }
         document.addEventListener('mousedown', handler)
@@ -47,69 +48,89 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
         globalMutate('/api/portfolios')
     }
 
+    async function handleDelete(id: string) {
+        if (!confirm(dict?.portfolio?.deleteConfirm || 'Delete this portfolio? Trades will move to All Trades.')) return
+        await fetch(`/api/portfolios?id=${id}`, { method: 'DELETE' })
+        if (value === id) onChange(null)
+        globalMutate('/api/portfolios')
+    }
+
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-[#1a1a1a] border border-[#333] text-gray-400 hover:border-[#ccf381]/40 hover:text-[#ccf381] transition-all"
+                onClick={() => { setIsOpen(!isOpen); setIsCreating(false); setNewName('') }}
+                className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 hover:border-purple-400/50 transition-all whitespace-nowrap"
             >
                 <Briefcase size={13} />
-                <span className="max-w-[100px] truncate">{selectedName}</span>
+                <span className="max-w-[120px] truncate">{selectedName}</span>
                 <ChevronDown size={12} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-1 w-52 bg-[#1a1a1a] border border-[#333] rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-full mt-2 w-64 bg-[#1a1a1a] border border-[#333] rounded-xl shadow-2xl z-50 overflow-hidden">
+                    {/* Header */}
+                    <div className="px-3 py-2 border-b border-white/5">
+                        <p className="text-[9px] text-gray-600 uppercase font-bold tracking-wider">{dict?.portfolio?.selectPortfolio || 'Select Portfolio'}</p>
+                    </div>
+
                     {/* All Trades */}
                     <button
                         onClick={() => { onChange(null); setIsOpen(false) }}
-                        className={`w-full px-3 py-2.5 text-left text-xs font-bold flex items-center gap-2 transition-colors ${
+                        className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors ${
                             !value ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
                         }`}
                     >
-                        <Briefcase size={12} />
+                        <Briefcase size={14} />
                         {dict?.portfolio?.allTrades || 'All Trades'}
+                        {!value && <span className="ml-auto text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
                     </button>
 
-                    {/* Portfolios */}
+                    {/* Portfolios list */}
                     {portfolios.map((p: any) => (
                         <button
                             key={p.id}
                             onClick={() => { onChange(p.id); setIsOpen(false) }}
-                            className={`w-full px-3 py-2.5 text-left text-xs font-bold flex items-center gap-2 transition-colors border-t border-white/5 ${
+                            className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors border-t border-white/5 group ${
                                 value === p.id ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
                             }`}
                         >
-                            <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
-                            <span className="truncate">{p.name}</span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0" />
+                            <span className="truncate flex-1">{p.name}</span>
+                            {value === p.id && <span className="text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
+                            <span
+                                onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }}
+                                className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all cursor-pointer p-0.5"
+                            >
+                                <Trash2 size={11} />
+                            </span>
                         </button>
                     ))}
 
                     {/* Create New */}
-                    <div className="border-t border-white/5">
+                    <div className="border-t border-white/10 bg-[#111]">
                         {isCreating ? (
-                            <div className="p-2 flex gap-1.5">
+                            <div className="p-2.5 flex gap-2">
                                 <input
                                     autoFocus
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                                    placeholder="Portfolio name..."
-                                    className="flex-1 text-xs bg-[#0d0d0d] border border-[#333] rounded-lg px-2 py-1.5 text-white placeholder:text-gray-700 focus:border-[#ccf381] outline-none"
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') { setIsCreating(false); setNewName('') } }}
+                                    placeholder={dict?.portfolio?.namePlaceholder || 'Portfolio name...'}
+                                    className="flex-1 text-xs bg-[#0d0d0d] border border-[#333] rounded-lg px-2.5 py-2 text-white placeholder:text-gray-700 focus:border-[#ccf381] outline-none"
                                 />
-                                <button onClick={handleCreate} className="p-1.5 rounded-lg bg-[#ccf381]/15 text-[#ccf381] hover:bg-[#ccf381]/25 transition-colors">
-                                    <Plus size={12} />
+                                <button onClick={handleCreate} className="px-2.5 py-2 rounded-lg bg-[#ccf381] text-black text-[10px] font-bold hover:bg-[#bbe075] transition-colors">
+                                    Add
                                 </button>
-                                <button onClick={() => setIsCreating(false)} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
+                                <button onClick={() => { setIsCreating(false); setNewName('') }} className="px-2 py-2 rounded-lg bg-[#252525] text-gray-500 hover:text-red-400 transition-colors">
                                     <X size={12} />
                                 </button>
                             </div>
                         ) : (
                             <button
                                 onClick={() => setIsCreating(true)}
-                                className="w-full px-3 py-2.5 text-left text-xs font-bold text-gray-600 hover:text-[#ccf381] hover:bg-[#252525] transition-colors flex items-center gap-2"
+                                className="w-full px-3 py-3 text-left text-xs font-bold text-gray-500 hover:text-[#ccf381] hover:bg-[#1a1a1a] transition-colors flex items-center gap-2"
                             >
-                                <Plus size={12} />
+                                <Plus size={14} />
                                 {dict?.portfolio?.create || 'New Portfolio'}
                             </button>
                         )}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle, Menu, X, Shield, Target, List } from 'lucide-react'
+import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle, Menu, X, Shield, Target, List, CalendarDays, User as UserIcon } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -43,10 +43,12 @@ export function Sidebar({ dict }: { dict: any }) {
     const links = [
         { name: dict.sidebar.overview, href: '/dashboard', icon: LayoutDashboard },
         { name: dict.sidebar.analytics, href: '/analytics', icon: BarChart3 },
+        { name: dict.sidebar.calendar, href: '/calendar', icon: CalendarDays },
         { name: dict.sidebar.leaderboard, href: '/leaderboard', icon: Trophy },
         { name: dict.sidebar.journal, href: '/journal', icon: Wallet },
         { name: dict.sidebar.history, href: '/history', icon: List },
         { name: dict.sidebar.challenge, href: '/challenge', icon: Target },
+        { name: dict.sidebar.profile, href: '/profile/me', icon: UserIcon },
     ]
 
     const lowerLinks = [
