@@ -427,107 +427,129 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0 }: 
                         </div>
                     </div>
 
-                    {/* Row 3: SL & TP */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="stopLoss" className="text-gray-400 text-xs flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
-                                {dict?.tradeForm?.stopLoss || "Stop Loss"}
-                            </Label>
-                            <Input
-                                id="stopLoss"
-                                name="stopLoss"
-                                type="number"
-                                step="0.01"
-                                placeholder="1995.00"
-                                className="bg-[#0d0d0d] border-[#333] focus:border-red-400 text-white placeholder:text-gray-700 h-11 rounded-xl"
-                                value={sl}
-                                onChange={(e) => setSl(e.target.value)}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="takeProfit" className="text-gray-400 text-xs flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#ccf381] inline-block"></span>
-                                {dict?.tradeForm?.takeProfit || "Take Profit"}
-                            </Label>
-                            <Input
-                                id="takeProfit"
-                                name="takeProfit"
-                                type="number"
-                                step="0.01"
-                                placeholder="2010.00"
-                                className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl"
-                                value={tp}
-                                onChange={(e) => setTp(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Row 4: Strategy Tags + Screenshot */}
-                    <div className="flex flex-col md:flex-row gap-4 items-start">
-                        <div className="flex-grow grid gap-2">
-                            <Label className="text-gray-400 text-xs">{dict?.tradeForm?.strategy || 'Strategy'}</Label>
-                            <div className="flex flex-wrap gap-1.5">
-                                {STRATEGY_PRESETS.map((tag) => (
-                                    <button
-                                        key={tag}
-                                        type="button"
-                                        onClick={() => setStrategy(strategy === tag ? '' : tag)}
-                                        className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all duration-200 ${
-                                            strategy === tag
-                                                ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_8px_rgba(204,243,129,0.15)]'
-                                                : 'bg-[#0d0d0d] border-[#333] text-gray-500 hover:border-[#555] hover:text-gray-300'
-                                        }`}
-                                    >
-                                        #{tag}
-                                    </button>
-                                ))}
-                            </div>
-                            <input type="hidden" name="strategy" value={strategy} />
-                        </div>
-
-                        {/* Screenshot Upload */}
-                        <div className="grid gap-2 shrink-0">
-                            <Label className="text-gray-400 text-xs">{dict?.tradeForm?.screenshot || 'Chart'}</Label>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                name="screenshot"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0]
-                                    if (file) {
-                                        setScreenshotFile(file)
-                                        setScreenshotPreview(URL.createObjectURL(file))
-                                    }
-                                }}
-                            />
-                            {screenshotPreview ? (
-                                <div className="relative w-20 h-14 rounded-lg overflow-hidden border border-[#333] group">
-                                    <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setScreenshotFile(null)
-                                            setScreenshotPreview(null)
-                                            if (fileInputRef.current) fileInputRef.current.value = ''
-                                        }}
-                                        className="absolute top-0.5 right-0.5 p-0.5 bg-black/70 rounded-full text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <X size={10} />
-                                    </button>
+                    {/* Combined SL/TP, Strategy and Screenshot into a two-column grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Left Column: SL/TP and Strategy */}
+                        <div className="md:col-span-2 flex flex-col gap-5">
+                            {/* SL & TP Row */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="stopLoss" className="text-gray-400 text-xs flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+                                        {dict?.tradeForm?.stopLoss || "Stop Loss"}
+                                    </Label>
+                                    <Input
+                                        id="stopLoss"
+                                        name="stopLoss"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="1995.00"
+                                        className="bg-[#0d0d0d] border-[#333] focus:border-red-400 text-white placeholder:text-gray-700 h-11 rounded-xl"
+                                        value={sl}
+                                        onChange={(e) => setSl(e.target.value)}
+                                    />
                                 </div>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="w-20 h-14 rounded-lg border border-dashed border-[#333] bg-[#0d0d0d] flex flex-col items-center justify-center gap-0.5 text-gray-600 hover:border-[#555] hover:text-gray-400 transition-colors"
-                                >
-                                    <ImagePlus size={16} />
-                                    <span className="text-[8px] font-bold">📷</span>
-                                </button>
-                            )}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="takeProfit" className="text-gray-400 text-xs flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#ccf381] inline-block"></span>
+                                        {dict?.tradeForm?.takeProfit || "Take Profit"}
+                                    </Label>
+                                    <Input
+                                        id="takeProfit"
+                                        name="takeProfit"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="2010.00"
+                                        className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl"
+                                        value={tp}
+                                        onChange={(e) => setTp(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Strategy Row */}
+                            <div className="grid gap-2">
+                                <Label className="text-gray-400 text-xs">{dict?.tradeForm?.strategy || 'Strategy'}</Label>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {STRATEGY_PRESETS.map((tag) => (
+                                        <button
+                                            key={tag}
+                                            type="button"
+                                            onClick={() => setStrategy(strategy === tag ? '' : tag)}
+                                            className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all duration-200 ${
+                                                strategy === tag
+                                                    ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_8px_rgba(204,243,129,0.15)]'
+                                                    : 'bg-[#0d0d0d] border-[#333] text-gray-500 hover:border-[#555] hover:text-gray-300'
+                                            }`}
+                                        >
+                                            #{tag}
+                                        </button>
+                                    ))}
+                                </div>
+                                <input type="hidden" name="strategy" value={strategy} />
+                            </div>
+                        </div>
+
+                        {/* Right Column: Screenshot Upload - Expanded height */}
+                        <div className="md:col-span-1 h-full min-h-[140px]">
+                            <div className="grid gap-2 h-full flex flex-col">
+                                <Label className="text-gray-400 text-xs">{dict?.tradeForm?.screenshot || 'Chart Screenshot'}</Label>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    name="screenshot"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                            setScreenshotFile(file)
+                                            setScreenshotPreview(URL.createObjectURL(file))
+                                        }
+                                    }}
+                                />
+                                <div className="flex-grow">
+                                    {screenshotPreview ? (
+                                        <div className="relative w-full h-full min-h-[120px] rounded-xl overflow-hidden border border-[#333] group bg-[#0d0d0d]">
+                                            <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className="p-2 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all border border-white/20 mr-2"
+                                                >
+                                                    <ImagePlus size={20} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setScreenshotFile(null)
+                                                        setScreenshotPreview(null)
+                                                        if (fileInputRef.current) fileInputRef.current.value = ''
+                                                    }}
+                                                    className="p-2 bg-red-500/20 backdrop-blur-md rounded-full text-red-400 hover:bg-red-500/30 transition-all border border-red-500/30"
+                                                >
+                                                    <X size={20} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="w-full h-full min-h-[120px] rounded-xl border-2 border-dashed border-[#222] bg-[#0d0d0d]/50 flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-[#ccf381]/30 hover:bg-[#ccf381]/5 hover:text-gray-400 transition-all group"
+                                        >
+                                            <div className="w-10 h-10 rounded-full bg-[#111] flex items-center justify-center group-hover:bg-[#ccf381]/10 transition-colors">
+                                                <ImagePlus size={20} className="group-hover:text-[#ccf381]" />
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs font-bold">{dict?.tradeForm?.uploadImage || 'Upload Chart'}</span>
+                                                <span className="text-[10px] opacity-50">JPG, PNG, WebP</span>
+                                            </div>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

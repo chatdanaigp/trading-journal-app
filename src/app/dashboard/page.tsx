@@ -56,12 +56,12 @@ export default function DashboardPage() {
                         <PortfolioSelector value={portfolioId} onChange={setPortfolioId} dict={dict} />
                         <button
                             onClick={() => setImportOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400/50 transition-all whitespace-nowrap"
+                            className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400/50 transition-all whitespace-nowrap"
                         >
                             <Upload size={14} />
                             {dict?.import?.csvBtn || 'Import CSV'}
                         </button>
-                        <TopNavigation />
+                        <TopNavigation showDate={false} />
                     </div>
                 </div>
             </StaggerItem>
@@ -100,11 +100,13 @@ export default function DashboardPage() {
                                     </div>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className={`text-xs px-2 py-1 rounded-md border flex items-center gap-1 font-medium ${Number(stats.netProfit) >= 0 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                                    {Number(stats.netProfit) >= 0 ? '↗' : '↘'} {stats.winRate}% {dict.dashboard.winRate}
+                            <div className="flex items-center gap-3">
+                                <span className={`text-sm px-3 py-1.5 rounded-xl border flex items-center gap-1.5 font-bold ${Number(stats.netProfit) >= 0 ? 'bg-[#ccf381]/15 border-[#ccf381]/30 text-[#ccf381]' : 'bg-red-500/15 border-red-500/30 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]'}`}>
+                                    <span className="text-lg leading-none">{Number(stats.netProfit) >= 0 ? '↗' : '↘'}</span>
+                                    <span className="text-base tracking-tight">{portSize > 0 ? ((Number(stats.netProfit) / portSize) * 100).toFixed(1) : '0.0'}%</span>
+                                    <span className="text-[10px] uppercase opacity-70 ml-0.5">{dict.dashboard.growthRate}</span>
                                 </span>
-                                <span className="text-xs text-gray-600">{dict.dashboard.vsLastPeriod}</span>
+                                <span className="text-xs text-gray-600 font-medium">{dict.dashboard.vsLastPeriod}</span>
                             </div>
                         </CardContent>
                     </Card>

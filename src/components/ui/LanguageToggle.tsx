@@ -36,11 +36,11 @@ export function LanguageToggle() {
     }
 
     return (
-        <div className="flex items-center bg-[#1a1a1a] border border-[#333] rounded-full p-0.5">
+        <div className="flex items-center bg-[#1a1a1a] border border-[#333] rounded-full p-1 h-9">
             <button
                 onClick={() => toggleLang('EN')}
                 className={cn(
-                    "px-3 py-1 text-xs font-bold rounded-full transition-all duration-300",
+                    "px-3 h-full text-xs font-bold rounded-full transition-all duration-300",
                     lang === 'EN' ? "bg-[#333] text-white shadow-md" : "text-gray-500 hover:text-white"
                 )}
             >
@@ -49,7 +49,7 @@ export function LanguageToggle() {
             <button
                 onClick={() => toggleLang('TH')}
                 className={cn(
-                    "px-3 py-1 text-xs font-bold rounded-full transition-all duration-300",
+                    "px-3 h-full text-xs font-bold rounded-full transition-all duration-300",
                     lang === 'TH' ? "bg-[#333] text-white shadow-md" : "text-gray-500 hover:text-white"
                 )}
             >

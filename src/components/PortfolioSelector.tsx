@@ -59,7 +59,7 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => { setIsOpen(!isOpen); setIsCreating(false); setNewName('') }}
-                className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 hover:border-purple-400/50 transition-all whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 hover:border-purple-400/50 transition-all whitespace-nowrap"
             >
                 <Briefcase size={13} />
                 <span className="max-w-[120px] truncate">{selectedName}</span>
