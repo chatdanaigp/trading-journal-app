@@ -50,6 +50,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 <th className="px-4 py-3">Entry</th>
                                 <th className="px-4 py-3">Exit</th>
                                 <th className="px-4 py-3">SL / TP</th>
+                                <th className="px-4 py-3 text-center">RR</th>
                                 <th className="px-5 py-3 text-right">{dict?.dashboard?.result || "Result"}</th>
                                 <th className="px-5 py-3">Detail</th>
                                 <th className="px-5 py-3 text-center rounded-tr-xl w-12"></th>
@@ -80,6 +81,15 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                     const risk = Math.abs(trade.entry_price - trade.stop_loss)
                                     const reward = Math.abs(trade.take_profit - trade.entry_price)
                                     if (risk > 0) plannedRR = (reward / risk).toFixed(1)
+                                }
+
+                                let actualRR: string | null = null
+                                if (trade.stop_loss && trade.entry_price && exitPrice) {
+                                    const risk = Math.abs(trade.entry_price - trade.stop_loss)
+                                    const reward = Math.abs(exitPrice - trade.entry_price)
+                                    if (risk > 0) {
+                                        actualRR = (reward / risk).toFixed(2)
+                                    }
                                 }
 
                                 const tradeDate = new Date(trade.created_at || Date.now())
@@ -121,7 +131,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         </td>
                                         <td className="px-4 py-4 text-center">
                                             <div className={cn(
-                                                "text-[10px] font-black px-2 py-1 rounded inline-block",
+                                                "text-xs font-black px-2.5 py-1.5 rounded inline-block min-w-[50px]",
                                                 trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-500'
                                             )}>
                                                 {trade.type}
@@ -138,19 +148,38 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         </td>
                                         <td className="px-4 py-4">
                                             <div className="flex flex-col gap-1 text-[11px] font-bold">
-                                                {trade.stop_loss && (
-                                                    <span className="text-red-400/80 flex items-center gap-1">
-                                                        <span className="w-1 h-1 rounded-full bg-red-500"></span>
-                                                        {trade.stop_loss?.toLocaleString()}
-                                                    </span>
+                                                {profit > 0 ? (
+                                                    trade.take_profit && (
+                                                        <span className="text-[#ccf381]/80 flex items-center gap-1">
+                                                            <span className="w-1 h-1 rounded-full bg-[#ccf381]"></span>
+                                                            {trade.take_profit?.toLocaleString()}
+                                                        </span>
+                                                    )
+                                                ) : (
+                                                    trade.stop_loss && (
+                                                        <span className="text-red-400/80 flex items-center gap-1">
+                                                            <span className="w-1 h-1 rounded-full bg-red-500"></span>
+                                                            {trade.stop_loss?.toLocaleString()}
+                                                        </span>
+                                                    )
                                                 )}
-                                                {trade.take_profit && (
-                                                    <span className="text-[#ccf381]/80 flex items-center gap-1">
-                                                        <span className="w-1 h-1 rounded-full bg-[#ccf381]"></span>
-                                                        {trade.take_profit?.toLocaleString()}
-                                                    </span>
-                                                )}
+                                                {!trade.take_profit && profit > 0 && <span className="text-gray-600">—</span>}
+                                                {!trade.stop_loss && profit <= 0 && <span className="text-gray-600">—</span>}
                                             </div>
+                                        </td>
+                                        <td className="px-4 py-4 text-center">
+                                            {actualRR ? (
+                                                <div className={cn(
+                                                    "text-[11px] font-black px-2 py-1 rounded border inline-block",
+                                                    Number(actualRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
+                                                    Number(actualRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                                    'bg-red-500/10 border-red-500/20 text-red-400'
+                                                )}>
+                                                    1:{actualRR}
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-600 text-xs">—</span>
+                                            )}
                                         </td>
                                         <td className="px-5 py-4 text-right">
                                             <div>
@@ -167,16 +196,6 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                     )}>
                                                         {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
                                                     </span>
-                                                    {plannedRR && (
-                                                        <span className={cn(
-                                                            "text-[9px] font-black px-1.5 py-0.5 rounded border uppercase tracking-tighter",
-                                                            Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
-                                                            Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                                                            'bg-red-500/10 border-red-500/20 text-red-400'
-                                                        )}>
-                                                            RR 1:{plannedRR}
-                                                        </span>
-                                                    )}
                                                 </div>
                                             </div>
                                         </td>
@@ -277,6 +296,15 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     }
                     const tDate = new Date(t.created_at || Date.now())
 
+                    let actualRR: string | null = null
+                    if (t.stop_loss && t.entry_price && ePrice) {
+                        const risk = Math.abs(t.entry_price - t.stop_loss)
+                        const reward = Math.abs(ePrice - t.entry_price)
+                        if (risk > 0) {
+                            actualRR = (reward / risk).toFixed(2)
+                        }
+                    }
+
                     return (
                         <div className="flex flex-col gap-6">
                             {/* Desktop/Tablet side-by-side layout */}
@@ -347,8 +375,14 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         <DetailItem icon={<BarChart3 size={12} />} label="Strategy" value={t.strategy} valueClass="text-[#ccf381]" />
                                         <DetailItem icon={<Target size={12} />} label="Entry" value={t.entry_price?.toLocaleString()} />
                                         <DetailItem icon={<Zap size={12} />} label="Exit" value={ePrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} />
-                                        <DetailItem icon={<Shield size={12} />} label="Stop Loss" value={t.stop_loss?.toLocaleString()} valueClass="text-red-400/80" />
-                                        <DetailItem icon={<Target size={12} />} label="Take Profit" value={t.take_profit?.toLocaleString()} valueClass="text-[#ccf381]/80" />
+                                        {p > 0 ? (
+                                            <DetailItem icon={<Target size={12} />} label="Take Profit" value={t.take_profit?.toLocaleString()} valueClass="text-[#ccf381]/80" />
+                                        ) : (
+                                            <DetailItem icon={<Shield size={12} />} label="Stop Loss" value={t.stop_loss?.toLocaleString()} valueClass="text-red-400/80" />
+                                        )}
+                                        {actualRR && (
+                                            <DetailItem icon={<Hash size={12} />} label="Actual RR" value={`1:${actualRR}`} valueClass={Number(actualRR) >= 1 ? "text-[#ccf381]" : "text-red-400"} />
+                                        )}
                                     </div>
 
                                     {/* Notes (Compact inside right col) */}
