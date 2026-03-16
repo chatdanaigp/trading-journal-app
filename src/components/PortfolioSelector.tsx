@@ -32,26 +32,43 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
+    // Auto-select first portfolio if value is null and portfolios are available
+    useEffect(() => {
+        if (!value && portfolios.length > 0) {
+            onChange(portfolios[0].id)
+        }
+    }, [value, portfolios, onChange])
+
     const selectedName = value
         ? (portfolios.find((p: any) => p.id === value)?.name || 'Portfolio')
-        : (dict?.portfolio?.allTrades || 'All Trades')
+        : (portfolios[0]?.name || 'Portfolio')
 
     async function handleCreate() {
         if (!newName.trim()) return
-        await fetch('/api/portfolios', {
+        const res = await fetch('/api/portfolios', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: newName.trim() })
         })
+        if (res.ok) {
+            const newPortfolio = await res.json()
+            if (newPortfolio && newPortfolio.id) {
+                onChange(newPortfolio.id)
+            }
+        }
         setNewName('')
         setIsCreating(false)
         globalMutate('/api/portfolios')
+        setIsOpen(false)
     }
 
     async function handleDelete(id: string) {
-        if (!confirm(dict?.portfolio?.deleteConfirm || 'Delete this portfolio? Trades will move to All Trades.')) return
+        if (!confirm(dict?.portfolio?.deleteConfirm || 'Delete this portfolio? Trades will move to your default portfolio.')) return
         await fetch(`/api/portfolios?id=${id}`, { method: 'DELETE' })
-        if (value === id) onChange(null)
+        if (value === id) {
+            const other = portfolios.find((p: any) => p.id !== id)
+            onChange(other ? other.id : null)
+        }
         globalMutate('/api/portfolios')
     }
 
@@ -73,38 +90,28 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
                         <p className="text-[9px] text-gray-600 uppercase font-bold tracking-wider">{dict?.portfolio?.selectPortfolio || 'Select Portfolio'}</p>
                     </div>
 
-                    {/* All Trades */}
-                    <button
-                        onClick={() => { onChange(null); setIsOpen(false) }}
-                        className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors ${
-                            !value ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
-                        }`}
-                    >
-                        <Briefcase size={14} />
-                        {dict?.portfolio?.allTrades || 'All Trades'}
-                        {!value && <span className="ml-auto text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
-                    </button>
-
                     {/* Portfolios list */}
-                    {portfolios.map((p: any) => (
-                        <button
-                            key={p.id}
-                            onClick={() => { onChange(p.id); setIsOpen(false) }}
-                            className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors border-t border-white/5 group ${
-                                value === p.id ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
-                            }`}
-                        >
-                            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0" />
-                            <span className="truncate flex-1">{p.name}</span>
-                            {value === p.id && <span className="text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
-                            <span
-                                onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }}
-                                className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all cursor-pointer p-0.5"
+                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                        {portfolios.map((p: any) => (
+                            <button
+                                key={p.id}
+                                onClick={() => { onChange(p.id); setIsOpen(false) }}
+                                className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors border-b border-white/5 group ${
+                                    value === p.id ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
+                                }`}
                             >
-                                <Trash2 size={11} />
-                            </span>
-                        </button>
-                    ))}
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${value === p.id ? 'bg-[#ccf381]' : 'bg-gray-600'}`} />
+                                <span className="truncate flex-1">{p.name}</span>
+                                {value === p.id && <span className="text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
+                                <span
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }}
+                                    className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all cursor-pointer p-0.5"
+                                >
+                                    <Trash2 size={11} />
+                                </span>
+                            </button>
+                        ))}
+                    </div>
 
                     {/* Create New */}
                     <div className="border-t border-white/10 bg-[#111]">

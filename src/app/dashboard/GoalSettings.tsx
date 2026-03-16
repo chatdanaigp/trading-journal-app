@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { updateProfileGoals } from './actions'
+import { updateProfileGoals, updatePortfolioGoals } from './actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 
-export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { initialPortSize: number, initialGoalPercent: number, dict?: any }) {
+export function GoalSettings({ initialPortSize, initialGoalPercent, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, portfolioId?: string | null, dict?: any }) {
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [isLoading, setIsLoading] = useState(false)
@@ -17,7 +17,13 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { in
 
     const handleSave = async () => {
         setIsLoading(true)
-        await updateProfileGoals(validPortSize, validGoalPercent)
+        if (portfolioId) {
+            // Save per-portfolio goals
+            await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent)
+        } else {
+            // Fallback: save to profile (global)
+            await updateProfileGoals(validPortSize, validGoalPercent)
+        }
         setIsLoading(false)
         setIsOpen(false)
     }
@@ -46,6 +52,11 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, dict }: { in
                         <Target className="w-3.5 h-3.5 text-[#ccf381]" />
                     </div>
                     <span className="text-sm font-bold text-white">{dict?.dashboard?.goalSettingsTitle || 'Goal Settings'}</span>
+                    {portfolioId && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#ccf381]/10 border border-[#ccf381]/20 text-[#ccf381]">
+                            Per Portfolio
+                        </span>
+                    )}
                 </div>
                 <button
                     onClick={() => setIsOpen(false)}

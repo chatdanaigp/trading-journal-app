@@ -33,44 +33,31 @@ export function MonthlyInsight({ dict }: { dict?: any }) {
                         <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/25 flex items-center justify-center">
                             <Brain className="w-3.5 h-3.5 text-purple-400" />
                         </div>
-                        <span>{dict?.analytics?.aiInsightsTitle || 'AI Monthly Review'}</span>
-                        <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded-md border border-purple-500/25">{data.month}</span>
+                        <span>{dict?.analytics?.monthlyReview || 'Monthly Stats Review'}</span>
+                        <span className="text-[10px] font-bold text-gray-400 bg-white/5 px-1.5 py-0.5 rounded-md border border-white/10">{data.month}</span>
                     </CardTitle>
                     {expanded ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
                 </button>
             </CardHeader>
 
             {expanded && (
-                <CardContent className="relative z-10 pt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <CardContent className="relative z-10 pt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-2">
-                        <div className="bg-[#0d0d0d] rounded-lg p-2.5 text-center border border-white/5">
-                            <p className="text-[9px] text-gray-600 uppercase font-bold">Trades</p>
-                            <p className="text-lg font-black text-white">{data.summary.totalTrades}</p>
+                    <div className="grid grid-cols-3 gap-2 pb-2">
+                        <div className="bg-[#0a0a0a] rounded-lg p-2.5 text-center border border-white/5 shadow-inner">
+                            <p className="text-[9px] text-gray-600 uppercase font-bold mb-1">Trades</p>
+                            <p className="text-xl font-black text-white">{data.summary.totalTrades}</p>
                         </div>
-                        <div className="bg-[#0d0d0d] rounded-lg p-2.5 text-center border border-white/5">
-                            <p className="text-[9px] text-gray-600 uppercase font-bold">Win Rate</p>
-                            <p className={`text-lg font-black ${data.summary.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{data.summary.winRate}%</p>
+                        <div className="bg-[#0a0a0a] rounded-lg p-2.5 text-center border border-white/5 shadow-inner">
+                            <p className="text-[9px] text-gray-600 uppercase font-bold mb-1">Win Rate</p>
+                            <p className={`text-xl font-black ${data.summary.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{data.summary.winRate}%</p>
                         </div>
-                        <div className="bg-[#0d0d0d] rounded-lg p-2.5 text-center border border-white/5">
-                            <p className="text-[9px] text-gray-600 uppercase font-bold">Net P&L</p>
-                            <p className={`text-lg font-black ${data.summary.netProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                        <div className="bg-[#0a0a0a] rounded-lg p-2.5 text-center border border-white/5 shadow-inner">
+                            <p className="text-[9px] text-gray-600 uppercase font-bold mb-1">Net P&L</p>
+                            <p className={`text-xl font-black ${data.summary.netProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
                                 {data.summary.netProfit >= 0 ? '+' : ''}${data.summary.netProfit}
                             </p>
                         </div>
-                    </div>
-
-                    {/* AI Insights */}
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-purple-400">
-                            <Sparkles size={10} />
-                            AI COACH INSIGHTS
-                        </div>
-                        {data.insights.map((insight: string, i: number) => (
-                            <div key={i} className="text-xs text-gray-300 bg-[#0d0d0d] rounded-lg p-3 border border-white/5 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: insight.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>') }}
-                            />
-                        ))}
                     </div>
                 </CardContent>
             )}

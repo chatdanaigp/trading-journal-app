@@ -30,24 +30,21 @@ export async function createTrade(formData: FormData) {
 
     let screenshotUrl = null
 
-    if (screenshot && screenshot.size > 0) {
-        const fileExt = screenshot.name.split('.').pop()
+    if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
+        const fileExt = screenshot.name.split('.').pop() || 'png'
         const fileName = `${user.id}/${Date.now()}.${fileExt}`
 
         const { error: uploadError } = await supabase.storage
             .from('trade-screenshots')
             .upload(fileName, screenshot)
 
-        if (uploadError) {
-            console.error('Error uploading screenshot:', uploadError)
-            // Continue creating trade even if upload fails, or return error?
-            // Let's log it but continue for now, maybe add a warning
-        } else {
+        if (!uploadError) {
             const { data: { publicUrl } } = supabase.storage
                 .from('trade-screenshots')
                 .getPublicUrl(fileName)
-
             screenshotUrl = publicUrl
+        } else {
+            console.error('Supabase Storage upload failed:', uploadError)
         }
     }
 
@@ -65,6 +62,23 @@ export async function createTrade(formData: FormData) {
         }
     }
 
+    const portfolioId = formData.get('portfolioId') as string
+
+    // Auto-assign to first portfolio if none provided (e.g., saving from "All Trades")
+    let finalPortfolioId: string | null = portfolioId || null
+    if (!finalPortfolioId) {
+        const { data: firstPortfolio } = await supabase
+            .from('portfolios')
+            .select('id')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .single()
+        if (firstPortfolio) {
+            finalPortfolioId = firstPortfolio.id
+        }
+    }
+
     const { error } = await supabase.from('trades').insert({
         user_id: user.id,
         symbol: symbol.toUpperCase(),
@@ -79,6 +93,7 @@ export async function createTrade(formData: FormData) {
         stop_loss: stopLoss ? Number(stopLoss) : null,
         take_profit: takeProfit ? Number(takeProfit) : null,
         strategy: strategy || null,
+        portfolio_id: finalPortfolioId,
     })
 
     if (error) {
@@ -155,8 +170,25 @@ export async function updateTrade(formData: FormData) {
         }
     }
 
-    // We are not handling screenshot updates in this version for simplicity, 
-    // but we could add it later.
+    // Handle screenshot update
+    let screenshotUrl = undefined
+    const screenshot = formData.get('screenshot') as File
+    if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
+        const fileExt = screenshot.name.split('.').pop() || 'png'
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`
+        const { error: uploadError } = await supabase.storage
+            .from('trade-screenshots')
+            .upload(fileName, screenshot)
+
+        if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage
+                .from('trade-screenshots')
+                .getPublicUrl(fileName)
+            screenshotUrl = publicUrl
+        } else {
+            console.error('Supabase Storage update failed:', uploadError)
+        }
+    }
 
     const { error } = await supabase
         .from('trades')
@@ -172,6 +204,7 @@ export async function updateTrade(formData: FormData) {
             stop_loss: stopLoss ? Number(stopLoss) : null,
             take_profit: takeProfit ? Number(takeProfit) : null,
             strategy: strategy || null,
+            ...(screenshotUrl !== undefined && { screenshot_url: screenshotUrl }),
         })
         .eq('id', tradeId)
         .eq('user_id', user.id) // Ensure user owns the trade
@@ -305,56 +338,7 @@ export async function getTradeStats(startDate?: string, endDate?: string) {
     }
 }
 
-export async function analyzeTrade(tradeId: string) {
-    const supabase = await createClient()
 
-    // 1. Fetch the trade
-    const { data: trade, error: fetchError } = await supabase
-        .from('trades')
-        .select('*')
-        .eq('id', tradeId)
-        .single()
-
-    if (fetchError || !trade) return { error: 'Trade not found' }
-
-    // 2. "AI" Analysis Logic (Rule-based Mock)
-    let analysis = ""
-    const profit = Number(trade.profit)
-    const type = trade.type
-    const symbol = trade.symbol
-
-    const positivePhrases = [
-        "เข้าออเดอร์ได้สวยมาก! ตามเทรนด์เป๊ะๆ ครับ",
-        "บริหารความเสี่ยงได้ยอดเยี่ยมครับไม้นี้",
-        "เฉียบคมมาก! จุดเข้าสวยและทำตามแผนได้ดี",
-        "เทรดแบบนี้แหละครับ พอร์ตโตแน่นอน รักษาฟอร์มไว้นะ!"
-    ]
-    const negativePhrases = [
-        "ระวังเรื่อง Stop Loss ด้วยนะครับ ไม้นี้เจ็บหนักไปหน่อย",
-        "ใจเย็นๆ นะครับ อย่าเพิ่งไล่ราคา (Chase) รอจังหวะเข้าสวยๆ ดีกว่า",
-        "ลองทบทวนแผนดูอีกทีนะครับ ไม้นี้เข้าตามระบบหรือเปล่า?",
-        "อย่าเทรดแก้แค้น (Revenge Trade) นะครับ พักดื่มน้ำแล้วค่อยลุยใหม่"
-    ]
-
-    if (profit > 0) {
-        analysis = `✅ **AI Coach:** ${positivePhrases[Math.floor(Math.random() * positivePhrases.length)]} (กำไร: +$${profit})`
-    } else if (profit < 0) {
-        analysis = `⚠️ **AI Coach:** ${negativePhrases[Math.floor(Math.random() * negativePhrases.length)]} (ขาดทุน: $${profit})`
-    } else {
-        analysis = "ℹ️ **AI Coach:** เสมอตัวครับ (Breakeven) ดีแล้วที่รักษาเงินต้นไว้ได้ รอจังหวะหน้าเอาใหม่ครับ"
-    }
-
-    // 3. Save Analysis
-    const { error: updateError } = await supabase
-        .from('trades')
-        .update({ ai_analysis: analysis })
-        .eq('id', tradeId)
-
-    if (updateError) return { error: updateError.message }
-
-    revalidatePath('/', 'layout')
-    return { success: true, analysis }
-}
 
 export async function getProfileGoals() {
     const supabase = await createClient()
@@ -395,6 +379,27 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
         .from('profiles')
         .update(updateData)
         .eq('id', user.id)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/', 'layout')
+    return { success: true }
+}
+
+export async function updatePortfolioGoals(portfolioId: string, portSize: number, profitGoalPercent: number) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Not authenticated' }
+
+    const { error } = await supabase
+        .from('portfolios')
+        .update({
+            port_size: portSize,
+            profit_goal_percent: profitGoalPercent,
+        })
+        .eq('id', portfolioId)
+        .eq('user_id', user.id)
 
     if (error) return { error: error.message }
 

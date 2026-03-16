@@ -17,6 +17,9 @@ import { TopNavigation } from '@/components/TopNavigation'
 import { PageSkeleton } from '@/components/ui/Skeleton'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { PortProgressWidget } from './PortProgressWidget'
+import { isSameDay } from 'date-fns'
+import { getTradingDay } from '@/utils/date-helpers'
 
 function useLang() {
     const [dict, setDict] = useState<any>(null)
@@ -32,10 +35,11 @@ export default function DashboardPage() {
     const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : undefined
     const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : undefined
 
-    const { data, isLoading } = useDashboardData(month, year)
     const dict = useLang()
     const [importOpen, setImportOpen] = useState(false)
     const [portfolioId, setPortfolioId] = useState<string | null>(null)
+
+    const { data, isLoading } = useDashboardData(month, year, portfolioId)
 
     if (isLoading || !data || !dict) return <PageSkeleton />
 
@@ -167,7 +171,7 @@ export default function DashboardPage() {
                 </StaggerItem>
 
                 <StaggerItem className="col-span-12 lg:col-span-8 h-full">
-                    <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} dict={dict} />
+                    <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} portfolioId={portfolioId} dict={dict} />
                 </StaggerItem>
             </div>
 
@@ -185,20 +189,32 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     <StaggerItem className="col-span-1 lg:col-span-6 h-full">
-                        <div className="w-full h-full flex flex-col">
-                            <h2 className="text-xl font-bold text-white mb-4 shrink-0">{dict.dashboard.quickTrade}</h2>
-                            <div className="flex-grow">
-                                <TradeForm trades={trades} portSize={portSize} goalPercent={goalPercent} dict={dict} />
-                            </div>
-                        </div>
+                        <TradeForm trades={trades} portSize={portSize} goalPercent={goalPercent} dict={dict} portfolioId={portfolioId} />
                     </StaggerItem>
                     <StaggerItem className="col-span-1 lg:col-span-6 h-full">
-                        <div className="w-full h-full flex flex-col">
-                            <div className="h-[44px] hidden lg:block shrink-0" aria-hidden="true"></div>
-                            <div className="flex-grow">
-                                <CalendarWidget trades={allTrades} dict={dict} />
-                            </div>
-                        </div>
+                        <Card className="relative overflow-hidden border-0 shadow-2xl h-full flex flex-col bg-[#0d0d0d]">
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#050505] z-0" />
+                            <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
+                            
+                            <CardContent className="p-6 flex flex-col gap-8 relative z-10 h-full">
+                                {/* Portfolio Progress Widget (Refocused as Daily Challenge) */}
+                                <PortProgressWidget 
+                                    portSize={portSize}
+                                    goalPercent={goalPercent}
+                                    netProfitToday={trades.filter((t: any) => t.created_at && isSameDay(getTradingDay(t.created_at), getTradingDay(new Date()))).reduce((sum: number, t: any) => sum + (t.profit || 0), 0)}
+                                    dict={dict}
+                                />
+                                
+                                <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent w-full" />
+
+                                <div className="flex-grow flex flex-col">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">{dict?.dashboard?.tradingCalendar || 'Trading Calendar'}</h2>
+                                    </div>
+                                    <CalendarWidget trades={allTrades} dict={dict} />
+                                </div>
+                            </CardContent>
+                        </Card>
                     </StaggerItem>
                 </div>
 

@@ -10,11 +10,13 @@ export function ProfitTree({
     netProfit,
     portSize,
     goalPercent,
+    portfolioId,
     dict
 }: {
     netProfit: number,
     portSize: number,
     goalPercent: number,
+    portfolioId?: string | null,
     dict?: any
 }) {
     // 1. Calculate Target
@@ -137,7 +139,7 @@ export function ProfitTree({
                             <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">${targetProfit.toLocaleString()}</span>
                         </div>
                     </div>
-                    <GoalSettings initialPortSize={portSize} initialGoalPercent={goalPercent} dict={dict} />
+                    <GoalSettings initialPortSize={portSize} initialGoalPercent={goalPercent} portfolioId={portfolioId} dict={dict} />
                 </div>
 
                 {/* Middle Spacer */}

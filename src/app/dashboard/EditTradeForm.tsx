@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
 import { useSWRConfig } from 'swr'
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ImagePlus, X } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 
 interface EditTradeFormProps {
@@ -42,6 +42,9 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [sl, setSl] = useState(initialData.stop_loss || '')
     const [tp, setTp] = useState(initialData.take_profit || '')
     const [strategy, setStrategy] = useState(initialData.strategy || '')
+    const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
+    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(initialData.screenshot_url || null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const STRATEGY_PRESETS = ['Breakout', 'Reversal', 'Trend', 'Scalping', 'News', 'Range', 'Other']
 
@@ -390,6 +393,60 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                 />
+            </div>
+
+            {/* Screenshot Upload */}
+            <div className="flex flex-col gap-2">
+                <Label className="text-gray-400 text-xs flex items-center gap-1.5">
+                    <ImagePlus size={10} className="text-[#ccf381]" /> 
+                    {initialData.screenshot_url ? 'Update Screenshot' : 'Add Screenshot'}
+                </Label>
+                <input 
+                    ref={fileInputRef} 
+                    type="file" 
+                    name="screenshot" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => { 
+                        const file = e.target.files?.[0]; 
+                        if (file) { 
+                            setScreenshotFile(file); 
+                            setScreenshotPreview(URL.createObjectURL(file)); 
+                        } 
+                    }} 
+                />
+                {screenshotPreview ? (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-[#333] group">
+                        <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                            <Button type="button" onClick={() => fileInputRef.current?.click()} variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                                <ImagePlus size={24} />
+                            </Button>
+                            <Button 
+                                type="button" 
+                                onClick={() => { 
+                                    setScreenshotFile(null); 
+                                    setScreenshotPreview(null); 
+                                    if (fileInputRef.current) fileInputRef.current.value = ''; 
+                                }} 
+                                variant="ghost" 
+                                size="icon" 
+                                className="text-red-400 hover:bg-red-400/10"
+                            >
+                                <X size={24} />
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <button 
+                        type="button" 
+                        onClick={() => fileInputRef.current?.click()} 
+                        className="w-full h-24 rounded-xl border-2 border-dashed border-[#2a2a2a] bg-[#0a0a0a] flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-[#ccf381]/40 hover:bg-[#ccf381]/5 transition-all"
+                    >
+                        <ImagePlus size={20} />
+                        <span className="text-[10px] font-black tracking-widest uppercase">UPLOAD CHART</span>
+                    </button>
+                )}
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#ccf381] hover:bg-[#bbe075] text-black font-bold h-12 rounded-xl text-md transition-all mt-2">

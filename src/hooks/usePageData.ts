@@ -14,10 +14,11 @@ const swrConfig = {
     keepPreviousData: true,
 }
 
-export function useDashboardData(month?: number, year?: number) {
+export function useDashboardData(month?: number, year?: number, portfolioId?: string | null) {
     const params = new URLSearchParams()
     if (month !== undefined) params.set('month', month.toString())
     if (year !== undefined) params.set('year', year.toString())
+    if (portfolioId) params.set('portfolio_id', portfolioId)
     const query = params.toString()
 
     return useSWR(

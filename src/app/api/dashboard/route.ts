@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const paramMonth = searchParams.get('month')
     const paramYear = searchParams.get('year')
+    const portfolioId = searchParams.get('portfolio_id')
 
     let targetDate = new Date()
     if (paramMonth && paramYear) {
@@ -27,22 +28,36 @@ export async function GET(request: Request) {
     const monthStart = startOfMonth(targetDate).toISOString()
     const monthEnd = endOfMonth(targetDate).toISOString()
 
-    // Fetch trades for current month
-    const { data: trades } = await supabase
+    // Base query for trades
+    let tradesQuery = supabase
         .from('trades')
         .select('*')
         .eq('user_id', user.id)
+
+    if (portfolioId && portfolioId !== 'null') {
+        tradesQuery = tradesQuery.eq('portfolio_id', portfolioId)
+    }
+
+    // Fetch trades for current month
+    const { data: trades } = await tradesQuery
         .gte('created_at', monthStart)
         .lte('created_at', monthEnd)
         .order('created_at', { ascending: false })
         .order('id', { ascending: false })
         .limit(100)
 
-    // Fetch ALL trades for calendar
-    const { data: allTrades } = await supabase
+    // Base query for ALL trades
+    let allTradesQuery = supabase
         .from('trades')
         .select('*')
         .eq('user_id', user.id)
+
+    if (portfolioId && portfolioId !== 'null') {
+        allTradesQuery = allTradesQuery.eq('portfolio_id', portfolioId)
+    }
+
+    // Fetch ALL trades for calendar
+    const { data: allTrades } = await allTradesQuery
         .order('created_at', { ascending: false })
         .order('id', { ascending: false })
         .limit(500)
@@ -53,6 +68,20 @@ export async function GET(request: Request) {
         .select('username, port_size, profit_goal_percent, is_portfolio_quest_active')
         .eq('id', user.id)
         .single()
+
+    // Fetch portfolio-specific goals if a portfolio is selected
+    let portfolioGoals: { port_size: number; profit_goal_percent: number } | null = null
+    if (portfolioId && portfolioId !== 'null') {
+        const { data: portfolio } = await supabase
+            .from('portfolios')
+            .select('port_size, profit_goal_percent')
+            .eq('id', portfolioId)
+            .eq('user_id', user.id)
+            .single()
+        if (portfolio) {
+            portfolioGoals = portfolio
+        }
+    }
 
     const username = (user.user_metadata?.full_name as string)
         || (user.user_metadata?.name as string)
@@ -93,9 +122,9 @@ export async function GET(request: Request) {
         shortStats: { count: shortTrades.length, winRate: shortWinRate, profit: shortTrades.reduce((s: number, t: any) => s + (t.profit || 0), 0).toFixed(2) }
     }
 
-    // Points
-    const portSize = profile?.port_size || 1000
-    const goalPercent = profile?.profit_goal_percent || 10
+    // Goals: prefer portfolio-specific, fallback to profile
+    const portSize = (portfolioGoals?.port_size && portfolioGoals.port_size > 0) ? portfolioGoals.port_size : (profile?.port_size || 0)
+    const goalPercent = (portfolioGoals?.profit_goal_percent && portfolioGoals.profit_goal_percent > 0) ? portfolioGoals.profit_goal_percent : (profile?.profit_goal_percent || 10)
     const isQuestActive = profile?.is_portfolio_quest_active || false
     
     // Evaluate pure localized strings for exact matching to bypass Vercel UTC shifts
