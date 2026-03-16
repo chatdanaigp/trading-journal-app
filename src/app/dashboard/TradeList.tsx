@@ -3,8 +3,9 @@
 import React from 'react'
 
 import { useState } from 'react'
-import { Pencil, Share2, Trash2, ImageIcon, X, Eye, ArrowUpRight, ArrowDownRight, Clock, Target, Shield, TrendingUp, Hash, BarChart3, Zap } from 'lucide-react'
+import { Pencil, Share2, Trash2, ImageIcon, X, Eye, ArrowUpRight, ArrowDownRight, Clock, Target, Shield, TrendingUp, Hash, BarChart3, Zap, MoreHorizontal, Edit2, ExternalLink } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
+import { Card, CardContent } from '@/components/ui/card'
 import { useSWRConfig } from 'swr'
 import { deleteTrade } from './actions'
 import { EditTradeForm } from './EditTradeForm'
@@ -37,11 +38,12 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                 </div>
             )}
 
-            <div className={cn("bg-[#1a1a1a] rounded-2xl overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar", className)}>
+            <CardContent className="p-0 overflow-hidden">
                 {trades.length === 0 ? (
                     <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                 ) : (
-                    <table className="w-full text-left min-w-[700px] relative table-fixed">
+                    <div className="overflow-x-auto custom-scrollbar">
+                        <table className="w-full text-left min-w-[900px] relative table-fixed">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
                                 <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
@@ -49,7 +51,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 <th className="px-4 py-3 text-center w-[8%]">Lot</th>
                                 <th className="px-4 py-3 w-[10%]">Entry</th>
                                 <th className="px-4 py-3 w-[10%]">Exit</th>
-                                <th className="px-4 py-3 w-[10%]">SL / TP</th>
+                                <th className="px-4 py-3 w-[10%]">P&L (Pts)</th>
                                 <th className="px-4 py-3 text-center w-[10%]">RR</th>
                                 <th className="px-5 py-3 text-right w-[12%]">{dict?.dashboard?.result || "Result"}</th>
                                 <th className="px-5 py-3 w-[12%]">Detail</th>
@@ -62,38 +64,27 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 const timeB = new Date(b.created_at || 0).getTime()
                                 if (timeA !== timeB) return timeB - timeA
                                 return (b.id || '').localeCompare(a.id || '')
-                            }).map((trade) => {
-                                const lot = trade.lot_size || 0.01
-                                const rawProfit = trade.profit || 0
-                                const profit = Math.round(rawProfit * 100) / 100
-                                const points = lot !== 0 ? Math.round(profit / lot) : 0
-
-                                let exitPrice = trade.exit_price
-                                if (!exitPrice && trade.entry_price) {
-                                    const priceDiff = profit / (lot * 100)
-                                    exitPrice = trade.type === 'BUY'
-                                        ? trade.entry_price + priceDiff
-                                        : trade.entry_price - priceDiff
+                            }).map((t) => {
+                                const isProfit = (t.profit || 0) > 0
+                                const lot = t.lot_size || 0.01
+                                const pts = lot !== 0 ? Math.abs(Math.round((t.profit || 0) / lot)) : 0
+                                
+                                // Calculate RR: Actual Points / Planned SL Distance (Pts)
+                                // If stop_loss exists, risk is entry - sl. 
+                                const entry = t.entry_price || 0
+                                const sl = t.stop_loss || 0
+                                const riskPts = Math.abs(entry - sl)
+                                
+                                let actualRRDisplay = "1:0"
+                                if (riskPts > 0) {
+                                    const rrValue = pts / riskPts
+                                    // Only show decimals if not a whole number
+                                    const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
+                                    actualRRDisplay = `1:${formattedRR}`
                                 }
 
-                                let plannedRR: string | null = null
-                                if (trade.stop_loss && trade.take_profit && trade.entry_price) {
-                                    const risk = Math.abs(trade.entry_price - trade.stop_loss)
-                                    const reward = Math.abs(trade.take_profit - trade.entry_price)
-                                    if (risk > 0) plannedRR = (reward / risk).toFixed(1)
-                                }
-
-                                let actualRR: string | null = null
-                                if (trade.stop_loss && trade.entry_price && exitPrice) {
-                                    const risk = Math.abs(trade.entry_price - trade.stop_loss)
-                                    const reward = Math.abs(exitPrice - trade.entry_price)
-                                    if (risk > 0) {
-                                        actualRR = (reward / risk).toFixed(2)
-                                    }
-                                }
-
-                                const tradeDate = new Date(trade.created_at || Date.now())
-                                const tradingDay = getTradingDay(trade.created_at || Date.now())
+                                const tDate = new Date(t.created_at || Date.now())
+                                const tradingDay = getTradingDay(t.created_at || Date.now())
                                 const dayOfWeek = tradingDay.getDay()
                                 let dayBorderColor = "border-l-transparent"
 
@@ -107,107 +98,68 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 }
 
                                 return (
-                                    <tr key={trade.id} className={cn("hover:bg-[#252525] transition-colors group border-b border-r border-b-[#252525] border-r-transparent last:border-b-0 text-sm", dayBorderColor)}>
-                                        <td className="px-5 py-4 transition-all duration-300">
-                                            <div>
-                                                <div className="text-lg font-bold text-white tracking-wide whitespace-nowrap">{trade.symbol}</div>
-                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap">
-                                                    {tradeDate.toLocaleDateString()} • {tradeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                                {trade.notes && (
-                                                    <div className="text-xs text-gray-400 mt-1 flex items-start gap-1">
-                                                        <span className="text-gray-600 shrink-0">📝</span>
-                                                        <span>{trade.notes}</span>
-                                                    </div>
-                                                )}
-                                                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                                                    {trade.strategy && (
-                                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[#ccf381]/10 border border-[#ccf381]/25 text-[#ccf381]">
-                                                            #{trade.strategy}
-                                                        </span>
-                                                    )}
+                                    <tr key={t.id} className={cn("group hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-0 h-20", dayBorderColor)}>
+                                        <td className="px-5 py-3">
+                                            <div className="flex flex-col">
+                                                <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                    {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-center">
-                                            <div className={cn(
-                                                "text-xs font-black px-2.5 py-1.5 rounded inline-block min-w-[50px]",
-                                                trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-500'
+                                        <td className="px-4 py-3 text-center">
+                                            <span className={cn(
+                                                "px-3 py-1.5 rounded-lg text-xs font-black tracking-widest",
+                                                t.type === 'BUY' ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
                                             )}>
-                                                {trade.type}
-                                            </div>
+                                                {t.type}
+                                            </span>
                                         </td>
-                                        <td className="px-4 py-4 text-center">
-                                            <div className="text-sm font-bold text-white">{trade.lot_size}</div>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="text-white font-black text-sm">{t.lot_size}</span>
                                         </td>
-                                        <td className="px-4 py-4">
-                                            <div className="text-sm font-bold text-white whitespace-nowrap">{trade.entry_price?.toLocaleString()}</div>
+                                        <td className="px-4 py-3">
+                                            <span className="text-white font-bold text-sm tracking-tight">{t.entry_price?.toLocaleString()}</span>
                                         </td>
-                                        <td className="px-4 py-4">
-                                            <div className="text-sm font-bold text-gray-300 whitespace-nowrap">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                        <td className="px-4 py-3">
+                                            <span className="text-white/70 font-medium text-sm tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
                                         </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex flex-col gap-1 text-[11px] font-bold">
-                                                {profit > 0 ? (
-                                                    trade.take_profit && (
-                                                        <span className="text-[#ccf381]/80 flex items-center gap-1">
-                                                            <span className="w-1 h-1 rounded-full bg-[#ccf381]"></span>
-                                                            {trade.take_profit?.toLocaleString()}
-                                                        </span>
-                                                    )
-                                                ) : (
-                                                    trade.stop_loss && (
-                                                        <span className="text-red-400/80 flex items-center gap-1">
-                                                            <span className="w-1 h-1 rounded-full bg-red-500"></span>
-                                                            {trade.stop_loss?.toLocaleString()}
-                                                        </span>
-                                                    )
-                                                )}
-                                                {!trade.take_profit && profit > 0 && <span className="text-gray-600">—</span>}
-                                                {!trade.stop_loss && profit <= 0 && <span className="text-gray-600">—</span>}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-center">
-                                            {actualRR ? (
-                                                <div className={cn(
-                                                    "text-[11px] font-black px-2 py-1 rounded border inline-block",
-                                                    Number(actualRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
-                                                    Number(actualRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                                                    'bg-red-500/10 border-red-500/20 text-red-400'
-                                                )}>
-                                                    1:{actualRR}
+                                        <td className="px-4 py-3">
+                                            {t.profit !== undefined ? (
+                                                <div className="flex items-center gap-1.5 font-bold text-xs">
+                                                    <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-green-500" : "bg-red-500")} />
+                                                    <span className={isProfit ? "text-green-500" : "text-red-500"}>
+                                                        {pts.toLocaleString()}
+                                                    </span>
                                                 </div>
                                             ) : (
-                                                <span className="text-gray-600 text-xs">—</span>
+                                                <span className="text-gray-600 text-[10px]">-</span>
                                             )}
                                         </td>
-                                        <td className="px-5 py-4 text-right">
+                                        <td className="px-4 py-3 text-center">
+                                            <div className="inline-flex px-2 py-1 rounded bg-red-500/5 border border-red-500/10">
+                                                <span className="text-[11px] font-black font-mono text-red-400/80">{actualRRDisplay}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-3 text-right">
                                             <div>
                                                 <div className={cn(
                                                     "text-xl font-black tracking-tight",
-                                                    Math.abs(Number(profit)) < 0.01 ? 'text-white' : Number(profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
+                                                    Math.abs(Number(t.profit)) < 0.01 ? 'text-white' : Number(t.profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
                                                 )}>
-                                                    {Math.abs(Number(profit)) < 0.01 ? `$0` : Number(profit) > 0 ? `+$${Number(profit).toLocaleString()}` : `$${Number(profit).toLocaleString()}`}
-                                                </div>
-                                                <div className="flex items-center justify-end gap-2 mt-1">
-                                                    <span className={cn(
-                                                        "text-[11px] font-bold",
-                                                        Math.abs(Number(points)) < 0.01 ? 'text-gray-400' : Number(points) > 0 ? 'text-[#ccf381]/80' : 'text-red-400/70'
-                                                    )}>
-                                                        {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
-                                                    </span>
+                                                    {Math.abs(Number(t.profit)) < 0.01 ? `$0` : Number(t.profit) > 0 ? `+$${Number(t.profit).toLocaleString()}` : `$${Number(t.profit).toLocaleString()}`}
                                                 </div>
                                             </div>
                                         </td>
-                                        {/* Trade Detail Column */}
-                                        <td className="px-5 py-4 transition-all duration-300">
+                                        <td className="px-5 py-3 transition-all duration-300">
                                             <button
-                                                onClick={() => setViewingTrade(trade)}
+                                                onClick={() => setViewingTrade(t)}
                                                 className="flex items-center gap-2 group/detail"
                                             >
-                                                {trade.screenshot_url ? (
+                                                {t.screenshot_url ? (
                                                     <div className="w-16 h-10 rounded-lg overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
-                                                        <img src={trade.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                        <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
                                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/detail:opacity-100 transition-opacity flex items-center justify-center">
                                                             <Eye size={12} className="text-white" />
                                                         </div>
@@ -222,26 +174,26 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                 </span>
                                             </button>
                                         </td>
-                                        <td className="px-5 py-4 text-center transition-all duration-300">
+                                        <td className="px-5 py-3 text-center transition-all duration-300">
                                             <div className="flex items-center justify-center gap-1.5">
                                                 <button
-                                                    onClick={() => setSharingTrade(trade)}
+                                                    onClick={() => setSharingTrade(t)}
                                                     className="p-1.5 bg-[#1a2a10] hover:bg-[#2a3d1a] rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
                                                     title="Share Trade Card"
                                                 >
                                                     <Share2 size={15} />
                                                 </button>
                                                 <button
-                                                    onClick={() => setEditingTrade(trade)}
+                                                    onClick={() => setEditingTrade(t)}
                                                     className="p-1.5 bg-[#333] hover:bg-[#444] rounded-lg text-gray-400 hover:text-white transition-all"
                                                     title="Edit Trade"
                                                 >
                                                     <Pencil size={15} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(trade.id)}
-                                                    disabled={deletingId === trade.id}
-                                                    className={`p-1.5 rounded-lg transition-all ${deletingId === trade.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
+                                                    onClick={() => handleDelete(t.id)}
+                                                    disabled={deletingId === t.id}
+                                                    className={`p-1.5 rounded-lg transition-all ${deletingId === t.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
                                                     title="Delete Trade"
                                                 >
                                                     <Trash2 size={15} />
@@ -253,8 +205,9 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                             })}
                         </tbody>
                     </table>
+                    </div>
                 )}
-            </div>
+            </CardContent>
 
             {/* Modal for Editing */}
             <Modal
@@ -296,13 +249,16 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     }
                     const tDate = new Date(t.created_at || Date.now())
 
-                    let actualRR: string | null = null
-                    if (t.stop_loss && t.entry_price && ePrice) {
-                        const risk = Math.abs(t.entry_price - t.stop_loss)
-                        const reward = Math.abs(ePrice - t.entry_price)
-                        if (risk > 0) {
-                            actualRR = (reward / risk).toFixed(2)
-                        }
+                    const isProfit = (t.profit || 0) > 0
+                    const entry = t.entry_price || 0
+                    const sl = t.stop_loss || 0
+                    const riskPts = Math.abs(entry - sl)
+                    
+                    let actualRRDisplay = "1:0"
+                    if (riskPts > 0) {
+                        const rrValue = pts / riskPts
+                        const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
+                        actualRRDisplay = `1:${formattedRR}`
                     }
 
                     return (
@@ -348,19 +304,17 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         </div>
                                         <div className="text-right">
                                             <p className={cn("text-sm font-black",
-                                                Math.abs(pts) < 0.01 ? 'text-gray-500' : pts > 0 ? 'text-[#ccf381]/80' : 'text-red-400/80'
+                                                Math.abs(pts) < 0.01 ? 'text-gray-500' : isProfit ? 'text-[#ccf381]/80' : 'text-red-400/80'
                                             )}>
-                                                {pts > 0 ? '+' : ''}{pts.toLocaleString()} PTS
+                                                {isProfit ? '+' : '-'}{pts.toLocaleString()} PTS
                                             </p>
-                                            {rr && (
-                                                <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
-                                                    Number(rr) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
-                                                    Number(rr) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                                                    'bg-red-500/10 border-red-500/20 text-red-400'
-                                                )}>
-                                                    RR 1:{rr}
-                                                </div>
-                                            )}
+                                            <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
+                                                riskPts > 0 && (pts / riskPts) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
+                                                riskPts > 0 && (pts / riskPts) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                                'bg-red-500/10 border-red-500/20 text-red-400'
+                                            )}>
+                                                RR {actualRRDisplay}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -369,20 +323,14 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         "grid gap-2.5",
                                         t.screenshot_url ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"
                                     )}>
-                                        <DetailItem icon={<Clock size={12} />} label="Timestamp" value={`${tDate.toLocaleDateString()} • ${tDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
+                                        <DetailItem icon={<Clock size={12} />} label="Timestamp" value={`${tDate.toLocaleDateString('th-TH')} • ${tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`} />
                                         <DetailItem icon={t.type === 'BUY' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />} label="Type" value={t.type} valueClass={t.type === 'BUY' ? 'text-green-400' : 'text-red-400'} />
                                         <DetailItem icon={<TrendingUp size={12} />} label="Volume" value={String(t.lot_size)} />
-                                        <DetailItem icon={<BarChart3 size={12} />} label="Strategy" value={t.strategy} valueClass="text-[#ccf381]" />
+                                        <DetailItem icon={<BarChart3 size={12} />} label="Strategy" value={t.strategy || '-'} valueClass="text-[#ccf381]" />
                                         <DetailItem icon={<Target size={12} />} label="Entry" value={t.entry_price?.toLocaleString()} />
-                                        <DetailItem icon={<Zap size={12} />} label="Exit" value={ePrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} />
-                                        {p > 0 ? (
-                                            <DetailItem icon={<Target size={12} />} label="Take Profit" value={t.take_profit?.toLocaleString()} valueClass="text-[#ccf381]/80" />
-                                        ) : (
-                                            <DetailItem icon={<Shield size={12} />} label="Stop Loss" value={t.stop_loss?.toLocaleString()} valueClass="text-red-400/80" />
-                                        )}
-                                        {actualRR && (
-                                            <DetailItem icon={<Hash size={12} />} label="Actual RR" value={`1:${actualRR}`} valueClass={Number(actualRR) >= 1 ? "text-[#ccf381]" : "text-red-400"} />
-                                        )}
+                                        <DetailItem icon={<Zap size={12} />} label="Exit" value={t.exit_price?.toLocaleString() || '-'} />
+                                        <DetailItem icon={isProfit ? <Target size={12} /> : <Shield size={12} />} label={isProfit ? "Take Profit" : "Stop Loss"} value={pts.toLocaleString()} valueClass={isProfit ? "text-green-400" : "text-red-400"} />
+                                        <DetailItem icon={<Hash size={12} />} label="Actual RR" value={actualRRDisplay} valueClass={riskPts > 0 && (pts / riskPts) >= 1 ? "text-[#ccf381]" : "text-red-400"} />
                                     </div>
 
                                     {/* Notes (Compact inside right col) */}
