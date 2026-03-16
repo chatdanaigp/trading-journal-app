@@ -38,23 +38,29 @@ export async function createTrade(formData: FormData) {
 
     let screenshotUrl = null
 
-    if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
-        const adminSupabase = await getAdminClient()
-        const fileExt = screenshot.name.split('.').pop() || 'png'
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`
+    try {
+        if (screenshot && screenshot instanceof File && screenshot.size > 0 && screenshot.name !== 'undefined') {
+            const adminSupabase = await getAdminClient()
+            const fileExt = screenshot.name.split('.').pop() || 'png'
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`
 
-        const { error: uploadError } = await adminSupabase.storage
-            .from('trade-screenshots')
-            .upload(fileName, screenshot)
-
-        if (!uploadError) {
-            const { data: { publicUrl } } = adminSupabase.storage
+            const { error: uploadError } = await adminSupabase.storage
                 .from('trade-screenshots')
-                .getPublicUrl(fileName)
-            screenshotUrl = publicUrl
-        } else {
-            console.error('Supabase Storage upload failed:', uploadError)
+                .upload(fileName, screenshot)
+
+            if (!uploadError) {
+                const { data: { publicUrl } } = adminSupabase.storage
+                    .from('trade-screenshots')
+                    .getPublicUrl(fileName)
+                screenshotUrl = publicUrl
+            } else {
+                console.error('Supabase Storage upload failed:', uploadError)
+                return { error: `Upload failed: ${uploadError.message}` }
+            }
         }
+    } catch (uploadErr: any) {
+        console.error('Catastrophic upload error during create:', uploadErr)
+        return { error: `Upload error: ${uploadErr.message}` }
     }
 
     const exactCreatedAt = formData.get('exactCreatedAt') as string
@@ -181,23 +187,41 @@ export async function updateTrade(formData: FormData) {
 
     // Handle screenshot update
     let screenshotUrl = undefined
-    const screenshot = formData.get('screenshot') as File
-    if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
-        const adminSupabase = await getAdminClient()
-        const fileExt = screenshot.name.split('.').pop() || 'png'
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`
-        const { error: uploadError } = await adminSupabase.storage
-            .from('trade-screenshots')
-            .upload(fileName, screenshot)
+    try {
+        const screenshot = formData.get('screenshot') as File | null
+        if (screenshot && screenshot instanceof File && screenshot.size > 0 && screenshot.name !== 'undefined') {
+            console.log('Detected screenshot for update, size:', screenshot.size)
+            
+            if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                console.error('SUPABASE_SERVICE_ROLE_KEY is missing')
+                return { error: 'Server configuration error: missing service key' }
+            }
 
-        if (!uploadError) {
-            const { data: { publicUrl } } = adminSupabase.storage
+            const adminSupabase = await getAdminClient()
+            const fileExt = screenshot.name.split('.').pop() || 'png'
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`
+            
+            const { error: uploadError } = await adminSupabase.storage
                 .from('trade-screenshots')
-                .getPublicUrl(fileName)
-            screenshotUrl = publicUrl
-        } else {
-            console.error('Supabase Storage update failed:', uploadError)
+                .upload(fileName, screenshot, {
+                    cacheControl: '3600',
+                    upsert: false
+                })
+
+            if (!uploadError) {
+                const { data: { publicUrl } } = adminSupabase.storage
+                    .from('trade-screenshots')
+                    .getPublicUrl(fileName)
+                screenshotUrl = publicUrl
+                console.log('Update screenshot upload successful:', screenshotUrl)
+            } else {
+                console.error('Supabase Storage update failed:', uploadError)
+                return { error: `Upload failed: ${uploadError.message}` }
+            }
         }
+    } catch (uploadErr: any) {
+        console.error('Catastrophic upload error during update:', uploadErr)
+        return { error: `Upload error: ${uploadErr.message || 'Unknown error'}` }
     }
 
     const { error } = await supabase
