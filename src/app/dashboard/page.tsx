@@ -38,10 +38,24 @@ export default function DashboardPage() {
     const dict = useLang()
     const [importOpen, setImportOpen] = useState(false)
     const [portfolioId, setPortfolioId] = useState<string | null>(null)
+    const [isInitialized, setIsInitialized] = useState(false)
 
-    const { data, isLoading } = useDashboardData(month, year, portfolioId)
+    // Persist portfolio selection
+    useEffect(() => {
+        const saved = localStorage.getItem('tj_selected_portfolio')
+        if (saved) setPortfolioId(saved)
+        setIsInitialized(true)
+    }, [])
 
-    if (isLoading || !data || !dict) return <PageSkeleton />
+    const handlePortfolioChange = (id: string | null) => {
+        setPortfolioId(id)
+        if (id) localStorage.setItem('tj_selected_portfolio', id)
+        else localStorage.removeItem('tj_selected_portfolio')
+    }
+
+    const { data, isLoading } = useDashboardData(month, year, isInitialized ? portfolioId : undefined)
+
+    if (isLoading || !data || !dict || !isInitialized) return <PageSkeleton />
 
     const { trades, allTrades, stats, username, points, dailyTargetAmount, isQuestActive, portSize, goalPercent } = data
     const { monthlyPoints, weeklyPoints, dailyPoints, dailyProfit } = points
@@ -57,7 +71,7 @@ export default function DashboardPage() {
                         <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <PortfolioSelector value={portfolioId} onChange={setPortfolioId} dict={dict} />
+                        <PortfolioSelector value={portfolioId} onChange={handlePortfolioChange} dict={dict} />
                         <button
                             onClick={() => setImportOpen(true)}
                             className="flex items-center gap-1.5 px-3 py-2 h-9 text-xs font-bold rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400/50 transition-all whitespace-nowrap"

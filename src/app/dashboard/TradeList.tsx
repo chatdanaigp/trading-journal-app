@@ -41,18 +41,18 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                 {trades.length === 0 ? (
                     <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                 ) : (
-                    <table className="w-full text-left min-w-[700px] relative">
+                    <table className="w-full text-left min-w-[700px] relative table-fixed">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
-                                <th className="px-5 py-3 rounded-tl-xl">{dict?.dashboard?.asset || "Asset"}</th>
-                                <th className="px-4 py-3 text-center">Side</th>
-                                <th className="px-4 py-3 text-center">Lot</th>
-                                <th className="px-4 py-3">Entry</th>
-                                <th className="px-4 py-3">Exit</th>
-                                <th className="px-4 py-3">SL / TP</th>
-                                <th className="px-4 py-3 text-center">RR</th>
-                                <th className="px-5 py-3 text-right">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3">Detail</th>
+                                <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
+                                <th className="px-4 py-3 text-center w-[8%]">Side</th>
+                                <th className="px-4 py-3 text-center w-[8%]">Lot</th>
+                                <th className="px-4 py-3 w-[10%]">Entry</th>
+                                <th className="px-4 py-3 w-[10%]">Exit</th>
+                                <th className="px-4 py-3 w-[10%]">SL / TP</th>
+                                <th className="px-4 py-3 text-center w-[10%]">RR</th>
+                                <th className="px-5 py-3 text-right w-[12%]">{dict?.dashboard?.result || "Result"}</th>
+                                <th className="px-5 py-3 w-[12%]">Detail</th>
                                 <th className="px-5 py-3 text-center rounded-tr-xl w-12"></th>
                             </tr>
                         </thead>

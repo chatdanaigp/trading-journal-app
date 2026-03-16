@@ -32,13 +32,6 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
-    // Auto-select first portfolio if value is null and portfolios are available
-    useEffect(() => {
-        if (!value && portfolios.length > 0) {
-            onChange(portfolios[0].id)
-        }
-    }, [value, portfolios, onChange])
-
     const selectedName = value
         ? (portfolios.find((p: any) => p.id === value)?.name || 'Portfolio')
         : (portfolios[0]?.name || 'Portfolio')
