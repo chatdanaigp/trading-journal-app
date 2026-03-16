@@ -3,6 +3,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+async function getAdminClient() {
+    return createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+}
 
 export async function createTrade(formData: FormData) {
     const supabase = await createClient()
@@ -31,15 +39,16 @@ export async function createTrade(formData: FormData) {
     let screenshotUrl = null
 
     if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
+        const adminSupabase = await getAdminClient()
         const fileExt = screenshot.name.split('.').pop() || 'png'
         const fileName = `${user.id}/${Date.now()}.${fileExt}`
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await adminSupabase.storage
             .from('trade-screenshots')
             .upload(fileName, screenshot)
 
         if (!uploadError) {
-            const { data: { publicUrl } } = supabase.storage
+            const { data: { publicUrl } } = adminSupabase.storage
                 .from('trade-screenshots')
                 .getPublicUrl(fileName)
             screenshotUrl = publicUrl
@@ -174,14 +183,15 @@ export async function updateTrade(formData: FormData) {
     let screenshotUrl = undefined
     const screenshot = formData.get('screenshot') as File
     if (screenshot && screenshot.size > 0 && screenshot.name !== 'undefined') {
+        const adminSupabase = await getAdminClient()
         const fileExt = screenshot.name.split('.').pop() || 'png'
         const fileName = `${user.id}/${Date.now()}.${fileExt}`
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await adminSupabase.storage
             .from('trade-screenshots')
             .upload(fileName, screenshot)
 
         if (!uploadError) {
-            const { data: { publicUrl } } = supabase.storage
+            const { data: { publicUrl } } = adminSupabase.storage
                 .from('trade-screenshots')
                 .getPublicUrl(fileName)
             screenshotUrl = publicUrl
