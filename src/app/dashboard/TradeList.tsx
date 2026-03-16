@@ -42,14 +42,17 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                 ) : (
                     <table className="w-full text-left min-w-[700px] relative">
-                        <thead className="bg-[#2a2a2a] text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-40 shadow-md">
+                        <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
-                                <th className="px-5 py-3 rounded-tl-xl transition-all duration-300">{dict?.dashboard?.asset || "Asset"}</th>
-                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.sideLot || "Side / Lot"}</th>
-                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.price || "Price"}</th>
-                                <th className="px-5 py-3 transition-all duration-300">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3 transition-all duration-300">Detail</th>
-                                <th className="px-5 py-3 text-center rounded-tr-xl w-12 transition-all duration-300"></th>
+                                <th className="px-5 py-3 rounded-tl-xl">{dict?.dashboard?.asset || "Asset"}</th>
+                                <th className="px-4 py-3 text-center">Side</th>
+                                <th className="px-4 py-3 text-center">Lot</th>
+                                <th className="px-4 py-3">Entry</th>
+                                <th className="px-4 py-3">Exit</th>
+                                <th className="px-4 py-3">SL / TP</th>
+                                <th className="px-5 py-3 text-right">{dict?.dashboard?.result || "Result"}</th>
+                                <th className="px-5 py-3">Detail</th>
+                                <th className="px-5 py-3 text-center rounded-tr-xl w-12"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
@@ -116,59 +119,65 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-5 py-4 transition-all duration-300">
-                                            <div>
-                                                <div className={`text-sm font-black mb-1 px-2 py-0.5 rounded inline-block ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                                                    {trade.type}
-                                                </div>
-                                                <div className="text-xs text-gray-400 font-medium mt-1">Lot: <span className="text-white">{trade.lot_size}</span></div>
+                                        <td className="px-4 py-4 text-center">
+                                            <div className={cn(
+                                                "text-[10px] font-black px-2 py-1 rounded inline-block",
+                                                trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-500'
+                                            )}>
+                                                {trade.type}
                                             </div>
                                         </td>
-                                        <td className="px-5 py-4 text-sm font-mono text-gray-300 transition-all duration-300">
-                                            <div>
-                                                <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-                                                    <span className="text-gray-500 text-[10px] uppercase">En:</span>
-                                                    <span className="text-white font-bold">{trade.entry_price?.toLocaleString()}</span>
-                                                </div>
-                                                <div className="flex items-baseline gap-1.5 mt-1 whitespace-nowrap">
-                                                    <span className="text-gray-500 text-[10px] uppercase">Ex:</span>
-                                                    <span className="text-gray-300">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                                {(trade.stop_loss || trade.take_profit) && (
-                                                    <div className="flex items-center gap-2 mt-1.5 text-[10px]">
-                                                        {trade.stop_loss && (
-                                                            <span className="text-red-400/70 flex items-center gap-0.5">
-                                                                <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span>
-                                                                SL: {trade.stop_loss?.toLocaleString()}
-                                                            </span>
-                                                        )}
-                                                        {trade.take_profit && (
-                                                            <span className="text-[#ccf381]/70 flex items-center gap-0.5">
-                                                                <span className="w-1 h-1 rounded-full bg-[#ccf381] inline-block"></span>
-                                                                TP: {trade.take_profit?.toLocaleString()}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <td className="px-4 py-4 text-center">
+                                            <div className="text-sm font-bold text-white">{trade.lot_size}</div>
                                         </td>
-                                        <td className="px-5 py-4 transition-all duration-300">
-                                            <div>
-                                                <div className={`text-xl font-black tracking-tight whitespace-nowrap ${Math.abs(Number(profit)) < 0.01 ? 'text-white' : Number(profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_5px_rgba(204,243,129,0.3)]' : 'text-red-500'}`}>
-                                                    {Math.abs(Number(profit)) < 0.01 ? `$0` : Number(profit) > 0 ? `+$${Number(profit).toLocaleString()}` : `$${Number(profit).toLocaleString()}`}
-                                                </div>
-                                                <div className={`text-xs font-bold mt-1 ${Math.abs(Number(points)) < 0.01 ? 'text-gray-400' : Number(points) > 0 ? 'text-[#ccf381]/70' : 'text-red-400/70'}`}>
-                                                    {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
-                                                </div>
-                                                {plannedRR && (
-                                                    <span className={`inline-block text-[9px] font-bold mt-1 px-1.5 py-0.5 rounded border ${
-                                                        Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/30 text-[#ccf381]' :
-                                                        Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
-                                                        'bg-red-500/10 border-red-500/30 text-red-400'
-                                                    }`}>
-                                                        RR 1:{plannedRR}
+                                        <td className="px-4 py-4">
+                                            <div className="text-sm font-bold text-white whitespace-nowrap">{trade.entry_price?.toLocaleString()}</div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="text-sm font-bold text-gray-300 whitespace-nowrap">{exitPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex flex-col gap-1 text-[11px] font-bold">
+                                                {trade.stop_loss && (
+                                                    <span className="text-red-400/80 flex items-center gap-1">
+                                                        <span className="w-1 h-1 rounded-full bg-red-500"></span>
+                                                        {trade.stop_loss?.toLocaleString()}
                                                     </span>
                                                 )}
+                                                {trade.take_profit && (
+                                                    <span className="text-[#ccf381]/80 flex items-center gap-1">
+                                                        <span className="w-1 h-1 rounded-full bg-[#ccf381]"></span>
+                                                        {trade.take_profit?.toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 text-right">
+                                            <div>
+                                                <div className={cn(
+                                                    "text-xl font-black tracking-tight",
+                                                    Math.abs(Number(profit)) < 0.01 ? 'text-white' : Number(profit) > 0 ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
+                                                )}>
+                                                    {Math.abs(Number(profit)) < 0.01 ? `$0` : Number(profit) > 0 ? `+$${Number(profit).toLocaleString()}` : `$${Number(profit).toLocaleString()}`}
+                                                </div>
+                                                <div className="flex items-center justify-end gap-2 mt-1">
+                                                    <span className={cn(
+                                                        "text-[11px] font-bold",
+                                                        Math.abs(Number(points)) < 0.01 ? 'text-gray-400' : Number(points) > 0 ? 'text-[#ccf381]/80' : 'text-red-400/70'
+                                                    )}>
+                                                        {Math.abs(Number(points)) < 0.01 ? '0 pts' : Number(points) > 0 ? `+${Number(points).toLocaleString()} pts` : `${Number(points).toLocaleString()} pts`}
+                                                    </span>
+                                                    {plannedRR && (
+                                                        <span className={cn(
+                                                            "text-[9px] font-black px-1.5 py-0.5 rounded border uppercase tracking-tighter",
+                                                            Number(plannedRR) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
+                                                            Number(plannedRR) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                                            'bg-red-500/10 border-red-500/20 text-red-400'
+                                                        )}>
+                                                            RR 1:{plannedRR}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         {/* Trade Detail Column */}
@@ -396,12 +405,12 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
 
 function DetailItem({ icon, label, value, valueClass }: { icon: React.ReactNode, label: string, value: string, valueClass?: string }) {
     return (
-        <div className="bg-[#0d0d0d] rounded-xl p-2.5 border border-white/5 flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 opacity-40">
+        <div className="bg-[#0d0d0d] rounded-xl p-4 border border-white/5 flex flex-col gap-2">
+            <div className="flex items-center gap-2 opacity-50">
                 {icon}
-                <p className="text-[9px] font-black uppercase tracking-wider">{label}</p>
+                <p className="text-[11px] font-black uppercase tracking-widest">{label}</p>
             </div>
-            <p className={cn("text-[11px] font-bold text-gray-200 truncate", valueClass)}>{value || '—'}</p>
+            <p className={cn("text-base font-bold text-white truncate", valueClass)}>{value || '—'}</p>
         </div>
     )
 }
