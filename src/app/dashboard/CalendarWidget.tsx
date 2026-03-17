@@ -155,7 +155,7 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                                 {stats && (
                                     <div className="flex flex-col w-full">
                                         <span className={cn("text-[10px] font-bold leading-tight", profitColor)}>
-                                            {stats.dailyProfit > 0 ? '+' : ''}{stats.dailyProfit}
+                                            {stats.dailyProfit > 0 ? '+' : ''}{new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(stats.dailyProfit)}
                                         </span>
                                     </div>
                                 )}
@@ -189,13 +189,13 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                                     <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
                                         <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPnl || 'Net P&L'}</p>
                                         <p className={cn("text-xl md:text-2xl font-black", selectedDayStats.dailyProfit >= 0 ? "text-[#ccf381]" : "text-red-400")}>
-                                            {selectedDayStats.dailyProfit >= 0 ? '+' : ''}${selectedDayStats.dailyProfit.toLocaleString()}
+                                            {selectedDayStats.dailyProfit >= 0 ? '+' : ''}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(selectedDayStats.dailyProfit)}
                                         </p>
                                     </div>
                                     <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
                                         <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase mb-1">{dict?.dashboard?.netPts || 'Net Points'}</p>
                                         <p className={cn("text-xl md:text-2xl font-black", selectedDayStats.dailyPoints >= 0 ? "text-[#ccf381]" : "text-red-400")}>
-                                            {selectedDayStats.dailyPoints >= 0 ? '+' : ''}{selectedDayStats.dailyPoints.toLocaleString()}
+                                            {selectedDayStats.dailyPoints >= 0 ? '+' : ''}{new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(selectedDayStats.dailyPoints)}
                                         </p>
                                     </div>
                                     <div className="bg-[#1a1a1a] rounded-xl p-4 border border-[#222]">
@@ -227,7 +227,7 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                                                 </div>
                                                 <div className="text-right">
                                                     <p className={cn("font-bold text-sm", (trade.profit || 0) >= 0 ? "text-[#ccf381]" : "text-red-400")}>
-                                                        {(trade.profit || 0) >= 0 ? '+' : ''}${(trade.profit || 0).toLocaleString()}
+                                                        {(trade.profit || 0) >= 0 ? '+' : ''}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(trade.profit || 0)}
                                                     </p>
                                                     <p className="text-xs text-gray-500">{trade.lot_size} {dict?.dashboard?.lots || 'Lots'}</p>
                                                 </div>

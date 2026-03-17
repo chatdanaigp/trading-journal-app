@@ -44,167 +44,167 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                 ) : (
                     <div className="max-h-[800px] overflow-y-auto custom-scrollbar overflow-x-hidden">
                         <table className="w-full text-left relative table-fixed">
-                        <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
-                            <tr>
-                                <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
-                                <th className="px-4 py-3 text-center w-[10%]">Side</th>
-                                <th className="px-4 py-3 text-center w-[10%]">Lot</th>
-                                <th className="px-4 py-2 text-center w-[10%]">Entry</th>
-                                <th className="px-4 py-2 text-center w-[10%]">Exit</th>
-                                <th className="px-4 py-2 text-center w-[10%]">P&L (Pts)</th>
-                                <th className="px-4 py-2 text-center w-[10%]">RR</th>
-                                <th className="px-5 py-3 text-center w-[10%]">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3 rounded-tr-xl w-[15%]"></th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#2a2a2a]">
-                            {[...trades].sort((a, b) => {
-                                const timeA = new Date(a.created_at || 0).getTime()
-                                const timeB = new Date(b.created_at || 0).getTime()
-                                if (timeA !== timeB) return timeB - timeA
-                                return (b.id || '').localeCompare(a.id || '')
-                            }).map((t) => {
-                                const profitValue = t.profit || 0
-                                const isProfit = profitValue > 0.01
-                                const isLoss = profitValue < -0.01
-                                const isBE = !isProfit && !isLoss
-                                
-                                const lot = t.lot_size || 0.01
-                                const pts = lot !== 0 ? Math.abs(Math.round(profitValue / lot)) : 0
-                                
-                                // Calculate RR: Actual Points / Planned SL Distance (Pts)
-                                // If stop_loss exists, risk is entry - sl.
-                                const entry = t.entry_price || 0
-                                const slPoints = t.stop_loss || 0
-                                
-                                let actualRRDisplay = "1:0"
-                                if (slPoints > 0) {
-                                    const rrValue = pts / slPoints
-                                     // Only show decimals if not a whole number
-                                     const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
-                                     actualRRDisplay = `1:${formattedRR}`
-                                 }
+                            <thead className="bg-[#2a2a2a] text-gray-400 text-[12px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
+                                <tr>
+                                    <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
+                                    <th className="px-4 py-3 text-center w-[8%]">Side</th>
+                                    <th className="px-4 py-3 text-center w-[8%]">Lot</th>
+                                    <th className="px-4 py-2 text-center w-[8%]">Entry</th>
+                                    <th className="px-4 py-2 text-center w-[8%]">Exit</th>
+                                    <th className="px-4 py-2 text-center w-[8%]">P&L (Pts)</th>
+                                    <th className="px-4 py-2 text-center w-[8%]">RR</th>
+                                    <th className="px-5 py-3 text-center w-[8%]">{dict?.dashboard?.result || "Result"}</th>
+                                    <th className="px-5 py-3 rounded-tr-xl w-[25%]"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#2a2a2a]">
+                                {[...trades].sort((a, b) => {
+                                    const timeA = new Date(a.created_at || 0).getTime()
+                                    const timeB = new Date(b.created_at || 0).getTime()
+                                    if (timeA !== timeB) return timeB - timeA
+                                    return (b.id || '').localeCompare(a.id || '')
+                                }).map((t) => {
+                                    const profitValue = t.profit || 0
+                                    const isProfit = profitValue > 0.01
+                                    const isLoss = profitValue < -0.01
+                                    const isBE = !isProfit && !isLoss
 
-                                const tDate = new Date(t.created_at || Date.now())
-                                const tradingDay = getTradingDay(t.created_at || Date.now())
-                                const dayOfWeek = tradingDay.getDay()
-                                let dayBorderColor = "border-l-transparent"
+                                    const lot = t.lot_size || 0.01
+                                    const pts = lot !== 0 ? Math.abs(Math.round(profitValue / lot)) : 0
 
-                                switch (dayOfWeek) {
-                                    case 1: dayBorderColor = "border-l-[4px] border-l-[#facc15]"; break
-                                    case 2: dayBorderColor = "border-l-[4px] border-l-[#f472b6]"; break
-                                    case 3: dayBorderColor = "border-l-[4px] border-l-[#4ade80]"; break
-                                    case 4: dayBorderColor = "border-l-[4px] border-l-[#fb923c]"; break
-                                    case 5: dayBorderColor = "border-l-[4px] border-l-[#60a5fa]"; break
-                                    default: dayBorderColor = "border-l-[4px] border-l-gray-600"
-                                }
+                                    // Calculate RR: Actual Points / Planned SL Distance (Pts)
+                                    // If stop_loss exists, risk is entry - sl.
+                                    const entry = t.entry_price || 0
+                                    const slPoints = t.stop_loss || 0
 
-                                return (
-                                    <tr key={t.id} className={cn("group hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-0 h-20", dayBorderColor)}>
-                                        <td className="px-5 py-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
-                                                    {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
+                                    let actualRRDisplay = "1:0"
+                                    if (slPoints > 0) {
+                                        const rrValue = pts / slPoints
+                                        // Only show decimals if not a whole number
+                                        const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
+                                        actualRRDisplay = `1:${formattedRR}`
+                                    }
+
+                                    const tDate = new Date(t.created_at || Date.now())
+                                    const tradingDay = getTradingDay(t.created_at || Date.now())
+                                    const dayOfWeek = tradingDay.getDay()
+                                    let dayBorderColor = "border-l-transparent"
+
+                                    switch (dayOfWeek) {
+                                        case 1: dayBorderColor = "border-l-[4px] border-l-[#facc15]"; break
+                                        case 2: dayBorderColor = "border-l-[4px] border-l-[#f472b6]"; break
+                                        case 3: dayBorderColor = "border-l-[4px] border-l-[#4ade80]"; break
+                                        case 4: dayBorderColor = "border-l-[4px] border-l-[#fb923c]"; break
+                                        case 5: dayBorderColor = "border-l-[4px] border-l-[#60a5fa]"; break
+                                        default: dayBorderColor = "border-l-[4px] border-l-gray-600"
+                                    }
+
+                                    return (
+                                        <tr key={t.id} className={cn("group hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-0 h-20", dayBorderColor)}>
+                                            <td className="px-5 py-3">
+                                                <div className="flex flex-col">
+                                                    <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                        {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className={cn(
-                                                "px-3 py-1.5 rounded-lg text-xs font-black tracking-widest",
-                                                t.type === 'BUY' ? "bg-[#ccf381]/10 text-[#ccf381] border border-[#ccf381]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
-                                            )}>
-                                                {t.type}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="text-white font-black text-sm">{t.lot_size}</span>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="text-white font-bold text-sm tracking-tight">{t.entry_price?.toLocaleString()}</span>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="text-white/70 font-medium text-sm tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            {t.profit !== undefined ? (
-                                                <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
-                                                    {!isBE && <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-[#ccf381]" : "bg-red-500")} />}
-                                                    <span className={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-500" : "text-white"}>
-                                                        {isBE ? "BE" : pts.toLocaleString()}
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-gray-600 text-xs">-</span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <div className={cn(
-                                                "inline-flex px-2 py-1 rounded border",
-                                                isProfit ? "bg-[#ccf381]/5 border-[#ccf381]/10" : "bg-red-500/5 border-red-500/10"
-                                            )}>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
                                                 <span className={cn(
-                                                    "text-xs font-black font-mono",
-                                                    isProfit ? "text-[#ccf381]/80" : "text-red-400/80"
-                                                )}>{actualRRDisplay}</span>
-                                            </div>
-                                        </td>
+                                                    "px-3 py-1.5 rounded-lg text-xs font-black tracking-widest",
+                                                    t.type === 'BUY' ? "bg-[#ccf381]/10 text-[#ccf381] border border-[#ccf381]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
+                                                )}>
+                                                    {t.type}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className="text-white font-black text-sm">{t.lot_size}</span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className="text-white font-bold text-sm tracking-tight">{t.entry_price?.toLocaleString()}</span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className="text-white/70 font-medium text-sm tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {t.profit !== undefined ? (
+                                                    <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
+                                                        {!isBE && <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-[#ccf381]" : "bg-red-500")} />}
+                                                        <span className={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-500" : "text-white"}>
+                                                            {isBE ? "BE" : pts.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-600 text-xs">-</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <div className={cn(
+                                                    "inline-flex px-2 py-1 rounded border",
+                                                    isProfit ? "bg-[#ccf381]/5 border-[#ccf381]/10" : "bg-red-500/5 border-red-500/10"
+                                                )}>
+                                                    <span className={cn(
+                                                        "text-xs font-black font-mono",
+                                                        isProfit ? "text-[#ccf381]/80" : "text-red-400/80"
+                                                    )}>{actualRRDisplay}</span>
+                                                </div>
+                                            </td>
                                             <td className="px-5 py-3 text-center">
                                                 <div className={cn(
                                                     "text-base font-black tracking-tight",
                                                     isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
                                                 )}>
-                                                    {isBE ? `$0` : isProfit ? `+$${profitValue.toLocaleString()}` : `$${profitValue.toLocaleString()}`}
+                                                    {isBE ? `$0` : isProfit ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}`}
                                                 </div>
                                             </td>
-                                        <td className="px-5 py-3 transition-all duration-300">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => setViewingTrade(t)}
-                                                    className="group/detail relative shrink-0"
-                                                >
-                                                    {t.screenshot_url ? (
-                                                        <div className="w-14 h-9 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
-                                                            <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="w-14 h-9 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
-                                                            <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
-                                                        </div>
-                                                    )}
-                                                </button>
-                                                <div className="flex items-center gap-1">
+                                            <td className="px-5 py-3 transition-all duration-300">
+                                                <div className="flex items-center justify-end gap-11.5">
                                                     <button
-                                                        onClick={() => setSharingTrade(t)}
-                                                        className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
-                                                        title="Share Trade Card"
+                                                        onClick={() => setViewingTrade(t)}
+                                                        className="group/detail relative shrink-0"
                                                     >
-                                                        <Share2 size={14} />
+                                                        {t.screenshot_url ? (
+                                                            <div className="w-24 h-14 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                                <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-24 h-14 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
+                                                                <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
+                                                            </div>
+                                                        )}
                                                     </button>
-                                                    <button
-                                                        onClick={() => setEditingTrade(t)}
-                                                        className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all"
-                                                        title="Edit Trade"
-                                                    >
-                                                        <Edit2 size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(t.id)}
-                                                        disabled={deletingId === t.id}
-                                                        className={`p-1.5 rounded-lg transition-all ${deletingId === t.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
-                                                        title="Delete Trade"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
+                                                    <div className="flex items-center gap-4">
+                                                        <button
+                                                            onClick={() => setSharingTrade(t)}
+                                                            className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
+                                                            title="Share Trade Card"
+                                                        >
+                                                            <Share2 size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingTrade(t)}
+                                                            className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all"
+                                                            title="Edit Trade"
+                                                        >
+                                                            <Edit2 size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(t.id)}
+                                                            disabled={deletingId === t.id}
+                                                            className={`p-1.5 rounded-lg transition-all ${deletingId === t.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
+                                                            title="Delete Trade"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </CardContent>
@@ -236,14 +236,14 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     const lot = t.lot_size || 0.01
                     const p = Math.round((t.profit || 0) * 100) / 100
                     const pts = lot !== 0 ? Math.abs(Math.round(p / lot)) : 0
-                    
+
                     const isProfit = p > 0.01
                     const isLoss = p < -0.01
                     const isBE = !isProfit && !isLoss
 
                     let actualRRDisplay = "1:0"
                     const slPoints = t.stop_loss || 0
-                    
+
                     if (slPoints > 0) {
                         const rrValue = pts / slPoints
                         const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
@@ -281,14 +281,14 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                     <div className={cn(
                                         "rounded-2xl p-5 border flex items-center justify-between",
                                         Math.abs(p) < 0.01 ? "bg-gray-500/5 border-gray-500/20" :
-                                        p > 0 ? "bg-[#ccf381]/5 border-[#ccf381]/20 shadow-[0_0_20px_rgba(204,243,129,0.05)]" : "bg-red-500/5 border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.05)]"
+                                            p > 0 ? "bg-[#ccf381]/5 border-[#ccf381]/20 shadow-[0_0_20px_rgba(204,243,129,0.05)]" : "bg-red-500/5 border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.05)]"
                                     )}>
                                         <div className="flex flex-col">
                                             <p className="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">P&L Result</p>
                                             <p className={cn("text-3xl font-black tracking-tight",
                                                 Math.abs(p) < 0.01 ? 'text-white' : p > 0 ? 'text-[#ccf381]' : 'text-red-400'
                                             )}>
-                                                {Math.abs(p) < 0.01 ? '$0' : p > 0 ? `+$${p.toLocaleString()}` : `$${p.toLocaleString()}`}
+                                                {Math.abs(p) < 0.01 ? '$0' : p > 0 ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}`}
                                             </p>
                                         </div>
                                         <div className="text-right">
@@ -297,10 +297,10 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                             )}>
                                                 {isProfit ? '+' : '-'}{pts.toLocaleString()} PTS
                                             </p>
-                                             <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
+                                            <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
                                                 slPoints > 0 && (pts / slPoints) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
-                                                slPoints > 0 && (pts / slPoints) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                                                'bg-red-500/10 border-red-500/20 text-red-400'
+                                                    slPoints > 0 && (pts / slPoints) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                                        'bg-red-500/10 border-red-500/20 text-red-400'
                                             )}>
                                                 RR {actualRRDisplay}
                                             </div>
@@ -354,7 +354,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                     className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer animate-in fade-in duration-300"
                     onClick={() => setViewingScreenshot(null)}
                 >
-                    <button 
+                    <button
                         className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
                         onClick={() => setViewingScreenshot(null)}
                     >
