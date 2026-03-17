@@ -51,15 +51,15 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 <table className="w-full text-left relative table-fixed">
                                     <thead className="bg-[#1a1a1a] text-gray-400 text-[12px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                                         <tr>
-                                            <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
-                                            <th className="px-4 py-3 text-center w-[10%]">Side</th>
-                                            <th className="px-4 py-3 text-center w-[10%]">Lot</th>
-                                            <th className="px-4 py-2 text-center w-[10%]">Entry</th>
-                                            <th className="px-4 py-2 text-center w-[10%]">Exit</th>
-                                            <th className="px-4 py-2 text-center w-[10%]">P&L (Pts)</th>
-                                            <th className="px-4 py-2 text-center w-[10%]">RR</th>
-                                            <th className="px-5 py-3 text-center w-[10%]">{dict?.dashboard?.result || "Result"}</th>
-                                            <th className="px-5 py-3 rounded-tr-xl w-[15%]"></th>
+                                            <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
+                                            <th className="px-4 py-3 text-center w-[9%]">Side</th>
+                                            <th className="px-4 py-3 text-center w-[8%]">Lot</th>
+                                            <th className="px-4 py-2 text-center w-[9%]">Entry</th>
+                                            <th className="px-4 py-2 text-center w-[9%]">Exit</th>
+                                            <th className="px-4 py-2 text-center w-[9%]">P&L (Pts)</th>
+                                            <th className="px-4 py-2 text-center w-[9%]">RR</th>
+                                            <th className="px-5 py-3 text-center w-[9%]">{dict?.dashboard?.result || "Result"}</th>
+                                            <th className="px-5 py-3 rounded-tr-xl w-[18%]"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
@@ -162,22 +162,22 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-3 transition-all duration-300">
-                                                        <div className="flex items-center justify-end gap-11.5">
+                                                        <div className="flex items-center justify-end gap-4">
                                                             <button
                                                                 onClick={() => setViewingTrade(t)}
                                                                 className="group/detail relative shrink-0"
                                                             >
                                                                 {t.screenshot_url ? (
-                                                                    <div className="w-24 h-14 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                                    <div className="w-20 h-12 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
                                                                         <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="w-24 h-14 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
+                                                                    <div className="w-20 h-12 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
                                                                         <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
                                                                     </div>
                                                                 )}
                                                             </button>
-                                                            <div className="flex items-center gap-4">
+                                                            <div className="flex items-center gap-2">
                                                                 <button
                                                                     onClick={() => setSharingTrade(t)}
                                                                     className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
