@@ -319,7 +319,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         <DetailItem icon={<Target size={12} />} label="Entry" value={t.entry_price?.toLocaleString()} />
                                         <DetailItem icon={<Zap size={12} />} label="Exit" value={t.exit_price?.toLocaleString() || '-'} />
                                         <DetailItem icon={isProfit ? <Target size={12} /> : isLoss ? <Shield size={12} /> : <TrendingUp size={12} />} label={isProfit ? "Take Profit" : isLoss ? "Stop Loss" : "Breakeven"} value={isBE ? "BE" : pts.toLocaleString()} valueClass={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-400" : "text-white"} />
-                                        <DetailItem icon={<Hash size={12} />} label="Actual RR" value={actualRRDisplay} valueClass={riskPts > 0 && (pts / riskPts) >= 1 ? "text-[#ccf381]" : isBE ? "text-white" : "text-red-400"} />
+                                        <DetailItem icon={<Hash size={12} />} label="Actual RR" value={actualRRDisplay} valueClass={slPoints > 0 && (pts / slPoints) >= 1 ? "text-[#ccf381]" : isBE ? "text-white" : "text-red-400"} />
                                     </div>
 
                                     {/* Notes (Compact inside right col) */}
