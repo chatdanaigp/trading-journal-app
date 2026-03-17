@@ -47,13 +47,13 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                         <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
                                 <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
-                                <th className="px-4 py-3 text-center w-[12%]">Side</th>
-                                <th className="px-4 py-3 text-center w-[8%]">Lot</th>
-                                <th className="px-4 py-2 w-[12%]">Entry</th>
-                                <th className="px-4 py-2 w-[12%]">Exit</th>
-                                <th className="px-4 py-2 w-[10%]">P&L (Pts)</th>
-                                <th className="px-4 py-2 text-center w-[10%]">RR</th>
-                                <th className="px-5 py-3 text-right w-[16%]">{dict?.dashboard?.result || "Result"}</th>
+                                <th className="px-4 py-3 text-center w-[11%]">Side</th>
+                                <th className="px-4 py-3 text-center w-[11%]">Lot</th>
+                                <th className="px-4 py-2 text-center w-[11%]">Entry</th>
+                                <th className="px-4 py-2 text-center w-[11%]">Exit</th>
+                                <th className="px-4 py-2 text-center w-[11%]">P&L (Pts)</th>
+                                <th className="px-4 py-2 text-center w-[11%]">RR</th>
+                                <th className="px-5 py-3 text-center w-[11%]">{dict?.dashboard?.result || "Result"}</th>
                                 <th className="px-5 py-3 rounded-tr-xl w-10"></th>
                             </tr>
                         </thead>
@@ -122,15 +122,15 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                         <td className="px-4 py-3 text-center">
                                             <span className="text-white font-black text-base">{t.lot_size}</span>
                                         </td>
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-3 text-center">
                                             <span className="text-white font-bold text-base tracking-tight">{t.entry_price?.toLocaleString()}</span>
                                         </td>
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-3 text-center">
                                             <span className="text-white/70 font-medium text-base tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
                                         </td>
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-3 text-center">
                                             {t.profit !== undefined ? (
-                                                <div className="flex items-center gap-1.5 font-bold text-sm">
+                                                <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
                                                     {!isBE && <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-[#ccf381]" : "bg-red-500")} />}
                                                     <span className={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-500" : "text-white"}>
                                                         {isBE ? "BE" : pts.toLocaleString()}
@@ -151,30 +151,30 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                 )}>{actualRRDisplay}</span>
                                             </div>
                                         </td>
-                                        <td className="px-5 py-3 text-right">
-                                            <div className="flex items-center justify-end gap-3">
-                                                <button
-                                                    onClick={() => setViewingTrade(t)}
-                                                    className="group/detail relative"
-                                                >
-                                                    {t.screenshot_url ? (
-                                                        <div className="w-14 h-9 rounded-lg overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
-                                                            <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="w-14 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
-                                                            <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
-                                                        </div>
-                                                    )}
-                                                </button>
-                                                <div className={cn(
-                                                    "text-lg font-black tracking-tight",
-                                                    isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
-                                                )}>
-                                                    {isBE ? `$0` : isProfit ? `+$${profitValue.toLocaleString()}` : `$${profitValue.toLocaleString()}`}
+                                            <td className="px-5 py-3 text-center">
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <button
+                                                        onClick={() => setViewingTrade(t)}
+                                                        className="group/detail relative shrink-0"
+                                                    >
+                                                        {t.screenshot_url ? (
+                                                            <div className="w-14 h-9 rounded-lg overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                                <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-14 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
+                                                                <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                    <div className={cn(
+                                                        "text-lg font-black tracking-tight",
+                                                        isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
+                                                    )}>
+                                                        {isBE ? `$0` : isProfit ? `+$${profitValue.toLocaleString()}` : `$${profitValue.toLocaleString()}`}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
                                         <td className="px-5 py-3 transition-all duration-300">
                                             <div className="flex items-center justify-end gap-1.5">
                                                 <button
