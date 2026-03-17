@@ -162,22 +162,34 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-3 transition-all duration-300">
-                                                        <div className="flex items-center justify-end gap-4">
+                                                        <div className="flex items-center justify-end gap-3 px-1">
                                                             <button
                                                                 onClick={() => setViewingTrade(t)}
                                                                 className="group/detail relative shrink-0"
                                                             >
-                                                                {t.screenshot_url ? (
-                                                                    <div className="w-20 h-12 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                                {/* Large Screen: Show Thumbnail */}
+                                                                <div className={cn(
+                                                                    "hidden xl:block overflow-hidden rounded border transition-colors relative",
+                                                                    t.screenshot_url ? "w-20 h-12 border-white/10 group-hover/detail:border-[#ccf381]/40" : "w-20 h-12 bg-white/5 border-white/10 group-hover/detail:bg-white/10"
+                                                                )}>
+                                                                    {t.screenshot_url ? (
                                                                         <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="w-20 h-12 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
-                                                                        <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
-                                                                    </div>
-                                                                )}
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center">
+                                                                            <Eye size={12} className="text-gray-500 group-hover/detail:text-white" />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Small Screen: Show Compact Icon Button */}
+                                                                <div className={cn(
+                                                                    "xl:hidden p-1.5 rounded-lg transition-all",
+                                                                    t.screenshot_url ? "bg-[#ccf381]/10 text-[#ccf381]/60 hover:text-[#ccf381] hover:bg-[#ccf381]/20" : "bg-white/5 text-gray-500 hover:text-white hover:bg-white/10"
+                                                                )}>
+                                                                    <ImageIcon size={14} />
+                                                                </div>
                                                             </button>
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-1.5">
                                                                 <button
                                                                     onClick={() => setSharingTrade(t)}
                                                                     className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
