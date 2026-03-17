@@ -448,14 +448,14 @@ export async function repairRecentTrades() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
 
-    // Fetch trades from the last 2 hours (approx period when auto-deduction was active)
-    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    // Fetch trades from the last 24 hours
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     
     const { data: trades, error } = await supabase
         .from('trades')
         .select('id, profit, lot_size, portfolio_id')
         .eq('user_id', user.id)
-        .gte('created_at', twoHoursAgo)
+        .gte('created_at', oneDayAgo)
 
     if (error) return { error: error.message }
     if (!trades || trades.length === 0) return { success: true, repaired: 0 }
@@ -473,6 +473,7 @@ export async function repairRecentTrades() {
         const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
         if (commission > 0) {
             const deduction = (trade.lot_size || 0) * commission
+            // We assume it was deducted once. Restoring it to Gross.
             const restoredProfit = (trade.profit || 0) + deduction
             
             await supabase
