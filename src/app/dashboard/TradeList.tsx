@@ -47,14 +47,14 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                         <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
                                 <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
-                                <th className="px-4 py-3 text-center w-[11%]">Side</th>
-                                <th className="px-4 py-3 text-center w-[11%]">Lot</th>
-                                <th className="px-4 py-2 text-center w-[11%]">Entry</th>
-                                <th className="px-4 py-2 text-center w-[11%]">Exit</th>
-                                <th className="px-4 py-2 text-center w-[11%]">P&L (Pts)</th>
-                                <th className="px-4 py-2 text-center w-[11%]">RR</th>
-                                <th className="px-5 py-3 text-center w-[11%]">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3 rounded-tr-xl w-10"></th>
+                                <th className="px-4 py-3 text-center w-[10%]">Side</th>
+                                <th className="px-4 py-3 text-center w-[10%]">Lot</th>
+                                <th className="px-4 py-2 text-center w-[10%]">Entry</th>
+                                <th className="px-4 py-2 text-center w-[10%]">Exit</th>
+                                <th className="px-4 py-2 text-center w-[10%]">P&L (Pts)</th>
+                                <th className="px-4 py-2 text-center w-[10%]">RR</th>
+                                <th className="px-5 py-3 text-center w-[10%]">{dict?.dashboard?.result || "Result"}</th>
+                                <th className="px-5 py-3 rounded-tr-xl w-[10%]"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
@@ -152,31 +152,29 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                             </div>
                                         </td>
                                             <td className="px-5 py-3 text-center">
-                                                <div className="flex items-center justify-center gap-3">
-                                                    <button
-                                                        onClick={() => setViewingTrade(t)}
-                                                        className="group/detail relative shrink-0"
-                                                    >
-                                                        {t.screenshot_url ? (
-                                                            <div className="w-14 h-9 rounded-lg overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
-                                                                <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
-                                                            </div>
-                                                        ) : (
-                                                            <div className="w-14 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
-                                                                <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
-                                                            </div>
-                                                        )}
-                                                    </button>
-                                                    <div className={cn(
-                                                        "text-lg font-black tracking-tight",
-                                                        isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
-                                                    )}>
-                                                        {isBE ? `$0` : isProfit ? `+$${profitValue.toLocaleString()}` : `$${profitValue.toLocaleString()}`}
-                                                    </div>
+                                                <div className={cn(
+                                                    "text-lg font-black tracking-tight",
+                                                    isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
+                                                )}>
+                                                    {isBE ? `$0` : isProfit ? `+$${profitValue.toLocaleString()}` : `$${profitValue.toLocaleString()}`}
                                                 </div>
                                             </td>
                                         <td className="px-5 py-3 transition-all duration-300">
                                             <div className="flex items-center justify-end gap-1.5">
+                                                <button
+                                                    onClick={() => setViewingTrade(t)}
+                                                    className="group/detail relative shrink-0"
+                                                >
+                                                    {t.screenshot_url ? (
+                                                        <div className="w-9 h-7 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                            <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-9 h-7 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
+                                                            <Eye size={12} className="text-gray-500 group-hover/detail:text-white" />
+                                                        </div>
+                                                    )}
+                                                </button>
                                                 <button
                                                     onClick={() => setSharingTrade(t)}
                                                     className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
