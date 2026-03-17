@@ -13,7 +13,6 @@ import { CheckCircle2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, I
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import { StrategyDropdown } from '@/components/ui/StrategyDropdown'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/utils/cn'
 
 export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, portfolioId = null }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number, portfolioId?: string | null }) {
     const [loading, setLoading] = useState(false)
@@ -35,7 +34,6 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
     const [sl, setSl] = useState('')
     const [tp, setTp] = useState('')
     const [strategy, setStrategy] = useState('')
-    const [commissionPerLot, setCommissionPerLot] = useState('')
     const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -73,17 +71,6 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
         }
     }
 
-    const calculateNetProfit = () => {
-        const gross = parseFloat(profitAmount) || 0
-        const cpl = parseFloat(commissionPerLot) || 0
-        const lSize = parseFloat(lot) || 0
-        const sign = profitSign === '-' ? -1 : 1
-        const net = (gross * sign) - (cpl * lSize)
-        return net
-    }
-
-    const netProfit = calculateNetProfit()
-
     async function handleSubmit(formData: FormData) {
         setLoading(true)
         setMessage(null)
@@ -95,10 +82,6 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
             formData.append('exactCreatedAt', exactDate.toISOString());
         }
 
-        // Apply Commission to Profit
-        const finalNetProfit = calculateNetProfit()
-        formData.set('profit', finalNetProfit.toString())
-
         try {
             const result = await createTrade(formData)
             if (result?.success) {
@@ -109,7 +92,7 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                 mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
                 setSymbol('XAUUSD')
                 setTradeDate(new Date().toISOString().split('T')[0])
-                setEntry(''); setExit(''); setLot(''); setProfitAmount(''); setProfitSign('+'); setPoints(null); setSl(''); setTp(''); setStrategy(''); setCommissionPerLot(''); setScreenshotFile(null); setScreenshotPreview(null);
+                setEntry(''); setExit(''); setLot(''); setProfitAmount(''); setProfitSign('+'); setPoints(null); setSl(''); setTp(''); setStrategy(''); setScreenshotFile(null); setScreenshotPreview(null);
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
             }
@@ -189,14 +172,6 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                                         <input type="hidden" name="profit" value={actualProfit} />
                                     </div>
                                 </div>
-                                {!isNaN(parseFloat(profitAmount)) && parseFloat(commissionPerLot) > 0 && (
-                                    <div className="mt-2 px-1 flex justify-between items-center">
-                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Net Profit (After Fee)</span>
-                                        <span className={cn("text-xs font-black", netProfit >= 0 ? "text-[#ccf381]" : "text-red-400")}>
-                                            {netProfit >= 0 ? '+' : '-'}${Math.abs(netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </span>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -233,16 +208,12 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                              )}
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-4 items-start">
-                            <div className="flex-[1] grid gap-2 w-full md:w-auto">
-                                <Label htmlFor="commission" className="text-gray-400 text-xs">Broker Commission ($ / Lot)</Label>
-                                <Input id="commission" type="number" step="0.01" min="0" placeholder="7.00" className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl" value={commissionPerLot} onChange={(e) => setCommissionPerLot(e.target.value)} />
-                            </div>
-                            <div className="flex-[2] grid gap-2 w-full md:w-auto">
+                        <div className="flex flex-col md:flex-row gap-4 items-end">
+                            <div className="flex-grow grid gap-2">
                                 <Label htmlFor="notes" className="text-gray-400 text-xs">Notes</Label>
                                 <Input id="notes" name="notes" placeholder="Trade rationale..." className="bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-11 rounded-xl" />
                             </div>
-                            <Button type="submit" disabled={loading} className="w-full md:w-auto mt-6 bg-[#ccf381] hover:bg-[#bbe075] text-black font-extrabold h-11 px-8 rounded-xl shrink-0">
+                            <Button type="submit" disabled={loading} className="w-full md:w-auto bg-[#ccf381] hover:bg-[#bbe075] text-black font-extrabold h-11 px-8 rounded-xl">
                                 {loading ? 'Logging...' : '+ Add Trade'}
                             </Button>
                         </div>

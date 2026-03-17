@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 
-export function GoalSettings({ initialPortSize, initialGoalPercent, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, portfolioId?: string | null, dict?: any }) {
+export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, portfolioId?: string | null, dict?: any }) {
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
+    const [commissionPerLot, setCommissionPerLot] = useState<number | string>(initialCommissionPerLot || 0)
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
 
@@ -19,10 +20,10 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, portfolioId,
         setIsLoading(true)
         if (portfolioId) {
             // Save per-portfolio goals
-            await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent)
+            await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0)
         } else {
             // Fallback: save to profile (global)
-            await updateProfileGoals(validPortSize, validGoalPercent)
+            await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0)
         }
         setIsLoading(false)
         setIsOpen(false)
@@ -89,6 +90,20 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, portfolioId,
                         type="number"
                         value={goalPercent}
                         onChange={(e) => setGoalPercent(e.target.value === '' ? '' : Number(e.target.value))}
+                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                    />
+                </div>
+                <div className="space-y-1.5 col-span-2">
+                    <Label htmlFor="commission-per-lot" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" /> Commission / Lot
+                    </Label>
+                    <Input
+                        id="commission-per-lot"
+                        type="number"
+                        step="0.01"
+                        value={commissionPerLot}
+                        onChange={(e) => setCommissionPerLot(e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder="7.00"
                         className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>

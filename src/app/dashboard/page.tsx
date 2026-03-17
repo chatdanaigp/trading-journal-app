@@ -185,7 +185,14 @@ export default function DashboardPage() {
                 </StaggerItem>
 
                 <StaggerItem className="col-span-12 lg:col-span-8 h-full">
-                    <ProfitTree netProfit={Number(stats.netProfit)} portSize={Number(portSize)} goalPercent={Number(goalPercent)} portfolioId={portfolioId} dict={dict} />
+                    <ProfitTree 
+                        netProfit={Number(stats.netProfit)} 
+                        portSize={Number(portSize)} 
+                        goalPercent={Number(goalPercent)} 
+                        commissionPerLot={data.commissionPerLot}
+                        portfolioId={portfolioId} 
+                        dict={dict} 
+                    />
                 </StaggerItem>
             </div>
 

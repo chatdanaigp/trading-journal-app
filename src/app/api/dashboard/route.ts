@@ -65,7 +65,7 @@ export async function GET(request: Request) {
     // Fetch profile
     const { data: profile } = await supabase
         .from('profiles')
-        .select('username, port_size, profit_goal_percent, is_portfolio_quest_active')
+        .select('username, port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot')
         .eq('id', user.id)
         .single()
 
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     if (portfolioId && portfolioId !== 'null') {
         const { data: portfolio } = await supabase
             .from('portfolios')
-            .select('port_size, profit_goal_percent')
+            .select('port_size, profit_goal_percent, commission_per_lot')
             .eq('id', portfolioId)
             .eq('user_id', user.id)
             .single()
@@ -175,5 +175,6 @@ export async function GET(request: Request) {
         isQuestActive,
         portSize,
         goalPercent,
+        commissionPerLot: (portfolioId && portfolioId !== 'null') ? (portfolioGoals as any)?.commission_per_lot : (profile?.commission_per_lot || 0)
     })
 }

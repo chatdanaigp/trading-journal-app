@@ -35,6 +35,7 @@ export async function createTrade(formData: FormData) {
     const stopLoss = formData.get('stopLoss')
     const takeProfit = formData.get('takeProfit')
     const strategy = formData.get('strategy') as string
+    const commissionPerLot = formData.get('commissionPerLot') // This is usually null now but keeping for safety
 
     let screenshotUrl = null
 
@@ -94,6 +95,35 @@ export async function createTrade(formData: FormData) {
         }
     }
 
+    // NEW: Auto-deduct commission based on portfolio settings
+    let finalProfit = profit ? Number(profit) : null
+    if (finalProfit !== null && finalPortfolioId) {
+        const { data: portData } = await supabase
+            .from('portfolios')
+            .select('commission_per_lot')
+            .eq('id', finalPortfolioId)
+            .single()
+        
+        const commPerLot = portData?.commission_per_lot || 0
+        if (commPerLot > 0) {
+            const totalComm = Number(lotSize) * commPerLot
+            finalProfit = finalProfit - totalComm
+        }
+    } else if (finalProfit !== null) {
+        // Fallback to profile setting if no portfolio
+        const { data: profData } = await supabase
+            .from('profiles')
+            .select('commission_per_lot')
+            .eq('id', user.id)
+            .single()
+        
+        const commPerLot = profData?.commission_per_lot || 0
+        if (commPerLot > 0) {
+            const totalComm = Number(lotSize) * commPerLot
+            finalProfit = finalProfit - totalComm
+        }
+    }
+
     const { error } = await supabase.from('trades').insert({
         user_id: user.id,
         symbol: symbol.toUpperCase(),
@@ -101,7 +131,7 @@ export async function createTrade(formData: FormData) {
         lot_size: Number(lotSize),
         entry_price: Number(entryPrice),
         exit_price: exitPrice ? Number(exitPrice) : null,
-        profit: profit ? Number(profit) : null,
+        profit: finalProfit,
         notes: notes,
         screenshot_url: screenshotUrl,
         created_at: createdAt,
@@ -382,19 +412,19 @@ export async function getProfileGoals() {
 
     const { data, error } = await supabase
         .from('profiles')
-        .select('port_size, profit_goal_percent, is_portfolio_quest_active')
+        .select('port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot')
         .eq('id', user.id)
         .single()
 
     if (error) {
         console.error('Error fetching profile goals:', error)
-        return { port_size: 1000, profit_goal_percent: 10, is_portfolio_quest_active: false } // Default fallback
+        return { port_size: 1000, profit_goal_percent: 10, is_portfolio_quest_active: false, commission_per_lot: 0 } // Default fallback
     }
 
     return data
 }
 
-export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean) {
+export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean, commissionPerLot?: number) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -402,7 +432,8 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
 
     const updateData: any = {
         port_size: portSize,
-        profit_goal_percent: profitGoalPercent
+        profit_goal_percent: profitGoalPercent,
+        commission_per_lot: commissionPerLot || 0
     }
 
     if (isQuestActive !== undefined) {
@@ -420,7 +451,7 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
     return { success: true }
 }
 
-export async function updatePortfolioGoals(portfolioId: string, portSize: number, profitGoalPercent: number) {
+export async function updatePortfolioGoals(portfolioId: string, portSize: number, profitGoalPercent: number, commissionPerLot?: number) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -431,6 +462,7 @@ export async function updatePortfolioGoals(portfolioId: string, portSize: number
         .update({
             port_size: portSize,
             profit_goal_percent: profitGoalPercent,
+            commission_per_lot: commissionPerLot || 0,
         })
         .eq('id', portfolioId)
         .eq('user_id', user.id)
