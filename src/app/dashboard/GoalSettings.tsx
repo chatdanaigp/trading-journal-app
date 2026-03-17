@@ -1,12 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { updateProfileGoals, updatePortfolioGoals } from './actions'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
+import { useSWRConfig } from 'swr'
 
 export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, portfolioId?: string | null, dict?: any }) {
+    const { mutate } = useSWRConfig()
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [commissionPerLot, setCommissionPerLot] = useState<number | string>(initialCommissionPerLot || 0)
@@ -18,15 +15,24 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
 
     const handleSave = async () => {
         setIsLoading(true)
-        if (portfolioId) {
-            // Save per-portfolio goals
-            await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0)
-        } else {
-            // Fallback: save to profile (global)
-            await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0)
+        try {
+            if (portfolioId) {
+                // Save per-portfolio goals
+                await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0)
+            } else {
+                // Fallback: save to profile (global)
+                await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0)
+            }
+            
+            // Real-time update: Refresh all API routes
+            await mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+            
+            setIsOpen(false)
+        } catch (error) {
+            console.error('Failed to save goals:', error)
+        } finally {
+            setIsLoading(false)
         }
-        setIsLoading(false)
-        setIsOpen(false)
     }
 
     if (!isOpen) {
