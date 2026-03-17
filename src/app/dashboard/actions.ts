@@ -95,46 +95,6 @@ export async function createTrade(formData: FormData) {
         }
     }
 
-    // NEW: Auto-deduct commission based on portfolio settings (Portfolio > Profile fallback)
-    let finalProfit = profit ? Number(profit) : null
-    if (finalProfit !== null) {
-        try {
-            let commPerLot = 0
-            
-            // 1. Check portfolio-specific commission first
-            if (finalPortfolioId) {
-                const { data: portData } = await supabase
-                    .from('portfolios')
-                    .select('commission_per_lot')
-                    .eq('id', finalPortfolioId)
-                    .single()
-                commPerLot = portData?.commission_per_lot || 0
-            }
-
-            // 2. Fallback to profile setting if portfolio has 0 or no portfolio
-            if (commPerLot === 0) {
-                const { data: profData } = await supabase
-                    .from('profiles')
-                    .select('commission_per_lot')
-                    .eq('id', user.id)
-                    .single()
-                commPerLot = profData?.commission_per_lot || 0
-            }
-
-            if (commPerLot > 0) {
-                const lotNum = Number(lotSize)
-                if (!isNaN(lotNum)) {
-                    const totalComm = lotNum * commPerLot
-                    finalProfit = finalProfit - totalComm
-                    console.log(`Deducted commission: ${totalComm} (Net: ${finalProfit})`)
-                }
-            }
-        } catch (commError) {
-            console.error('Commission calculation error (Did you run the SQL migration?):', commError)
-            // Continue with raw profit if calculation fails
-        }
-    }
-
     const { error } = await supabase.from('trades').insert({
         user_id: user.id,
         symbol: symbol.toUpperCase(),
@@ -142,7 +102,7 @@ export async function createTrade(formData: FormData) {
         lot_size: Number(lotSize),
         entry_price: Number(entryPrice),
         exit_price: exitPrice ? Number(exitPrice) : null,
-        profit: finalProfit,
+        profit: profit ? Number(profit) : null,
         notes: notes,
         screenshot_url: screenshotUrl,
         created_at: createdAt,
@@ -482,4 +442,47 @@ export async function updatePortfolioGoals(portfolioId: string, portSize: number
 
     revalidatePath('/', 'layout')
     return { success: true }
+}
+export async function repairRecentTrades() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Not authenticated' }
+
+    // Fetch trades from the last 2 hours (approx period when auto-deduction was active)
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    
+    const { data: trades, error } = await supabase
+        .from('trades')
+        .select('id, profit, lot_size, portfolio_id')
+        .eq('user_id', user.id)
+        .gte('created_at', twoHoursAgo)
+
+    if (error) return { error: error.message }
+    if (!trades || trades.length === 0) return { success: true, repaired: 0 }
+
+    // Fetch settings to know what was deducted
+    const { data: profile } = await supabase.from('profiles').select('commission_per_lot').eq('id', user.id).single()
+    const { data: portfolios } = await supabase.from('portfolios').select('id, commission_per_lot').eq('user_id', user.id)
+
+    const commissionMap = new Map<string | null, number>()
+    commissionMap.set(null, (profile as any)?.commission_per_lot || 0)
+    portfolios?.forEach(p => commissionMap.set(p.id, p.commission_per_lot || (profile as any)?.commission_per_lot || 0))
+
+    let repairedCount = 0
+    for (const trade of trades) {
+        const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
+        if (commission > 0) {
+            const deduction = (trade.lot_size || 0) * commission
+            const restoredProfit = (trade.profit || 0) + deduction
+            
+            await supabase
+                .from('trades')
+                .update({ profit: restoredProfit })
+                .eq('id', trade.id)
+            repairedCount++
+        }
+    }
+
+    revalidatePath('/', 'layout')
+    return { success: true, repaired: repairedCount }
 }

@@ -62,26 +62,24 @@ export async function GET(request: Request) {
         .order('id', { ascending: false })
         .limit(500)
 
-    // Fetch profile
+    // Fetch profile and all portfolios to get commission settings
     const { data: profile } = await supabase
         .from('profiles')
         .select('username, port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot')
         .eq('id', user.id)
         .single()
 
-    // Fetch portfolio-specific goals if a portfolio is selected
-    let portfolioGoals: { port_size: number; profit_goal_percent: number } | null = null
-    if (portfolioId && portfolioId !== 'null') {
-        const { data: portfolio } = await supabase
-            .from('portfolios')
-            .select('port_size, profit_goal_percent, commission_per_lot')
-            .eq('id', portfolioId)
-            .eq('user_id', user.id)
-            .single()
-        if (portfolio) {
-            portfolioGoals = portfolio
-        }
-    }
+    const { data: portfolios } = await supabase
+        .from('portfolios')
+        .select('id, commission_per_lot')
+        .eq('user_id', user.id)
+
+    // Create a map for quick commission lookup
+    const commissionMap = new Map<string | null, number>()
+    commissionMap.set(null, profile?.commission_per_lot || 0)
+    portfolios?.forEach(p => {
+        commissionMap.set(p.id, p.commission_per_lot || profile?.commission_per_lot || 0)
+    })
 
     const username = (user.user_metadata?.full_name as string)
         || (user.user_metadata?.name as string)
@@ -89,8 +87,13 @@ export async function GET(request: Request) {
         || user.email?.split('@')[0]
         || 'Trader'
 
-    // Calculate stats from trades
-    const tradeList = trades || []
+    // Calculate stats from trades with dynamic commission
+    const tradeList = (trades || []).map((t: any) => {
+        const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
+        const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
+        return { ...t, raw_profit: t.profit, profit: netProfit, commission_applied: commission }
+    })
+
     const totalTrades = tradeList.length
     const winTrades = tradeList.filter((t: any) => (t.profit || 0) > 0).length
     const totalProfit = tradeList.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
@@ -123,8 +126,9 @@ export async function GET(request: Request) {
     }
 
     // Goals: prefer portfolio-specific, fallback to profile
-    const portSize = (portfolioGoals?.port_size && portfolioGoals.port_size > 0) ? portfolioGoals.port_size : (profile?.port_size || 0)
-    const goalPercent = (portfolioGoals?.profit_goal_percent && portfolioGoals.profit_goal_percent > 0) ? portfolioGoals.profit_goal_percent : (profile?.profit_goal_percent || 10)
+    const portfolioGoals = portfolioId && portfolioId !== 'null' ? portfolios?.find(p => p.id === portfolioId) : null
+    const portSize = (profile?.port_size || 0)
+    const goalPercent = (profile?.profit_goal_percent || 10)
     const isQuestActive = profile?.is_portfolio_quest_active || false
     
     // Evaluate pure localized strings for exact matching to bypass Vercel UTC shifts
@@ -175,6 +179,6 @@ export async function GET(request: Request) {
         isQuestActive,
         portSize,
         goalPercent,
-        commissionPerLot: (portfolioId && portfolioId !== 'null') ? (portfolioGoals as any)?.commission_per_lot : (profile?.commission_per_lot || 0)
+        commissionPerLot: commissionMap.get(portfolioId) || commissionMap.get(null) || 0
     })
 }

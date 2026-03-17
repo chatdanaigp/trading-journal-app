@@ -34,12 +34,24 @@ export async function GET(request: Request) {
         .order('id', { ascending: false })
         .limit(1000)
 
-    // Fetch profile
+    // Fetch profile and all portfolios to get commission settings
     const { data: profile } = await supabase
         .from('profiles')
-        .select('username')
+        .select('username, commission_per_lot')
         .eq('id', user.id)
         .single()
+
+    const { data: portfolios } = await supabase
+        .from('portfolios')
+        .select('id, commission_per_lot')
+        .eq('user_id', user.id)
+
+    // Create a map for quick commission lookup
+    const commissionMap = new Map<string | null, number>()
+    commissionMap.set(null, (profile as any)?.commission_per_lot || 0)
+    portfolios?.forEach(p => {
+        commissionMap.set(p.id, p.commission_per_lot || (profile as any)?.commission_per_lot || 0)
+    })
 
     const username = (user.user_metadata?.full_name as string)
         || (user.user_metadata?.name as string)
@@ -47,8 +59,15 @@ export async function GET(request: Request) {
         || user.email?.split('@')[0]
         || 'Trader'
 
+    // Calculate dynamic net profit
+    const tradeList = (trades || []).map((t: any) => {
+        const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
+        const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
+        return { ...t, raw_profit: t.profit, profit: netProfit, commission_applied: commission }
+    })
+
     return NextResponse.json({
-        trades: trades || [],
+        trades: tradeList,
         username,
     })
 }

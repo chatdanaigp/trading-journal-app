@@ -115,22 +115,47 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
+    // Fetch profile and portfolios for commission settings
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('commission_per_lot')
+        .eq('id', user.id)
+        .single()
+    
+    const { data: portfolios } = await supabase
+        .from('portfolios')
+        .select('id, commission_per_lot')
+        .eq('user_id', user.id)
+
+    const commissionMap = new Map<string | null, number>()
+    commissionMap.set(null, profile?.commission_per_lot || 0)
+    portfolios?.forEach(p => {
+        commissionMap.set(p.id, p.commission_per_lot || profile?.commission_per_lot || 0)
+    })
+
     // Filter trades using robust UTC-safe THAI strings (YYYY-MM and YYYY)
     const todayStr = getTradingDayStr(new Date()) 
     const currentMonthPrefix = todayStr.substring(0, 7) // "YYYY-MM"
     const currentYearPrefix = todayStr.substring(0, 4) // "YYYY"
 
     // Fetch all trades once
-    const { data: allTrades, error } = await supabase
+    const { data: allTradesRaw, error } = await supabase
         .from('trades')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
 
-    if (error || !allTrades) {
+    if (error || !allTradesRaw) {
         const emptyData = { stats: { netProfit: 0, winRate: 0, profitFactor: 0, maxDrawdown: 0, totalTrades: 0, avgWin: 0, avgLoss: 0, expectancy: 0 }, equityCurve: [], assetPerformance: [], winRateDistribution: [] }
         return NextResponse.json({ monthlyData: emptyData, yearlyData: emptyData })
     }
+
+    // Apply dynamic commission
+    const allTrades = allTradesRaw.map(t => {
+        const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
+        const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
+        return { ...t, profit: netProfit }
+    })
 
     const monthlyTrades = allTrades.filter(t => getTradingDayStr(t.created_at).startsWith(currentMonthPrefix))
     const yearlyTrades = allTrades.filter(t => getTradingDayStr(t.created_at).startsWith(currentYearPrefix))
