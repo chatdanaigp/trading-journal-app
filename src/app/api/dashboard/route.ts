@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
     const { data: portfolios } = await supabase
         .from('portfolios')
-        .select('id, commission_per_lot')
+        .select('id, name, port_size, profit_goal_percent, commission_per_lot')
         .eq('user_id', user.id)
 
     // Create a map for quick commission lookup
@@ -127,8 +127,8 @@ export async function GET(request: Request) {
 
     // Goals: prefer portfolio-specific, fallback to profile
     const portfolioGoals = portfolioId && portfolioId !== 'null' ? portfolios?.find(p => p.id === portfolioId) : null
-    const portSize = (profile?.port_size || 0)
-    const goalPercent = (profile?.profit_goal_percent || 10)
+    const portSize = (portfolioGoals?.port_size && (portfolioGoals as any).port_size > 0) ? (portfolioGoals as any).port_size : (profile?.port_size || 0)
+    const goalPercent = (portfolioGoals?.profit_goal_percent && (portfolioGoals as any).profit_goal_percent > 0) ? (portfolioGoals as any).profit_goal_percent : (profile?.profit_goal_percent || 10)
     const isQuestActive = profile?.is_portfolio_quest_active || false
     
     // Evaluate pure localized strings for exact matching to bypass Vercel UTC shifts
