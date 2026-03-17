@@ -1,5 +1,8 @@
-'use client'
-
+import { useState } from 'react'
+import { updateProfileGoals, updatePortfolioGoals } from './actions'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
 
 export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, portfolioId?: string | null, dict?: any }) {
