@@ -41,14 +41,10 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
     const STRATEGY_PRESETS = ['Breakout', 'Reversal', 'Trend', 'Scalping', 'News', 'Range', 'FVG', 'OB', 'BOS', 'CHoCH', 'Liquidity', 'SMC', 'S/D', 'EMA', 'Fibonacci', 'Divergence', 'VBP', 'VWAP', 'Other']
 
     const computeRR = () => {
-        const entryVal = parseFloat(entry)
         const slVal = parseFloat(sl)
         const tpVal = parseFloat(tp)
-        if (isNaN(entryVal) || isNaN(slVal) || isNaN(tpVal)) return null
-        const risk = Math.abs(entryVal - slVal)
-        const reward = Math.abs(tpVal - entryVal)
-        if (risk === 0) return null
-        return (reward / risk).toFixed(1)
+        if (isNaN(slVal) || isNaN(tpVal) || slVal === 0) return null
+        return (tpVal / slVal).toFixed(1)
     }
     const plannedRR = computeRR()
     const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''

@@ -46,7 +46,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                         <table className="w-full text-left relative table-fixed">
                         <thead className="bg-[#2a2a2a] text-gray-400 text-[10px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                             <tr>
-                                <th className="px-5 py-3 rounded-tl-xl w-[20%]">{dict?.dashboard?.asset || "Asset"}</th>
+                                <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
                                 <th className="px-4 py-3 text-center w-[10%]">Side</th>
                                 <th className="px-4 py-3 text-center w-[10%]">Lot</th>
                                 <th className="px-4 py-2 text-center w-[10%]">Entry</th>
@@ -54,7 +54,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                 <th className="px-4 py-2 text-center w-[10%]">P&L (Pts)</th>
                                 <th className="px-4 py-2 text-center w-[10%]">RR</th>
                                 <th className="px-5 py-3 text-center w-[10%]">{dict?.dashboard?.result || "Result"}</th>
-                                <th className="px-5 py-3 rounded-tr-xl w-[10%]"></th>
+                                <th className="px-5 py-3 rounded-tr-xl w-[15%]"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
@@ -297,9 +297,9 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                             )}>
                                                 {isProfit ? '+' : '-'}{pts.toLocaleString()} PTS
                                             </p>
-                                            <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
-                                                riskPts > 0 && (pts / riskPts) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
-                                                riskPts > 0 && (pts / riskPts) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                             <div className={cn("mt-1 text-[10px] font-black px-2 py-0.5 rounded-full border inline-block uppercase tracking-tighter",
+                                                slPoints > 0 && (pts / slPoints) >= 2 ? 'bg-[#ccf381]/10 border-[#ccf381]/20 text-[#ccf381]' :
+                                                slPoints > 0 && (pts / slPoints) >= 1 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
                                                 'bg-red-500/10 border-red-500/20 text-red-400'
                                             )}>
                                                 RR {actualRRDisplay}

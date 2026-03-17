@@ -50,14 +50,10 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
     // Compute Planned Risk:Reward Ratio
     const computeRR = () => {
-        const entryVal = parseFloat(String(entry))
         const slVal = parseFloat(String(sl))
         const tpVal = parseFloat(String(tp))
-        if (isNaN(entryVal) || isNaN(slVal) || isNaN(tpVal)) return null
-        const risk = Math.abs(entryVal - slVal)
-        const reward = Math.abs(tpVal - entryVal)
-        if (risk === 0) return null
-        return (reward / risk).toFixed(1)
+        if (isNaN(slVal) || isNaN(tpVal) || slVal === 0) return null
+        return (tpVal / slVal).toFixed(1)
     }
     const plannedRR = computeRR()
 
