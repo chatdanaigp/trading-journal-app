@@ -31,183 +31,188 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
 
     return (
         <>
-            {!hideHeader && (
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-white">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
-                    <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
-                </div>
-            )}
+            <Card className="relative overflow-hidden border-0 shadow-2xl h-full flex flex-col bg-[#0d0d0d]">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#050505] z-0" />
+                <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
+                
+                <CardContent className="p-6 relative z-10 flex flex-col h-full">
+                    {!hideHeader && (
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
+                            <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
+                        </div>
+                    )}
 
-            <CardContent className="p-0">
-                {trades.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
-                ) : (
-                    <div className="max-h-[800px] overflow-y-auto custom-scrollbar overflow-x-hidden">
-                        <table className="w-full text-left relative table-fixed">
-                            <thead className="bg-[#2a2a2a] text-gray-400 text-[12px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
-                                <tr>
-                                    <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
-                                    <th className="px-4 py-3 text-center w-[8%]">Side</th>
-                                    <th className="px-4 py-3 text-center w-[8%]">Lot</th>
-                                    <th className="px-4 py-2 text-center w-[8%]">Entry</th>
-                                    <th className="px-4 py-2 text-center w-[8%]">Exit</th>
-                                    <th className="px-4 py-2 text-center w-[8%]">P&L (Pts)</th>
-                                    <th className="px-4 py-2 text-center w-[8%]">RR</th>
-                                    <th className="px-5 py-3 text-center w-[8%]">{dict?.dashboard?.result || "Result"}</th>
-                                    <th className="px-5 py-3 rounded-tr-xl w-[25%]"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#2a2a2a]">
-                                {[...trades].sort((a, b) => {
-                                    const timeA = new Date(a.created_at || 0).getTime()
-                                    const timeB = new Date(b.created_at || 0).getTime()
-                                    if (timeA !== timeB) return timeB - timeA
-                                    return (b.id || '').localeCompare(a.id || '')
-                                }).map((t) => {
-                                    const profitValue = t.profit || 0
-                                    const isProfit = profitValue > 0.01
-                                    const isLoss = profitValue < -0.01
-                                    const isBE = !isProfit && !isLoss
+                    <div className="p-0">
+                        {trades.length === 0 ? (
+                            <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
+                        ) : (
+                            <div className="max-h-[800px] overflow-y-auto custom-scrollbar overflow-x-hidden rounded-xl border border-white/5 bg-black/20">
+                                <table className="w-full text-left relative table-fixed">
+                                    <thead className="bg-[#1a1a1a] text-gray-400 text-[12px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
+                                        <tr>
+                                            <th className="px-5 py-3 rounded-tl-xl w-[15%]">{dict?.dashboard?.asset || "Asset"}</th>
+                                            <th className="px-4 py-3 text-center w-[10%]">Side</th>
+                                            <th className="px-4 py-3 text-center w-[10%]">Lot</th>
+                                            <th className="px-4 py-2 text-center w-[10%]">Entry</th>
+                                            <th className="px-4 py-2 text-center w-[10%]">Exit</th>
+                                            <th className="px-4 py-2 text-center w-[10%]">P&L (Pts)</th>
+                                            <th className="px-4 py-2 text-center w-[10%]">RR</th>
+                                            <th className="px-5 py-3 text-center w-[10%]">{dict?.dashboard?.result || "Result"}</th>
+                                            <th className="px-5 py-3 rounded-tr-xl w-[15%]"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {[...trades].sort((a, b) => {
+                                            const timeA = new Date(a.created_at || 0).getTime()
+                                            const timeB = new Date(b.created_at || 0).getTime()
+                                            if (timeA !== timeB) return timeB - timeA
+                                            return (b.id || '').localeCompare(a.id || '')
+                                        }).map((t) => {
+                                            const profitValue = t.profit || 0
+                                            const isProfit = profitValue > 0.01
+                                            const isLoss = profitValue < -0.01
+                                            const isBE = !isProfit && !isLoss
 
-                                    const lot = t.lot_size || 0.01
-                                    const pts = lot !== 0 ? Math.abs(Math.round(profitValue / lot)) : 0
+                                            const lot = t.lot_size || 0.01
+                                            const pts = lot !== 0 ? Math.abs(Math.round(profitValue / lot)) : 0
 
-                                    // Calculate RR: Actual Points / Planned SL Distance (Pts)
-                                    // If stop_loss exists, risk is entry - sl.
-                                    const entry = t.entry_price || 0
-                                    const slPoints = t.stop_loss || 0
+                                            // Calculate RR: Actual Points / Planned SL Distance (Pts)
+                                            const entry = t.entry_price || 0
+                                            const slPoints = t.stop_loss || 0
 
-                                    let actualRRDisplay = "1:0"
-                                    if (slPoints > 0) {
-                                        const rrValue = pts / slPoints
-                                        // Only show decimals if not a whole number
-                                        const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
-                                        actualRRDisplay = `1:${formattedRR}`
-                                    }
+                                            let actualRRDisplay = "1:0"
+                                            if (slPoints > 0) {
+                                                const rrValue = pts / slPoints
+                                                const formattedRR = rrValue % 1 === 0 ? rrValue.toFixed(0) : rrValue.toFixed(2)
+                                                actualRRDisplay = `1:${formattedRR}`
+                                            }
 
-                                    const tDate = new Date(t.created_at || Date.now())
-                                    const tradingDay = getTradingDay(t.created_at || Date.now())
-                                    const dayOfWeek = tradingDay.getDay()
-                                    let dayBorderColor = "border-l-transparent"
+                                            const tDate = new Date(t.created_at || Date.now())
+                                            const tradingDay = getTradingDay(t.created_at || Date.now())
+                                            const dayOfWeek = tradingDay.getDay()
+                                            let dayBorderColor = "border-l-transparent"
 
-                                    switch (dayOfWeek) {
-                                        case 1: dayBorderColor = "border-l-[4px] border-l-[#facc15]"; break
-                                        case 2: dayBorderColor = "border-l-[4px] border-l-[#f472b6]"; break
-                                        case 3: dayBorderColor = "border-l-[4px] border-l-[#4ade80]"; break
-                                        case 4: dayBorderColor = "border-l-[4px] border-l-[#fb923c]"; break
-                                        case 5: dayBorderColor = "border-l-[4px] border-l-[#60a5fa]"; break
-                                        default: dayBorderColor = "border-l-[4px] border-l-gray-600"
-                                    }
+                                            switch (dayOfWeek) {
+                                                case 1: dayBorderColor = "border-l-[4px] border-l-[#facc15]"; break
+                                                case 2: dayBorderColor = "border-l-[4px] border-l-[#f472b6]"; break
+                                                case 3: dayBorderColor = "border-l-[4px] border-l-[#4ade80]"; break
+                                                case 4: dayBorderColor = "border-l-[4px] border-l-[#fb923c]"; break
+                                                case 5: dayBorderColor = "border-l-[4px] border-l-[#60a5fa]"; break
+                                                default: dayBorderColor = "border-l-[4px] border-l-gray-600"
+                                            }
 
-                                    return (
-                                        <tr key={t.id} className={cn("group hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-0 h-20", dayBorderColor)}>
-                                            <td className="px-5 py-3">
-                                                <div className="flex flex-col">
-                                                    <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
-                                                        {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-xs font-black tracking-widest",
-                                                    t.type === 'BUY' ? "bg-[#ccf381]/10 text-[#ccf381] border border-[#ccf381]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
-                                                )}>
-                                                    {t.type}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className="text-white font-black text-sm">{t.lot_size}</span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className="text-white font-bold text-sm tracking-tight">{t.entry_price?.toLocaleString()}</span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className="text-white/70 font-medium text-sm tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                {t.profit !== undefined ? (
-                                                    <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
-                                                        {!isBE && <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-[#ccf381]" : "bg-red-500")} />}
-                                                        <span className={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-500" : "text-white"}>
-                                                            {isBE ? "BE" : pts.toLocaleString()}
+                                            return (
+                                                <tr key={t.id} className={cn("group hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-0 h-20", dayBorderColor)}>
+                                                    <td className="px-5 py-3">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className={cn(
+                                                            "px-3 py-1.5 rounded-lg text-xs font-black tracking-widest",
+                                                            t.type === 'BUY' ? "bg-[#ccf381]/10 text-[#ccf381] border border-[#ccf381]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
+                                                        )}>
+                                                            {t.type}
                                                         </span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-gray-600 text-xs">-</span>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <div className={cn(
-                                                    "inline-flex px-2 py-1 rounded border",
-                                                    isProfit ? "bg-[#ccf381]/5 border-[#ccf381]/10" : "bg-red-500/5 border-red-500/10"
-                                                )}>
-                                                    <span className={cn(
-                                                        "text-xs font-black font-mono",
-                                                        isProfit ? "text-[#ccf381]/80" : "text-red-400/80"
-                                                    )}>{actualRRDisplay}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-3 text-center">
-                                                <div className={cn(
-                                                    "text-base font-black tracking-tight",
-                                                    isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
-                                                )}>
-                                                    {isBE ? `$0` : isProfit ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}`}
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-3 transition-all duration-300">
-                                                <div className="flex items-center justify-end gap-11.5">
-                                                    <button
-                                                        onClick={() => setViewingTrade(t)}
-                                                        className="group/detail relative shrink-0"
-                                                    >
-                                                        {t.screenshot_url ? (
-                                                            <div className="w-24 h-14 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
-                                                                <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className="text-white font-black text-sm">{t.lot_size}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className="text-white font-bold text-sm tracking-tight">{t.entry_price?.toLocaleString()}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className="text-white/70 font-medium text-sm tracking-tight">{t.exit_price?.toLocaleString() || '-'}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        {t.profit !== undefined ? (
+                                                            <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
+                                                                {!isBE && <div className={cn("w-1.5 h-1.5 rounded-full", isProfit ? "bg-[#ccf381]" : "bg-red-500")} />}
+                                                                <span className={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-500" : "text-white"}>
+                                                                    {isBE ? "BE" : pts.toLocaleString()}
+                                                                </span>
                                                             </div>
                                                         ) : (
-                                                            <div className="w-24 h-14 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
-                                                                <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
-                                                            </div>
+                                                            <span className="text-gray-600 text-xs">-</span>
                                                         )}
-                                                    </button>
-                                                    <div className="flex items-center gap-4">
-                                                        <button
-                                                            onClick={() => setSharingTrade(t)}
-                                                            className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
-                                                            title="Share Trade Card"
-                                                        >
-                                                            <Share2 size={14} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setEditingTrade(t)}
-                                                            className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all"
-                                                            title="Edit Trade"
-                                                        >
-                                                            <Edit2 size={14} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(t.id)}
-                                                            disabled={deletingId === t.id}
-                                                            className={`p-1.5 rounded-lg transition-all ${deletingId === t.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
-                                                            title="Delete Trade"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <div className={cn(
+                                                            "inline-flex px-2 py-1 rounded border",
+                                                            isProfit ? "bg-[#ccf381]/5 border-[#ccf381]/10" : "bg-red-500/5 border-red-500/10"
+                                                        )}>
+                                                            <span className={cn(
+                                                                "text-xs font-black font-mono",
+                                                                isProfit ? "text-[#ccf381]/80" : "text-red-400/80"
+                                                            )}>{actualRRDisplay}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-5 py-3 text-center">
+                                                        <div className={cn(
+                                                            "text-base font-black tracking-tight",
+                                                            isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
+                                                        )}>
+                                                            {isBE ? `$0` : isProfit ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}`}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-5 py-3 transition-all duration-300">
+                                                        <div className="flex items-center justify-end gap-11.5">
+                                                            <button
+                                                                onClick={() => setViewingTrade(t)}
+                                                                className="group/detail relative shrink-0"
+                                                            >
+                                                                {t.screenshot_url ? (
+                                                                    <div className="w-24 h-14 rounded overflow-hidden border border-white/10 group-hover/detail:border-[#ccf381]/40 transition-colors relative">
+                                                                        <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-24 h-14 rounded flex items-center justify-center bg-white/5 border border-white/10 group-hover/detail:bg-white/10 transition-colors">
+                                                                        <Eye size={14} className="text-gray-500 group-hover/detail:text-white" />
+                                                                    </div>
+                                                                )}
+                                                            </button>
+                                                            <div className="flex items-center gap-4">
+                                                                <button
+                                                                    onClick={() => setSharingTrade(t)}
+                                                                    className="p-1.5 bg-[#ccf381]/10 hover:bg-[#ccf381]/20 rounded-lg text-[#ccf381]/60 hover:text-[#ccf381] transition-all"
+                                                                    title="Share Trade Card"
+                                                                >
+                                                                    <Share2 size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setEditingTrade(t)}
+                                                                    className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all"
+                                                                    title="Edit Trade"
+                                                                >
+                                                                    <Edit2 size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDelete(t.id)}
+                                                                    disabled={deletingId === t.id}
+                                                                    className={`p-1.5 rounded-lg transition-all ${deletingId === t.id ? 'bg-red-500/10 text-red-500/50 cursor-not-allowed' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300'}`}
+                                                                    title="Delete Trade"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
-                )}
-            </CardContent>
+                </CardContent>
+            </Card>
 
             {/* Modal for Editing */}
             <Modal
