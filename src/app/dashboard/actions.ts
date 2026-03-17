@@ -95,32 +95,43 @@ export async function createTrade(formData: FormData) {
         }
     }
 
-    // NEW: Auto-deduct commission based on portfolio settings
+    // NEW: Auto-deduct commission based on portfolio settings (Portfolio > Profile fallback)
     let finalProfit = profit ? Number(profit) : null
-    if (finalProfit !== null && finalPortfolioId) {
-        const { data: portData } = await supabase
-            .from('portfolios')
-            .select('commission_per_lot')
-            .eq('id', finalPortfolioId)
-            .single()
-        
-        const commPerLot = portData?.commission_per_lot || 0
-        if (commPerLot > 0) {
-            const totalComm = Number(lotSize) * commPerLot
-            finalProfit = finalProfit - totalComm
-        }
-    } else if (finalProfit !== null) {
-        // Fallback to profile setting if no portfolio
-        const { data: profData } = await supabase
-            .from('profiles')
-            .select('commission_per_lot')
-            .eq('id', user.id)
-            .single()
-        
-        const commPerLot = profData?.commission_per_lot || 0
-        if (commPerLot > 0) {
-            const totalComm = Number(lotSize) * commPerLot
-            finalProfit = finalProfit - totalComm
+    if (finalProfit !== null) {
+        try {
+            let commPerLot = 0
+            
+            // 1. Check portfolio-specific commission first
+            if (finalPortfolioId) {
+                const { data: portData } = await supabase
+                    .from('portfolios')
+                    .select('commission_per_lot')
+                    .eq('id', finalPortfolioId)
+                    .single()
+                commPerLot = portData?.commission_per_lot || 0
+            }
+
+            // 2. Fallback to profile setting if portfolio has 0 or no portfolio
+            if (commPerLot === 0) {
+                const { data: profData } = await supabase
+                    .from('profiles')
+                    .select('commission_per_lot')
+                    .eq('id', user.id)
+                    .single()
+                commPerLot = profData?.commission_per_lot || 0
+            }
+
+            if (commPerLot > 0) {
+                const lotNum = Number(lotSize)
+                if (!isNaN(lotNum)) {
+                    const totalComm = lotNum * commPerLot
+                    finalProfit = finalProfit - totalComm
+                    console.log(`Deducted commission: ${totalComm} (Net: ${finalProfit})`)
+                }
+            }
+        } catch (commError) {
+            console.error('Commission calculation error (Did you run the SQL migration?):', commError)
+            // Continue with raw profit if calculation fails
         }
     }
 
