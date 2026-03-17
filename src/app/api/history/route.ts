@@ -63,7 +63,8 @@ export async function GET(request: Request) {
     const tradeList = (trades || []).map((t: any) => {
         const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
         const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
-        return { ...t, raw_profit: t.profit, profit: netProfit, commission_applied: commission }
+        // Keep profit as Gross for display, store net_profit separately if needed or just return gross in 'profit'
+        return { ...t, profit: t.profit, net_profit: netProfit, commission_applied: commission }
     })
 
     return NextResponse.json({
