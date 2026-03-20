@@ -363,7 +363,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                     trade={sharingTrade}
                     username={username}
                     onClose={() => setSharingTrade(null)}
-                    dict={dict}
+                    currency={currency}
                 />
             )}
 
