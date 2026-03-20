@@ -131,10 +131,21 @@ export async function GET(request: Request) {
     }
 
     // Goals: prefer portfolio-specific, fallback to profile
-    const portfolioGoals = portfolioId && portfolioId !== 'null' ? portfolios?.find(p => p.id === portfolioId) : null
-    const portSize = (portfolioGoals?.port_size && (portfolioGoals as any).port_size > 0) ? (portfolioGoals as any).port_size : (profile?.port_size || 0)
-    const goalPercent = (portfolioGoals?.profit_goal_percent && (portfolioGoals as any).profit_goal_percent > 0) ? (portfolioGoals as any).profit_goal_percent : (profile?.profit_goal_percent || 10)
+    let portSize = profile?.port_size ?? 1000
+    let goalPercent = profile?.profit_goal_percent ?? 10
+    let commissionPerLot = profile?.commission_per_lot ?? 0
     const isQuestActive = profile?.is_portfolio_quest_active || false
+
+    // If a specific portfolio is selected, use its settings
+    if (portfolioId && portfolioId !== 'null') {
+        const portfolio = portfolios?.find(p => p.id === portfolioId)
+        if (portfolio) {
+            // Use portfolio settings if they exist, otherwise fallback to profile defaults
+            portSize = (portfolio as any).port_size ?? portSize
+            goalPercent = (portfolio as any).profit_goal_percent ?? goalPercent
+            commissionPerLot = (portfolio as any).commission_per_lot ?? commissionPerLot
+        }
+    }
     
     // Evaluate pure localized strings for exact matching to bypass Vercel UTC shifts
     const todayStr = getTradingDayStr(new Date()) 

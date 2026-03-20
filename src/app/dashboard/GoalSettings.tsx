@@ -26,27 +26,36 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
         setCurrency(initialCurrency || 'USD')
     }, [initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency])
     
-    const validPortSize = Number(portSize) || 0
-    const validGoalPercent = Number(goalPercent) || 0
+    const [error, setError] = useState<string | null>(null)
 
-    const handleSave = async () => {
-        setIsLoading(true)
+    async function handleSave() {
+        setLoading(true)
+        setError(null)
         try {
-            if (portfolioId) {
-                await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0, currency)
-            } else {
-                await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0, currency)
-            }
-// ... (rest of the handleSave logic remains same)
+            const validPortSize = Number(portSize)
+            const validGoalPercent = Number(goalPercent)
             
-            // Real-time update: Refresh all API routes
+            let result;
+            if (portfolioId) {
+                result = await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0, currency)
+            } else {
+                result = await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0, currency)
+            }
+
+            if (result?.error) {
+                setError(result.error)
+                return
+            }
+
+            // Force SWR to revalidate everything starting with /api/
             await mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
             
             setIsOpen(false)
-        } catch (error) {
-            console.error('Failed to save goals:', error)
+        } catch (e: any) {
+            console.error('Error saving goals:', e)
+            setError(e.message || 'An unexpected error occurred')
         } finally {
-            setIsLoading(false)
+            setLoading(false)
         }
     }
 
@@ -118,6 +127,13 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                     <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
                         Currency (USD / USC)
                     </Label>
+                    <div className="flex flex-col gap-6 py-6">
+                    {error && (
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-xs font-bold">
+                            Error: {error}
+                        </div>
+                    )}
+                    {/* Goal Settings Row */}
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             type="button"
