@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
     const { data: portfolios } = await supabase
         .from('portfolios')
-        .select('id, name, port_size, profit_goal_percent, commission_per_lot')
+        .select('id, name, port_size, profit_goal_percent, commission_per_lot, currency')
         .eq('user_id', user.id)
 
     // Create a map for quick commission lookup
