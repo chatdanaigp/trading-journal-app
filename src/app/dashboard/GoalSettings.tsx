@@ -1,22 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateProfileGoals, updatePortfolioGoals } from './actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
 
-export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, portfolioId?: string | null, dict?: any }) {
+export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, initialCurrency?: string, portfolioId?: string | null, dict?: any }) {
     const { mutate } = useSWRConfig()
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [commissionPerLot, setCommissionPerLot] = useState<number | string>(initialCommissionPerLot || 0)
-    const [currency, setCurrency] = useState<string>((initialPortSize as any).currency || 'USD')
+    const [currency, setCurrency] = useState<string>(initialCurrency || 'USD')
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
 
     // Note: initialPortSize is actually the whole object in some cases, 
     // but the prop signature says it's a number. 
     // I should check how it's passed.
+    
+    // Sync state with props when they change (e.g. portfolio switch)
+    useEffect(() => {
+        setPortSize(initialPortSize)
+        setGoalPercent(initialGoalPercent)
+        setCommissionPerLot(initialCommissionPerLot || 0)
+        setCurrency(initialCurrency || 'USD')
+    }, [initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency])
     
     const validPortSize = Number(portSize) || 0
     const validGoalPercent = Number(goalPercent) || 0

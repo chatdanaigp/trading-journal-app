@@ -148,6 +148,7 @@ export function ProfitTree({
                         initialPortSize={portSize} 
                         initialGoalPercent={goalPercent} 
                         initialCommissionPerLot={commissionPerLot}
+                        initialCurrency={currency}
                         portfolioId={portfolioId} 
                         dict={dict} 
                     />
