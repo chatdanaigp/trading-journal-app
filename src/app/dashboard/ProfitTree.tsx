@@ -171,7 +171,7 @@ export function ProfitTree({
                         <div className="flex justify-between items-end">
                             <div>
                                 <p className="text-xs text-gray-500 mb-1">{dict?.dashboard?.currentProfit || "Current Profit"}</p>
-                                <p className="text-2xl font-bold text-white">{isUSC ? '' : '$'}{netProfit.toLocaleString()}{isUSC ? ' USC' : ''}</p>
+                                <p className="text-2xl font-bold text-white">{isUSC ? '' : '$'}{netProfit.toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-3xl font-black text-[#ccf381]">{rawProgress.toFixed(1)}%</p>

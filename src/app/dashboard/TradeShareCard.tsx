@@ -13,9 +13,13 @@ interface TradeShareCardProps {
     username?: string
     points?: number
     dict?: any
+    currency?: string
 }
 
-export function TradeShareCard({ trade, username, points, dict }: TradeShareCardProps) {
+export function TradeShareCard({ trade, username, points, dict, currency }: TradeShareCardProps) {
+    const isUSC = currency === 'USC'
+    const symbol = isUSC ? '' : '$'
+    const suffix = isUSC ? ' USC' : ''
     const profit = Number(trade.profit) || 0
     const isProfit = profit >= 0
 
@@ -143,7 +147,7 @@ export function TradeShareCard({ trade, username, points, dict }: TradeShareCard
                         textShadow: '0 0 25px rgba(0,0,0,0.6)',
                         lineHeight: '1', marginBottom: '12px' // Equal margin
                     }}>
-                        {isProfit ? '+' : ''}{profit < 0 ? `-$${Math.abs(profit).toLocaleString()}` : `$${profit.toLocaleString()}`}
+                        {isProfit ? '+' : ''}{profit < 0 ? `-${symbol}${Math.abs(profit).toLocaleString()}${suffix}` : `${symbol}${profit.toLocaleString()}${suffix}`}
                     </div>
                     {points !== undefined && points !== 0 && (
                         <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: '600', fontFamily: fontPrimary }}>

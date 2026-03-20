@@ -9,14 +9,19 @@ interface PortProgressWidgetProps {
     totalNetProfit: number
     netProfitToday: number
     dict: any
+    currency?: string
 }
 
 export function PortProgressWidget({
     portSize,
     goalPercent,
     netProfitToday,
-    dict
+    dict,
+    currency
 }: Omit<PortProgressWidgetProps, 'totalNetProfit'>) {
+    const isUSC = currency === 'USC'
+    const symbol = isUSC ? '' : '$'
+    const suffix = isUSC ? ' USC' : ''
     if (portSize <= 0 || goalPercent <= 0) return null
 
     const targetAmount = portSize * (goalPercent / 100)
@@ -88,9 +93,9 @@ export function PortProgressWidget({
                         <div className="flex justify-between items-center px-1">
                             <div className="flex items-baseline gap-2">
                                 <span className={`text-lg font-black ${netProfitToday >= 0 ? 'text-white' : 'text-red-400'}`}>
-                                    ${netProfitToday.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {symbol}{netProfitToday.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}
                                 </span>
-                                <span className="text-xs text-gray-500 font-bold">/ ${dailyTargetAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span className="text-xs text-gray-500 font-bold">/ {symbol}{dailyTargetAmount.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}</span>
                             </div>
                             <div className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${dailyProgress >= 100 ? 'bg-[#ccf381]/20 text-[#ccf381]' : 'bg-white/5 text-gray-500'}`}>
                                 {dailyProgress >= 100 ? 'Challenge Completed' : 'In Progress'}

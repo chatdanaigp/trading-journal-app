@@ -13,8 +13,12 @@ import { CheckCircle2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, I
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import { StrategyDropdown } from '@/components/ui/StrategyDropdown'
 import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/utils/cn'
 
-export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, portfolioId = null }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number, portfolioId?: string | null }) {
+export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, portfolioId = null, currency = 'USD' }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number, portfolioId?: string | null, currency?: string }) {
+    const isUSC = currency === 'USC'
+    const currencySymbol = isUSC ? '' : '$'
+    const suffix = isUSC ? ' USC' : ''
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
@@ -157,7 +161,7 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                             </div>
                             <div className="grid gap-2 md:col-span-2">
                                 <div className="flex justify-between items-center h-[16px]">
-                                    <Label className="text-gray-400 text-xs">{dict?.tradeForm?.profitLoss || "Profit / Loss ($)"}</Label>
+                                    <Label className="text-gray-400 text-xs">{dict?.tradeForm?.profitLoss || "Profit / Loss"} ({isUSC ? 'USC' : '$'})</Label>
                                     {points !== null && <span className={`text-[10px] font-bold ${points >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>{points > 0 ? '+' : ''}{points.toLocaleString()} pts</span>}
                                 </div>
                                 <div className="flex gap-2 h-11">
@@ -167,8 +171,9 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                                         <button type="button" onClick={() => { setProfitSign('-'); handleCalculation('sign', '-') }} className={`flex-1 relative z-10 text-[10px] font-black ${profitSign === '-' ? 'text-red-400' : 'text-gray-500'}`}>LOSS</button>
                                     </div>
                                     <div className="relative flex-grow">
-                                        <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-bold ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>{profitSign === '+' ? '+$' : '-$'}</span>
-                                        <Input type="number" step="0.01" min="0" placeholder="50.00" className="pl-8 bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-full rounded-xl" value={profitAmount} onChange={(e) => { setProfitAmount(e.target.value); handleCalculation('profit', e.target.value) }} />
+                                        <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-bold ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>{profitSign === '+' ? `+${currencySymbol}` : `-${currencySymbol}`}</span>
+                                        <Input type="number" step="0.01" min="0" placeholder="50.00" className={cn("bg-[#0d0d0d] border-[#333] focus:border-[#ccf381] text-white placeholder:text-gray-700 h-full rounded-xl", isUSC ? "pl-4" : "pl-8")} value={profitAmount} onChange={(e) => { setProfitAmount(e.target.value); handleCalculation('profit', e.target.value) }} />
+                                        {isUSC && <span className={`absolute right-3 top-1/2 -translate-y-1/2 font-bold text-xs ${profitSign === '+' ? 'text-[#ccf381]' : 'text-red-400'}`}>USC</span>}
                                         <input type="hidden" name="profit" value={actualProfit} />
                                     </div>
                                 </div>

@@ -4,7 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Trophy, X, Target } from 'lucide-react'
 
-export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: any }) {
+export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, currency }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: any, currency?: string }) {
+    const isUSC = currency === 'USC'
+    const symbol = isUSC ? '' : '$'
+    const suffix = isUSC ? ' USC' : ''
     const [isOpen, setIsOpen] = useState(false)
     const prevNetToday = useRef(netToday)
 
@@ -119,13 +122,13 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict }:
                                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
                                         <Target className="w-3 h-3" /> Target
                                     </p>
-                                    <p className="font-mono text-sm">${dailyTarget.toFixed(2)}</p>
+                                    <p className="font-mono text-sm">{symbol}{dailyTarget.toFixed(isUSC ? 0 : 2)}{suffix}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] text-[#ccf381] font-bold uppercase tracking-wider flex items-center gap-1 mb-1 justify-end">
                                         <Sparkles className="w-3 h-3" /> Achieved
                                     </p>
-                                    <p className="font-mono text-lg font-bold text-[#ccf381]">${netToday.toFixed(2)}</p>
+                                    <p className="font-mono text-lg font-bold text-[#ccf381]">{symbol}{netToday.toFixed(isUSC ? 0 : 2)}{suffix}</p>
                                 </div>
                             </motion.div>
 

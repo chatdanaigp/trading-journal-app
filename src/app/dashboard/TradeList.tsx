@@ -13,7 +13,9 @@ import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
 import { getTradingDay } from '@/utils/date-helpers'
 
-export function TradeList({ trades, username, dict, className, hideHeader }: { trades: any[], username?: string, dict?: any, className?: string, hideHeader?: boolean }) {
+export function TradeList({ trades, username, dict, className, hideHeader, currency }: { trades: any[], username?: string, dict?: any, className?: string, hideHeader?: boolean, currency?: string }) {
+    const isUSC = currency === 'USC'
+    const symbol = isUSC ? 'USC' : '$'
     const [editingTrade, setEditingTrade] = useState<any | null>(null)
     const [sharingTrade, setSharingTrade] = useState<any | null>(null)
     const [viewingTrade, setViewingTrade] = useState<any | null>(null)
@@ -158,7 +160,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                                             "text-base font-black tracking-tight",
                                                             isBE ? 'text-white' : isProfit ? 'text-[#ccf381] drop-shadow-[0_0_8px_rgba(204,243,129,0.4)]' : 'text-red-500'
                                                         )}>
-                                                            {isBE ? `$0` : isProfit ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}`}
+                                                            {isBE ? (isUSC ? "0 USC" : "$0") : isProfit ? `+${isUSC ? '' : '$'}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}${isUSC ? ' USC' : ''}` : `${isUSC ? '' : '$'}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(profitValue)}${isUSC ? ' USC' : ''}`}
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-3 transition-all duration-300">
@@ -305,7 +307,7 @@ export function TradeList({ trades, username, dict, className, hideHeader }: { t
                                             <p className={cn("text-3xl font-black tracking-tight",
                                                 Math.abs(p) < 0.01 ? 'text-white' : p > 0 ? 'text-[#ccf381]' : 'text-red-400'
                                             )}>
-                                                {Math.abs(p) < 0.01 ? '$0' : p > 0 ? `+$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}` : `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}`}
+                                                {Math.abs(p) < 0.01 ? (isUSC ? "0 USC" : "$0") : p > 0 ? `+${isUSC ? '' : '$'}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}${isUSC ? ' USC' : ''}` : `${isUSC ? '' : '$'}${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(p)}${isUSC ? ' USC' : ''}`}
                                             </p>
                                         </div>
                                         <div className="text-right">

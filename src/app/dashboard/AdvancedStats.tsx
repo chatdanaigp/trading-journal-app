@@ -22,9 +22,13 @@ interface AdvancedStatsProps {
         }
     }
     dict?: any
+    currency?: string
 }
 
-export function AdvancedStats({ stats, dict }: AdvancedStatsProps) {
+export function AdvancedStats({ stats, dict, currency }: AdvancedStatsProps) {
+    const isUSC = currency === 'USC'
+    const symbol = isUSC ? '' : '$'
+    const suffix = isUSC ? ' USC' : ''
     const pf = Number(stats.profitFactor)
     const pfColor = pf >= 2.0 ? 'text-[#ccf381]' : pf >= 1.0 ? 'text-gray-200' : 'text-red-400'
 
@@ -68,11 +72,11 @@ export function AdvancedStats({ stats, dict }: AdvancedStatsProps) {
                     <div className="flex justify-between items-end">
                         <div>
                             <span className="text-xs text-gray-500 block mb-0.5">{dict?.dashboard?.avgWin || 'Avg Win'}</span>
-                            <span className="text-lg font-bold text-[#ccf381]">+${stats.averageWin}</span>
+                            <span className="text-lg font-bold text-[#ccf381]">+{symbol}{stats.averageWin}{suffix}</span>
                         </div>
                         <div className="text-right">
                             <span className="text-xs text-gray-500 block mb-0.5">{dict?.dashboard?.avgLoss || 'Avg Loss'}</span>
-                            <span className="text-lg font-bold text-red-400">-${stats.averageLoss}</span>
+                            <span className="text-lg font-bold text-red-400">-{symbol}{stats.averageLoss}{suffix}</span>
                         </div>
                     </div>
 

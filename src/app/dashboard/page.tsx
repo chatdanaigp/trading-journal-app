@@ -110,13 +110,11 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex justify-between items-baseline mb-4">
                                 <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
-                                    {isUSC ? '' : '$'}{Number(stats.netProfit).toLocaleString()}{isUSC ? ' USC' : ''}
+                                    {isUSC ? '' : '$'}{Number(stats.netProfit).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}
                                 </h3>
                                 {portSize > 0 && (
-                                    <div className="text-right opacity-90">
-                                        <span className="text-2xl font-bold text-white tracking-tight">
-                                            {isUSC ? '' : '$'}{(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}
-                                        </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-2xl font-black text-white">{isUSC ? '' : '$'}{(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}</span>
                                     </div>
                                 )}
                             </div>
@@ -202,7 +200,7 @@ export default function DashboardPage() {
             {/* Charts */}
             <div className="grid grid-cols-12 gap-6">
                 <StaggerItem className="col-span-12">
-                    <AdvancedStats stats={stats as any} dict={dict} />
+                    <AdvancedStats stats={stats as any} dict={dict} currency={currency} />
                 </StaggerItem>
                 <StaggerItem className="col-span-12">
                     <EquityChart trades={trades} dict={dict} />
@@ -213,7 +211,7 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     <StaggerItem className="col-span-1 lg:col-span-6 h-full">
-                        <TradeForm trades={trades} portSize={portSize} goalPercent={goalPercent} dict={dict} portfolioId={portfolioId} />
+                        <TradeForm trades={trades} portSize={portSize} goalPercent={goalPercent} dict={dict} portfolioId={portfolioId} currency={currency} />
                     </StaggerItem>
                     <StaggerItem className="col-span-1 lg:col-span-6 h-full">
                         <Card className="relative overflow-hidden border-0 shadow-2xl h-full flex flex-col bg-[#0d0d0d]">
@@ -227,6 +225,7 @@ export default function DashboardPage() {
                                     goalPercent={goalPercent}
                                     netProfitToday={trades.filter((t: any) => t.created_at && isSameDay(getTradingDay(t.created_at), getTradingDay(new Date()))).reduce((sum: number, t: any) => sum + (t.profit || 0), 0)}
                                     dict={dict}
+                                    currency={currency}
                                 />
                                 
                                 <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent w-full" />
@@ -244,7 +243,7 @@ export default function DashboardPage() {
 
                 <StaggerItem className="w-full">
                     <div className="w-full">
-                        <TradeList trades={trades} username={username} dict={dict} />
+                        <TradeList trades={trades} username={username} dict={dict} currency={currency} />
                     </div>
                 </StaggerItem>
             </div>

@@ -77,7 +77,7 @@ export function TradeShareModal({ trade, username, onClose, dict }: TradeShareMo
                 >
                     {/* This ref is what gets captured */}
                     <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0, minWidth: 'min-content' }} className="w-full">
-                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} />
+                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} currency={trade.currency || (dict?.dashboard?.currency)} />
                     </div>
                 </div>
 
