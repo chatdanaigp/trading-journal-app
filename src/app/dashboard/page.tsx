@@ -57,8 +57,10 @@ export default function DashboardPage() {
 
     if (isLoading || !data || !dict || !isInitialized) return <PageSkeleton />
 
-    const { trades, allTrades, stats, username, points, dailyTargetAmount, isQuestActive, portSize, goalPercent } = data
+    const { trades, allTrades, stats, username, points, dailyTargetAmount, isQuestActive, portSize, goalPercent, goals } = data
     const { monthlyPoints, weeklyPoints, dailyPoints, dailyProfit } = points
+    const currency = goals?.currency || 'USD'
+    const isUSC = currency === 'USC'
 
     return (
         <StaggerContainer className="space-y-8">
@@ -67,8 +69,8 @@ export default function DashboardPage() {
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
-                        <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.overview}</h1>
+                        <p className="text-gray-500 text-sm lg:text-base">{dict.welcome}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <PortfolioSelector value={portfolioId} onChange={handlePortfolioChange} dict={dict} />
@@ -99,21 +101,21 @@ export default function DashboardPage() {
                         </div>
                         <CardContent className="p-6 relative z-30">
                             <div className="flex justify-between items-start mb-1">
-                                <p className="text-gray-500 font-medium tracking-wide text-xs uppercase">{dict.dashboard.netProfit}</p>
+                                <p className="text-gray-500 font-medium tracking-wide text-xs uppercase">{dict.netProfit}</p>
                                 {portSize > 0 && (
                                     <p className="text-gray-500 font-medium tracking-wide text-[10px] uppercase text-right opacity-90 mt-0.5">
-                                        {dict.dashboard?.totalEquity || 'Total Balance'}
+                                        {dict?.totalEquity || 'Total Balance'}
                                     </p>
                                 )}
                             </div>
                             <div className="flex justify-between items-baseline mb-4">
                                 <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
-                                    ${Number(stats.netProfit).toLocaleString()}
+                                    {isUSC ? '' : '$'}{Number(stats.netProfit).toLocaleString()}{isUSC ? ' USC' : ''}
                                 </h3>
                                 {portSize > 0 && (
                                     <div className="text-right opacity-90">
                                         <span className="text-2xl font-bold text-white tracking-tight">
-                                            ${(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            {isUSC ? '' : '$'}{(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}
                                         </span>
                                     </div>
                                 )}
@@ -191,6 +193,7 @@ export default function DashboardPage() {
                         goalPercent={Number(goalPercent)} 
                         commissionPerLot={data.commissionPerLot}
                         portfolioId={portfolioId} 
+                        currency={currency}
                         dict={dict} 
                     />
                 </StaggerItem>

@@ -383,7 +383,7 @@ export async function getProfileGoals() {
 
     const { data, error } = await supabase
         .from('profiles')
-        .select('port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot')
+        .select('port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot, currency')
         .eq('id', user.id)
         .single()
 
@@ -395,7 +395,7 @@ export async function getProfileGoals() {
     return data
 }
 
-export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean, commissionPerLot?: number) {
+export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean, commissionPerLot?: number, currency?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -404,7 +404,8 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
     const updateData: any = {
         port_size: portSize,
         profit_goal_percent: profitGoalPercent,
-        commission_per_lot: commissionPerLot || 0
+        commission_per_lot: commissionPerLot || 0,
+        currency: currency || 'USD'
     }
 
     if (isQuestActive !== undefined) {
@@ -422,7 +423,7 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
     return { success: true }
 }
 
-export async function updatePortfolioGoals(portfolioId: string, portSize: number, profitGoalPercent: number, commissionPerLot?: number) {
+export async function updatePortfolioGoals(portfolioId: string, portSize: number, profitGoalPercent: number, commissionPerLot?: number, currency?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -434,6 +435,7 @@ export async function updatePortfolioGoals(portfolioId: string, portSize: number
             port_size: portSize,
             profit_goal_percent: profitGoalPercent,
             commission_per_lot: commissionPerLot || 0,
+            currency: currency || 'USD',
         })
         .eq('id', portfolioId)
         .eq('user_id', user.id)

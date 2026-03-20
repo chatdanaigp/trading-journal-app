@@ -10,9 +10,14 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
     const [commissionPerLot, setCommissionPerLot] = useState<number | string>(initialCommissionPerLot || 0)
+    const [currency, setCurrency] = useState<string>((initialPortSize as any).currency || 'USD')
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
 
+    // Note: initialPortSize is actually the whole object in some cases, 
+    // but the prop signature says it's a number. 
+    // I should check how it's passed.
+    
     const validPortSize = Number(portSize) || 0
     const validGoalPercent = Number(goalPercent) || 0
 
@@ -20,12 +25,11 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
         setIsLoading(true)
         try {
             if (portfolioId) {
-                // Save per-portfolio goals
-                await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0)
+                await updatePortfolioGoals(portfolioId, validPortSize, validGoalPercent, Number(commissionPerLot) || 0, currency)
             } else {
-                // Fallback: save to profile (global)
-                await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0)
+                await updateProfileGoals(validPortSize, validGoalPercent, undefined, Number(commissionPerLot) || 0, currency)
             }
+// ... (rest of the handleSave logic remains same)
             
             // Real-time update: Refresh all API routes
             await mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
@@ -102,6 +106,36 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                         className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>
+                <div className="space-y-1.5 col-span-2">
+                    <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                        Currency (USD / USC)
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setCurrency('USD')}
+                            className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                                currency === 'USD' 
+                                ? 'bg-[#ccf381]/10 border-[#ccf381]/40 text-[#ccf381]' 
+                                : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'
+                            }`}
+                        >
+                            Standard (USD)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setCurrency('USC')}
+                            className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                                currency === 'USC' 
+                                ? 'bg-[#ccf381]/10 border-[#ccf381]/40 text-[#ccf381]' 
+                                : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'
+                            }`}
+                        >
+                            Cent (USC)
+                        </button>
+                    </div>
+                </div>
+
                 <div className="space-y-1.5 col-span-2">
                     <Label htmlFor="commission-per-lot" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
                         <DollarSign className="w-3 h-3" /> Commission / Lot

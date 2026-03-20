@@ -65,7 +65,7 @@ export async function GET(request: Request) {
     // Fetch profile and all portfolios to get commission settings
     const { data: profile } = await supabase
         .from('profiles')
-        .select('username, port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot')
+        .select('username, port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot, currency')
         .eq('id', user.id)
         .single()
 
@@ -174,11 +174,13 @@ export async function GET(request: Request) {
     const monthlyGoalAmount = portSize * (goalPercent / 100)
     const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
 
+    const currency = (portfolioGoals as any)?.currency || profile?.currency || 'USD'
+    
     return NextResponse.json({
         trades: displayTrades,
         allTrades: allTrades || [],
         stats,
-        goals: { port_size: portSize, profit_goal_percent: goalPercent, is_portfolio_quest_active: isQuestActive },
+        goals: { port_size: portSize, profit_goal_percent: goalPercent, is_portfolio_quest_active: isQuestActive, currency },
         username,
         points: { monthlyPoints, weeklyPoints, dailyPoints, dailyProfit },
         dailyTargetAmount,

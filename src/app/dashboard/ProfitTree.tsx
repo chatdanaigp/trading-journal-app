@@ -12,6 +12,7 @@ export function ProfitTree({
     goalPercent,
     commissionPerLot,
     portfolioId,
+    currency,
     dict
 }: {
     netProfit: number,
@@ -19,8 +20,10 @@ export function ProfitTree({
     goalPercent: number,
     commissionPerLot?: number,
     portfolioId?: string | null,
+    currency?: string,
     dict?: any
 }) {
+    const isUSC = currency === 'USC'
     // 1. Calculate Target
     const targetProfit = (portSize * goalPercent) / 100
     // 2. Calculate Progress %
@@ -138,7 +141,7 @@ export function ProfitTree({
                         <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-md">{dict?.dashboard?.myForest || "My Forest"}</h2>
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-400 drop-shadow-md">{dict?.dashboard?.goalTarget || "Goal Target"}:</span>
-                            <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">${targetProfit.toLocaleString()}</span>
+                            <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">{isUSC ? '' : '$'}{targetProfit.toLocaleString()}{isUSC ? ' USC' : ''}</span>
                         </div>
                     </div>
                     <GoalSettings 
@@ -168,7 +171,7 @@ export function ProfitTree({
                         <div className="flex justify-between items-end">
                             <div>
                                 <p className="text-xs text-gray-500 mb-1">{dict?.dashboard?.currentProfit || "Current Profit"}</p>
-                                <p className="text-2xl font-bold text-white">${netProfit.toLocaleString()}</p>
+                                <p className="text-2xl font-bold text-white">{isUSC ? '' : '$'}{netProfit.toLocaleString()}{isUSC ? ' USC' : ''}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-3xl font-black text-[#ccf381]">{rawProgress.toFixed(1)}%</p>
