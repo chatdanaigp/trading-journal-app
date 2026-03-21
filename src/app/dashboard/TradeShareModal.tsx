@@ -11,9 +11,10 @@ interface TradeShareModalProps {
     username?: string
     onClose: () => void
     dict?: any
+    currency?: string
 }
 
-export function TradeShareModal({ trade, username, onClose, dict }: TradeShareModalProps) {
+export function TradeShareModal({ trade, username, onClose, dict, currency }: TradeShareModalProps) {
     const cardRef = useRef<HTMLDivElement>(null)
     const [downloading, setDownloading] = useState(false)
 
@@ -77,7 +78,7 @@ export function TradeShareModal({ trade, username, onClose, dict }: TradeShareMo
                 >
                     {/* This ref is what gets captured */}
                     <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0, minWidth: 'min-content' }} className="w-full">
-                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} currency={trade.currency || (dict?.dashboard?.currency)} />
+                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} currency={currency || trade.currency || (dict?.dashboard?.currency)} />
                     </div>
                 </div>
 
