@@ -72,10 +72,20 @@ export function AdvancedStats({ stats, dict, currency }: AdvancedStatsProps) {
                     <div className="flex justify-between items-end">
                         <div>
                             <span className="text-xs text-gray-500 block mb-0.5">{dict?.dashboard?.avgWin || 'Avg Win'}</span>
+                            {isUSC && (
+                                <span className="text-[10px] font-bold text-[#ccf381]/50 block leading-none mb-0.5">
+                                    ${(avgWin / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </span>
+                            )}
                             <span className="text-lg font-bold text-[#ccf381]">+{symbol}{stats.averageWin}{suffix}</span>
                         </div>
                         <div className="text-right">
                             <span className="text-xs text-gray-500 block mb-0.5">{dict?.dashboard?.avgLoss || 'Avg Loss'}</span>
+                            {isUSC && (
+                                <span className="text-[10px] font-bold text-red-500/50 block leading-none mb-0.5">
+                                    ${(avgLoss / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </span>
+                            )}
                             <span className="text-lg font-bold text-red-400">-{symbol}{stats.averageLoss}{suffix}</span>
                         </div>
                     </div>
@@ -99,25 +109,39 @@ export function AdvancedStats({ stats, dict, currency }: AdvancedStatsProps) {
                     {/* Long Stats */}
                     <div>
                         <div className="flex items-center gap-1.5 mb-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            <span className="text-xs font-bold text-gray-300">BUY</span>
+                            <div className="w-2 h-2 rounded-full bg-blue-500" />
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{dict?.dashboard?.longs || 'Longs'}</span>
                         </div>
-                        <p className={`text-lg font-bold ${Number(stats.longStats.profit) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {stats.longStats.winRate}%
-                        </p>
-                        <p className="text-[10px] text-gray-600">{dict?.dashboard?.winRate || 'Win Rate'} ({stats.longStats.count})</p>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-base font-black text-white">{stats.longStats.winRate}%</span>
+                            {isUSC && (
+                                <span className="text-[9px] font-bold text-gray-500 opacity-60">
+                                    (${ (Number(stats.longStats.profit) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }) })
+                                </span>
+                            )}
+                            <span className={`text-[10px] font-bold ${Number(stats.longStats.profit) >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                {Number(stats.longStats.profit) >= 0 ? '+' : ''}{symbol}{stats.longStats.profit}{suffix}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Short Stats */}
-                    <div>
-                        <div className="flex items-center gap-1.5 mb-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                            <span className="text-xs font-bold text-gray-300">SELL</span>
+                    <div className="text-right">
+                        <div className="flex items-center justify-end gap-1.5 mb-1">
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{dict?.dashboard?.shorts || 'Shorts'}</span>
+                            <div className="w-2 h-2 rounded-full bg-orange-500" />
                         </div>
-                        <p className={`text-lg font-bold ${Number(stats.shortStats.profit) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {stats.shortStats.winRate}%
-                        </p>
-                        <p className="text-[10px] text-gray-600">{dict?.dashboard?.winRate || 'Win Rate'} ({stats.shortStats.count})</p>
+                        <div className="flex items-baseline justify-end gap-1">
+                            <span className={`text-[10px] font-bold ${Number(stats.shortStats.profit) >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                {Number(stats.shortStats.profit) >= 0 ? '+' : ''}{symbol}{stats.shortStats.profit}{suffix}
+                            </span>
+                            {isUSC && (
+                                <span className="text-[9px] font-bold text-gray-500 opacity-60">
+                                    (${ (Number(stats.shortStats.profit) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }) })
+                                </span>
+                            )}
+                            <span className="text-base font-black text-white">{stats.shortStats.winRate}%</span>
+                        </div>
                     </div>
                 </div>
             </div>

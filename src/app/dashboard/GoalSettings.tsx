@@ -13,11 +13,8 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
     const [currency, setCurrency] = useState<string>(initialCurrency || 'USD')
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
-    // Note: initialPortSize is actually the whole object in some cases, 
-    // but the prop signature says it's a number. 
-    // I should check how it's passed.
-    
     // Sync state with props when they change (e.g. portfolio switch)
     useEffect(() => {
         setPortSize(initialPortSize)
@@ -26,10 +23,8 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
         setCurrency(initialCurrency || 'USD')
     }, [initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency])
     
-    const [error, setError] = useState<string | null>(null)
-
     async function handleSave() {
-        setLoading(true)
+        setIsLoading(true)
         setError(null)
         try {
             const validPortSize = Number(portSize)
@@ -55,7 +50,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
             console.error('Error saving goals:', e)
             setError(e.message || 'An unexpected error occurred')
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
     }
 
@@ -75,7 +70,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
     }
 
     return (
-        <div className="bg-[#151515] rounded-xl border border-white/10 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="bg-[#151515] rounded-xl border border-white/10 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200 w-full max-w-sm ml-auto">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -83,11 +78,6 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                         <Target className="w-3.5 h-3.5 text-[#ccf381]" />
                     </div>
                     <span className="text-sm font-bold text-white">{dict?.dashboard?.goalSettingsTitle || 'Goal Settings'}</span>
-                    {portfolioId && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#ccf381]/10 border border-[#ccf381]/20 text-[#ccf381]">
-                            Per Portfolio
-                        </span>
-                    )}
                 </div>
                 <button
                     onClick={() => setIsOpen(false)}
@@ -96,6 +86,12 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                     <X className="w-3.5 h-3.5" />
                 </button>
             </div>
+
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-3 py-2 rounded-lg text-[10px] font-bold">
+                    {error}
+                </div>
+            )}
 
             {/* Inputs */}
             <div className="grid grid-cols-2 gap-3">
@@ -108,32 +104,26 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                         type="number"
                         value={portSize}
                         onChange={(e) => setPortSize(e.target.value === '' ? '' : Number(e.target.value))}
-                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                        className="bg-[#0e0e0e] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>
                 <div className="space-y-1.5">
                     <Label htmlFor="goal-percent" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                        <Percent className="w-3 h-3" /> {dict?.admin?.goalPercent || 'Profit Goal'}
+                        <Percent className="w-3 h-3" /> {dict?.admin?.goalPercent || 'Goal %'}
                     </Label>
                     <Input
                         id="goal-percent"
                         type="number"
                         value={goalPercent}
                         onChange={(e) => setGoalPercent(e.target.value === '' ? '' : Number(e.target.value))}
-                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                        className="bg-[#0e0e0e] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>
-                <div className="space-y-1.5 col-span-2">
-                    <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                        Currency (USD / USC)
+
+                <div className="col-span-2 space-y-1.5">
+                    <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                        Currency
                     </Label>
-                    <div className="flex flex-col gap-6 py-6">
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-xs font-bold">
-                            Error: {error}
-                        </div>
-                    )}
-                    {/* Goal Settings Row */}
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             type="button"
@@ -144,7 +134,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                                 : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'
                             }`}
                         >
-                            Standard (USD)
+                            USD
                         </button>
                         <button
                             type="button"
@@ -155,29 +145,28 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                                 : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'
                             }`}
                         >
-                            Cent (USC)
+                            USC
                         </button>
                     </div>
                 </div>
 
-                <div className="space-y-1.5 col-span-2">
-                    <Label htmlFor="commission-per-lot" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" /> Commission / Lot
+                <div className="col-span-2 space-y-1.5">
+                    <Label htmlFor="commission" className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                        Commission / Lot
                     </Label>
                     <Input
-                        id="commission-per-lot"
+                        id="commission"
                         type="number"
                         step="0.01"
                         value={commissionPerLot}
                         onChange={(e) => setCommissionPerLot(e.target.value === '' ? '' : Number(e.target.value))}
-                        placeholder="7.00"
-                        className="bg-[#0d0d0d] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
+                        className="bg-[#0e0e0e] border-white/5 h-9 text-sm text-white focus:border-[#ccf381]/30 rounded-lg"
                     />
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-2">
                 <button
                     onClick={() => setIsOpen(false)}
                     className="px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
@@ -189,7 +178,7 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                     disabled={isLoading}
                     className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#ccf381] text-black text-xs font-bold hover:bg-[#d4f78e] transition-all disabled:opacity-50 shadow-lg shadow-[#ccf381]/10"
                 >
-                    {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : `✓ ${dict?.dashboard?.saveGoals || 'Save Goals'}`}
+                    {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : `✓ ${dict?.dashboard?.saveGoals || 'Save Settings'}`}
                 </button>
             </div>
         </div>

@@ -91,11 +91,21 @@ export function PortProgressWidget({
                         </div>
 
                         <div className="flex justify-between items-center px-1">
-                            <div className="flex items-baseline gap-2">
-                                <span className={`text-lg font-black ${netProfitToday >= 0 ? 'text-white' : 'text-red-400'}`}>
-                                    {symbol}{netProfitToday.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}
-                                </span>
-                                <span className="text-xs text-gray-500 font-bold">/ {symbol}{dailyTargetAmount.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}</span>
+                            <div className="flex flex-col">
+                                {isUSC && (
+                                    <div className="flex items-baseline gap-1 opacity-60">
+                                        <span className="text-[9px] font-bold text-gray-500">
+                                            ${(netProfitToday / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                        </span>
+                                        <span className="text-[8px] text-gray-600">/ ${(dailyTargetAmount / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                )}
+                                <div className="flex items-baseline gap-2 leading-none mt-0.5">
+                                    <span className={`text-lg font-black ${netProfitToday >= 0 ? 'text-white' : 'text-red-400'}`}>
+                                        {symbol}{netProfitToday.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}
+                                    </span>
+                                    <span className="text-xs text-gray-500 font-bold">/ {symbol}{dailyTargetAmount.toLocaleString(undefined, { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{suffix}</span>
+                                </div>
                             </div>
                             <div className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${dailyProgress >= 100 ? 'bg-[#ccf381]/20 text-[#ccf381]' : 'bg-white/5 text-gray-500'}`}>
                                 {dailyProgress >= 100 ? 'Challenge Completed' : 'In Progress'}

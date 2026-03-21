@@ -137,8 +137,12 @@ export async function GET(request: Request) {
     const isQuestActive = profile?.is_portfolio_quest_active || false
 
     // If a specific portfolio is selected, use its settings
+    const portfolioGoals = (portfolioId && portfolioId !== 'null') 
+        ? portfolios?.find(p => p.id === portfolioId) 
+        : null
+
     if (portfolioId && portfolioId !== 'null') {
-        const portfolio = portfolios?.find(p => p.id === portfolioId)
+        const portfolio = portfolioGoals
         if (portfolio) {
             // Use portfolio settings if they exist, otherwise fallback to profile defaults
             portSize = (portfolio as any).port_size ?? portSize

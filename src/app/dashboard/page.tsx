@@ -108,13 +108,27 @@ export default function DashboardPage() {
                                     </p>
                                 )}
                             </div>
-                            <div className="flex justify-between items-baseline mb-4">
-                                <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
-                                    {isUSC ? '' : '$'}{Number(stats.netProfit).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}
-                                </h3>
+                            <div className="flex justify-between items-end mb-4">
+                                <div className="flex flex-col">
+                                    {isUSC && (
+                                        <p className="text-[10px] font-bold text-gray-500 mb-0.5 opacity-60">
+                                            ${(Number(stats.netProfit) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                    )}
+                                    <h3 className={`text-5xl font-bold tracking-tight ${Number(stats.netProfit) >= 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-[#ccf381]' : 'text-red-400'}`}>
+                                        {isUSC ? '' : '$'}{Number(stats.netProfit).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}
+                                    </h3>
+                                </div>
                                 {portSize > 0 && (
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-2xl font-black text-white">{isUSC ? '' : '$'}{(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}</span>
+                                    <div className="flex flex-col items-end">
+                                        {isUSC && (
+                                            <p className="text-[10px] font-bold text-gray-500 mb-0.5 opacity-60">
+                                                ${((portSize + Number(stats.netProfit)) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </p>
+                                        )}
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-2xl font-black text-white">{isUSC ? '' : '$'}{(portSize + Number(stats.netProfit)).toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2, maximumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}</span>
+                                        </div>
                                     </div>
                                 )}
                             </div>

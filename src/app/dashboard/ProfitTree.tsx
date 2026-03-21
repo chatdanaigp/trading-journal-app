@@ -141,7 +141,14 @@ export function ProfitTree({
                         <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-md">{dict?.dashboard?.myForest || "My Forest"}</h2>
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-400 drop-shadow-md">{dict?.dashboard?.goalTarget || "Goal Target"}:</span>
-                            <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">{isUSC ? '' : '$'}{targetProfit.toLocaleString()}{isUSC ? ' USC' : ''}</span>
+                            <div className="flex flex-col">
+                                {isUSC && (
+                                    <span className="text-[10px] font-bold text-[#ccf381]/70 leading-tight">
+                                        ${(targetProfit / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    </span>
+                                )}
+                                <span className="text-sm font-bold text-[#ccf381] drop-shadow-md">{isUSC ? '' : '$'}{targetProfit.toLocaleString()}{isUSC ? ' USC' : ''}</span>
+                            </div>
                         </div>
                     </div>
                     <GoalSettings 
@@ -172,6 +179,11 @@ export function ProfitTree({
                         <div className="flex justify-between items-end">
                             <div>
                                 <p className="text-xs text-gray-500 mb-1">{dict?.dashboard?.currentProfit || "Current Profit"}</p>
+                                {isUSC && (
+                                    <p className="text-[10px] font-bold text-white/50 mb-0.5 leading-tight">
+                                        ${(netProfit / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    </p>
+                                )}
                                 <p className="text-2xl font-bold text-white">{isUSC ? '' : '$'}{netProfit.toLocaleString('en-US', { minimumFractionDigits: isUSC ? 0 : 2 })}{isUSC ? ' USC' : ''}</p>
                             </div>
                             <div className="text-right">
