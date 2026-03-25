@@ -16,6 +16,10 @@
 export function getTradingDay(dateInput: string | Date): Date {
     const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
 
+    // Apply 5-hour offset (Market opens at 05:00 AM Thai Time)
+    // If it's 04:59 AM Tuesday, subtracting 5 hours brings it to 11:59 PM Monday.
+    const offsetDate = new Date(d.getTime() - (5 * 60 * 60 * 1000));
+
     // Format the date to Thailand time explicitly to avoid Vercel UTC shifts
     const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: 'Asia/Bangkok',
@@ -26,7 +30,7 @@ export function getTradingDay(dateInput: string | Date): Date {
         hour12: false
     });
 
-    const parts = formatter.formatToParts(d);
+    const parts = formatter.formatToParts(offsetDate);
     const p: Record<string, string> = {};
     for (const part of parts) p[part.type] = part.value;
 
@@ -48,6 +52,9 @@ export function getTradingDay(dateInput: string | Date): Date {
 export function getTradingDayStr(dateInput: string | Date): string {
     const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
 
+    // Apply 5-hour offset
+    const offsetDate = new Date(d.getTime() - (5 * 60 * 60 * 1000));
+
     const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: 'Asia/Bangkok',
         year: 'numeric',
@@ -57,7 +64,7 @@ export function getTradingDayStr(dateInput: string | Date): string {
         hour12: false
     });
 
-    const parts = formatter.formatToParts(d);
+    const parts = formatter.formatToParts(offsetDate);
     const p: Record<string, string> = {};
     for (const part of parts) p[part.type] = part.value;
 
