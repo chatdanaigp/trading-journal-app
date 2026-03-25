@@ -38,13 +38,14 @@ export async function GET(request: Request) {
         tradesQuery = tradesQuery.eq('portfolio_id', portfolioId)
     }
 
-    // Fetch trades for current month
-    const { data: trades } = await tradesQuery
+    // Fetch trades for current month (All for stats)
+    const { data: allMonthlyTrades } = await tradesQuery
         .gte('created_at', monthStart)
         .lte('created_at', monthEnd)
         .order('created_at', { ascending: false })
         .order('id', { ascending: false })
-        .limit(100)
+    
+    const trades = allMonthlyTrades || []
 
     // Base query for ALL trades
     let allTradesQuery = supabase
@@ -94,7 +95,7 @@ export async function GET(request: Request) {
         return { ...t, net_profit: netProfit, commission_applied: commission }
     })
 
-    const displayTrades = tradeList.map(t => ({
+    const displayTrades = tradeList.slice(0, 100).map(t => ({
         ...t,
         profit: t.profit // Original gross profit for the list
     }))

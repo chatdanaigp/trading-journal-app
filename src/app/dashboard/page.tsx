@@ -237,7 +237,7 @@ export default function DashboardPage() {
                                 <PortProgressWidget 
                                     portSize={portSize}
                                     goalPercent={goalPercent}
-                                    netProfitToday={trades.filter((t: any) => t.created_at && isSameDay(getTradingDay(t.created_at), getTradingDay(new Date()))).reduce((sum: number, t: any) => sum + (t.profit || 0), 0)}
+                                    netProfitToday={dailyProfit}
                                     dict={dict}
                                     currency={currency}
                                 />
