@@ -23,7 +23,7 @@ export default function HistoryPage() {
     const { trades, username } = data
 
     return (
-        <StaggerContainer className="space-y-8 h-full flex flex-col">
+        <StaggerContainer className="flex min-h-[calc(100vh-8rem)] flex-col gap-8">
             {/* Header */}
             <StaggerItem className="shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                 <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
@@ -61,14 +61,14 @@ export default function HistoryPage() {
             </StaggerItem>
 
             {/* Full screen TradeList */}
-            <StaggerItem className="flex-grow pb-4">
-                <div className="w-full h-full">
+            <StaggerItem className="flex flex-1 min-h-0 pb-4">
+                <div className="w-full h-full min-h-0">
                     <TradeList 
                         trades={trades} 
                         username={username} 
                         dict={dict} 
                         hideHeader={true}
-                        className="max-h-[calc(100vh-160px)] h-full"
+                        className="h-full min-h-0"
                     />
                 </div>
             </StaggerItem>

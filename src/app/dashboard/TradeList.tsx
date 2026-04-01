@@ -42,7 +42,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                 <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#050505] z-0" />
                 <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
                 
-                <CardContent className="p-6 relative z-10 flex flex-col h-full">
+                <CardContent className="p-6 relative z-10 flex flex-1 min-h-0 flex-col">
                     {!hideHeader && (
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
@@ -50,11 +50,11 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                         </div>
                     )}
 
-                    <div className="p-0">
+                    <div className="flex flex-1 min-h-0 flex-col p-0">
                         {trades.length === 0 ? (
-                            <div className="p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
+                            <div className="flex flex-1 items-center justify-center p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
                         ) : (
-                            <div className="max-h-[800px] overflow-y-auto custom-scrollbar overflow-x-hidden rounded-xl border border-white/5 bg-black/20">
+                            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar overflow-x-hidden rounded-xl border border-white/5 bg-black/20">
                                 <table className="w-full text-left relative table-fixed">
                                     <thead className="bg-[#1a1a1a] text-gray-400 text-[12px] uppercase tracking-wider sticky top-0 z-40 shadow-md">
                                         <tr>
