@@ -5,7 +5,8 @@ import { AnalyticsData } from '../actions'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
-import { Clock, Tag, Flame } from 'lucide-react'
+import { Clock, Tag, Flame, Activity } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { dictionaries } from '@/utils/dictionaries'
 
 const SESSION_COLORS: Record<string, string> = {
@@ -145,7 +146,11 @@ export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dic
                                     )
                                 })}
                                 {(!sessionPerformance || sessionPerformance.length === 0) && (
-                                    <p className="text-gray-600 text-sm text-center py-8">No session data</p>
+                                    <EmptyState 
+                                        icon={Clock}
+                                        title="No session data"
+                                        subtitle="No trades logged yet"
+                                    />
                                 )}
                             </div>
                         </CardContent>
@@ -199,11 +204,11 @@ export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dic
                                     })}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-8 text-gray-600">
-                                    <Tag className="w-8 h-8 mb-2 text-gray-700" />
-                                    <p className="text-sm">{dict?.analytics?.noStrategyData || 'No strategy tags yet'}</p>
-                                    <p className="text-[10px] text-gray-700 mt-1">Add #tags when logging trades</p>
-                                </div>
+                                <EmptyState
+                                    icon={Tag}
+                                    title={dict?.analytics?.noStrategyData || 'No strategy tags yet'}
+                                    subtitle="Add #tags when logging trades"
+                                />
                             )}
                         </CardContent>
                     </Card>

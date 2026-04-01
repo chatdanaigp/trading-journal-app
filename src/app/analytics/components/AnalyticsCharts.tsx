@@ -9,23 +9,20 @@ import {
 import { BarChart3 } from 'lucide-react'
 import type { dictionaries } from '@/utils/dictionaries'
 
+import { EmptyState } from '@/components/ui/EmptyState'
+
 type AppDictionary = typeof dictionaries.EN
 
 export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: AppDictionary }) {
     if (data.stats.totalTrades === 0) {
         return (
-            <Card className="border-0 shadow-2xl overflow-hidden relative group">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#2a2a2a] via-[#1a1a1a] to-[#050505] z-0" />
-                <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none z-20" />
-
-                <CardContent className="flex flex-col items-center justify-center h-[400px] text-gray-500 relative z-10">
-                    <div className="p-6 bg-[#252525] rounded-full mb-4 border border-white/5 shadow-lg">
-                        <BarChart3 className="w-12 h-12 text-gray-600" />
-                    </div>
-                    <p className="text-xl font-bold text-gray-300">{dict.analytics.noData}</p>
-                    <p className="text-sm mt-2 text-gray-500">{dict.analytics.noDataSub}</p>
-                </CardContent>
-            </Card>
+            <div className="flex justify-center py-12">
+                <EmptyState 
+                    icon={BarChart3}
+                    title={dict.analytics.noData}
+                    subtitle={dict.analytics.noDataSub}
+                />
+            </div>
         )
     }
 

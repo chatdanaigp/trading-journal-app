@@ -3,8 +3,9 @@
 import { useState, useRef, useCallback } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X } from 'lucide-react'
+import { Upload, FileSpreadsheet, CheckCircle2, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import type { Dictionary } from '@/utils/dictionaries'
 
 type ImportResult = {
@@ -25,14 +26,12 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
     const [preview, setPreview] = useState<string[][]>([])
     const [headers, setHeaders] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
-    const [result, setResult] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { mutate } = useSWRConfig()
 
     const processFile = useCallback((f: File) => {
         setFile(f)
-        setResult(null)
 
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -68,7 +67,6 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
     const handleImport = async () => {
         if (!file) return
         setLoading(true)
-        setResult(null)
 
         try {
             const formData = new FormData()
@@ -79,20 +77,19 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
             const data = await res.json() as ImportResult
 
             if (data.success) {
-                setResult({ type: 'success', text: `Successfully imported ${data.imported} trades!` })
+                showSuccess(`Successfully imported ${data.imported} trades!`)
                 mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
                 setTimeout(() => {
                     setFile(null)
                     setPreview([])
                     setHeaders([])
-                    setResult(null)
                     onClose()
                 }, 1500)
             } else {
-                setResult({ type: 'error', text: data.error || 'Import failed' })
+                showError(data.error || 'Import failed')
             }
         } catch {
-            setResult({ type: 'error', text: 'Network error. Please try again.' })
+            showError('Network error. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -102,7 +99,6 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
         setFile(null)
         setPreview([])
         setHeaders([])
-        setResult(null)
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
@@ -203,16 +199,6 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
                                 </table>
                             </div>
                         )}
-                    </div>
-                )}
-
-                {/* Result Message */}
-                {result && (
-                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold ${
-                        result.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    }`}>
-                        {result.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
-                        {result.text}
                     </div>
                 )}
 

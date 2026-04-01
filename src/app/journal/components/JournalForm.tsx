@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { createJournalEntry } from '../actions'
 import { motion } from 'framer-motion'
 import { useSWRConfig } from 'swr'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import type { Dictionary } from '@/utils/dictionaries'
 
 type MoodOptionKey = 'great' | 'good' | 'neutral' | 'bad' | 'terrible'
@@ -47,7 +48,6 @@ export function JournalForm({ dict }: { dict: Dictionary }) {
     const [selectedMood, setSelectedMood] = useState<MoodOptionKey | ''>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const [followedPlan, setFollowedPlan] = useState(true)
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
     const { mutate } = useSWRConfig()
 
@@ -59,7 +59,6 @@ export function JournalForm({ dict }: { dict: Dictionary }) {
 
     async function handleSubmit(formData: FormData) {
         setLoading(true)
-        setMessage(null)
 
         formData.set('mood', selectedMood)
         formData.set('tags', selectedTags.join(','))
@@ -68,17 +67,16 @@ export function JournalForm({ dict }: { dict: Dictionary }) {
         const result = await createJournalEntry(formData)
 
         if (result.error) {
-            setMessage({ type: 'error', text: result.error })
+            showError(result.error)
         } else {
             // Globally refresh all SWR cached API routes (dashboard, journal, analytics, etc)
             mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
 
-            setMessage({ type: 'success', text: 'Entry saved!' })
+            showSuccess('Entry saved!')
             formRef.current?.reset()
             setSelectedMood('')
             setSelectedTags([])
             setFollowedPlan(true)
-            setTimeout(() => setMessage(null), 3000)
         }
         setLoading(false)
     }
@@ -220,14 +218,6 @@ export function JournalForm({ dict }: { dict: Dictionary }) {
             >
                 {loading ? 'Saving...' : '📝 Save Journal Entry'}
             </motion.button>
-
-            {/* Status Message */}
-            {message && (
-                <div className={`text-sm text-center py-2 rounded-xl ${message.type === 'success' ? 'text-[#ccf381] bg-[#ccf381]/5' : 'text-red-400 bg-red-500/5'
-                    }`}>
-                    {message.text}
-                </div>
-            )}
         </form>
     )
 }
