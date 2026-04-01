@@ -2,6 +2,7 @@
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Dictionary } from '@/utils/dictionaries'
 
 type Trade = {
     id: string
@@ -9,27 +10,30 @@ type Trade = {
     profit: number | null
 }
 
-export function EquityChart({ trades, dict }: { trades: Trade[], dict?: any }) {
+type EquityPoint = {
+    name: number
+    date: string
+    profit: number
+}
+
+export function EquityChart({ trades, dict }: { trades: Trade[], dict?: Dictionary }) {
     // Sort trades by date (oldest first)
     const sortedTrades = [...trades].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
-    let cumulativeProfit = 0
-    const data = sortedTrades.map((trade, index) => {
-        cumulativeProfit += (trade.profit || 0)
-        return {
+    const tradeData = sortedTrades.reduce<EquityPoint[]>((points, trade, index) => {
+        const previousProfit = points.at(-1)?.profit || 0
+        points.push({
             name: index + 1, // Trade #1, #2, etc.
             date: new Date(trade.created_at).toLocaleDateString(),
-            profit: cumulativeProfit
-        }
-    })
+            profit: previousProfit + (trade.profit || 0)
+        })
+        return points
+    }, [])
 
     // Add initial point (0,0) if no trades, or prepending start
-    if (data.length > 0) {
-        data.unshift({ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 })
-    } else {
-        // Placeholder data for empty state
-        data.push({ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 })
-    }
+    const data: EquityPoint[] = tradeData.length > 0
+        ? [{ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 }, ...tradeData]
+        : [{ name: 0, date: dict?.dashboard?.start || 'Start', profit: 0 }]
 
     return (
         <Card className="relative border-0 shadow-2xl col-span-1 lg:col-span-2 overflow-hidden group">
@@ -78,7 +82,7 @@ export function EquityChart({ trades, dict }: { trades: Trade[], dict?: any }) {
                                 contentStyle={{ backgroundColor: '#000', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
                                 itemStyle={{ color: '#ccf381', fontWeight: 'bold' }}
                                 labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
-                                formatter={(value: any) => [`$${Number(value).toFixed(2)}`, dict?.dashboard?.equity || 'Equity']}
+                                formatter={(value: number | string | undefined) => [`$${Number(value || 0).toFixed(2)}`, dict?.dashboard?.equity || 'Equity']}
                                 labelFormatter={(label) => `${dict?.dashboard?.tradeHash || 'Trade #'}${label}`}
                                 cursor={{ stroke: '#ccf381', strokeWidth: 1, strokeDasharray: '5 5' }}
                             />

@@ -4,6 +4,21 @@ import { useState, useRef } from 'react'
 import { createJournalEntry } from '../actions'
 import { motion } from 'framer-motion'
 import { useSWRConfig } from 'swr'
+import type { Dictionary } from '@/utils/dictionaries'
+
+type MoodOptionKey = 'great' | 'good' | 'neutral' | 'bad' | 'terrible'
+type JournalTagKey =
+    | 'FollowedPlan'
+    | 'FOMO'
+    | 'RevengeTrade'
+    | 'Overtraded'
+    | 'Patience'
+    | 'Discipline'
+    | 'NewsEvent'
+    | 'TechnicalSetup'
+    | 'EarlyExit'
+    | 'LateEntry'
+    | 'PerfectExecution'
 
 const MOOD_OPTIONS = [
     { value: 'great', emoji: '🔥', label: 'Great' },
@@ -11,17 +26,25 @@ const MOOD_OPTIONS = [
     { value: 'neutral', emoji: '😐', label: 'Neutral' },
     { value: 'bad', emoji: '😔', label: 'Bad' },
     { value: 'terrible', emoji: '💀', label: 'Terrible' },
-]
+] as const satisfies ReadonlyArray<{ value: MoodOptionKey; emoji: string; label: string }>
 
 const TAG_PRESETS = [
-    'Followed Plan', 'FOMO', 'Revenge Trade', 'Overtraded',
-    'Patience', 'Discipline', 'News Event', 'Technical Setup',
-    'Early Exit', 'Late Entry', 'Perfect Execution',
-]
+    { label: 'Followed Plan', key: 'FollowedPlan' },
+    { label: 'FOMO', key: 'FOMO' },
+    { label: 'Revenge Trade', key: 'RevengeTrade' },
+    { label: 'Overtraded', key: 'Overtraded' },
+    { label: 'Patience', key: 'Patience' },
+    { label: 'Discipline', key: 'Discipline' },
+    { label: 'News Event', key: 'NewsEvent' },
+    { label: 'Technical Setup', key: 'TechnicalSetup' },
+    { label: 'Early Exit', key: 'EarlyExit' },
+    { label: 'Late Entry', key: 'LateEntry' },
+    { label: 'Perfect Execution', key: 'PerfectExecution' },
+] as const satisfies ReadonlyArray<{ label: string; key: JournalTagKey }>
 
-export function JournalForm({ dict }: { dict: any }) {
+export function JournalForm({ dict }: { dict: Dictionary }) {
     const [loading, setLoading] = useState(false)
-    const [selectedMood, setSelectedMood] = useState<string>('')
+    const [selectedMood, setSelectedMood] = useState<MoodOptionKey | ''>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const [followedPlan, setFollowedPlan] = useState(true)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -48,7 +71,7 @@ export function JournalForm({ dict }: { dict: any }) {
             setMessage({ type: 'error', text: result.error })
         } else {
             // Globally refresh all SWR cached API routes (dashboard, journal, analytics, etc)
-            mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+            mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
 
             setMessage({ type: 'success', text: 'Entry saved!' })
             formRef.current?.reset()
@@ -167,20 +190,20 @@ export function JournalForm({ dict }: { dict: any }) {
             <div className="space-y-3">
                 <label className="text-sm font-medium text-gray-300">{dict.journalForm.tagsLabel}</label>
                 <div className="flex flex-wrap gap-2">
-                    {TAG_PRESETS.map(tag => (
+                    {TAG_PRESETS.map((tag) => (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                            key={tag}
+                            key={tag.key}
                             type="button"
-                            onClick={() => toggleTag(tag)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedTags.includes(tag)
+                            onClick={() => toggleTag(tag.label)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedTags.includes(tag.label)
                                 ? 'bg-[#ccf381]/15 border-[#ccf381]/40 text-[#ccf381] shadow-[0_0_10px_rgba(204,243,129,0.1)]'
                                 : 'bg-[#151515] border-white/5 text-gray-500 hover:border-white/10 hover:text-gray-300 hover:bg-[#1a1a1a]'
                                 }`}
                         >
-                            #{dict.journalForm.tagOptions[tag.replace(/\s/g, '')]}
+                            #{dict.journalForm.tagOptions[tag.key]}
                         </motion.button>
                     ))}
                 </div>

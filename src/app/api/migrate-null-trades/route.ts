@@ -1,7 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-export async function POST(request: Request) {
+type NullPortfolioTradeRow = {
+    id: string
+    user_id: string
+}
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : 'Migration failed'
+}
+
+export async function POST() {
     // Only allow if authorized or via local development trigger
     // Using service role for global migration
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -33,7 +42,8 @@ export async function POST(request: Request) {
         console.log(`Found ${nullTrades.length} trades to migrate.`)
 
         // 2. Group by user_id to avoid redundant portfolio lookups
-        const userIds = Array.from(new Set(nullTrades.map(t => t.user_id)))
+        const typedNullTrades = (nullTrades ?? []) as NullPortfolioTradeRow[]
+        const userIds = Array.from(new Set(typedNullTrades.map((trade) => trade.user_id)))
         const userPortfolios: Record<string, string> = {}
 
         for (const userId of userIds) {
@@ -58,7 +68,7 @@ export async function POST(request: Request) {
 
         // 3. Batch updates
         let successCount = 0
-        for (const trade of nullTrades) {
+        for (const trade of typedNullTrades) {
             const portfolioId = userPortfolios[trade.user_id]
             if (portfolioId) {
                 const { error: updateError } = await supabase
@@ -76,12 +86,12 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             message: 'Migration complete',
-            totalFound: nullTrades.length,
+            totalFound: typedNullTrades.length,
             successfullyMigrated: successCount
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Migration failed:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
     }
 }

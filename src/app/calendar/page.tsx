@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Calendar, AlertTriangle, TrendingUp, Clock, Zap, Shield, ChevronDown, ChevronUp, Globe, BarChart3, RefreshCw } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
+import type { CalendarApiResponse, CalendarEvent } from '@/types/models'
 
 const IMPACT_CONFIG: Record<string, { dot: string; glow: string; badge: string; badgeText: string; label: string }> = {
     high:   { dot: 'bg-red-500',    glow: 'rgba(239,68,68,0.25)',   badge: 'bg-red-500/15 border-red-500/30',    badgeText: 'text-red-400',    label: '🔴 High' },
@@ -15,9 +16,9 @@ const FILTER_OPTIONS = ['all', 'high', 'medium', 'low'] as const
 const ALL_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'NZD', 'CAD', 'CHF', 'CNY'] as const
 
 export default function CalendarPage() {
-    const [data, setData] = useState<any>(null)
+    const [data, setData] = useState<CalendarApiResponse | null>(null)
     const [loading, setLoading] = useState(true)
-    const [filter, setFilter] = useState<string>('all')
+    const [filter, setFilter] = useState<(typeof FILTER_OPTIONS)[number]>('all')
     const [selectedCurrencies, setSelectedCurrencies] = useState<Set<string>>(new Set(ALL_CURRENCIES))
     const [expandedEvent, setExpandedEvent] = useState<number | null>(null)
     const [refreshing, setRefreshing] = useState(false)
@@ -37,39 +38,72 @@ export default function CalendarPage() {
     const selectAllCurrencies = () => setSelectedCurrencies(new Set(ALL_CURRENCIES))
     const clearAllCurrencies = () => setSelectedCurrencies(new Set())
 
-    const fetchData = (showLoading = true) => {
+    const fetchData = async (showLoading = true) => {
         if (showLoading) setLoading(true)
         else setRefreshing(true)
-        fetch('/api/calendar')
-            .then(r => r.json())
-            .then(d => setData(d))
-            .catch(() => setData({ events: [] }))
-            .finally(() => { setLoading(false); setRefreshing(false) })
+        try {
+            const response = await fetch('/api/calendar')
+            const payload = await response.json() as CalendarApiResponse
+            setData(payload)
+        } catch {
+            setData({ events: [] })
+        } finally {
+            setLoading(false)
+            setRefreshing(false)
+        }
     }
 
-    useEffect(() => { fetchData() }, [])
+    useEffect(() => {
+        let active = true
+
+        const loadInitialData = async () => {
+            try {
+                const response = await fetch('/api/calendar')
+                const payload = await response.json() as CalendarApiResponse
+                if (active) {
+                    setData(payload)
+                }
+            } catch {
+                if (active) {
+                    setData({ events: [] })
+                }
+            } finally {
+                if (active) {
+                    setLoading(false)
+                }
+            }
+        }
+
+        void loadInitialData()
+
+        return () => {
+            active = false
+        }
+    }, [])
 
     // Auto-refresh every 5 minutes
     useEffect(() => {
-        const interval = setInterval(() => fetchData(false), 5 * 60 * 1000)
+        const interval = setInterval(() => {
+            void fetchData(false)
+        }, 5 * 60 * 1000)
         return () => clearInterval(interval)
     }, [])
 
-    const allEvents: any[] = data?.events || []
-    const currencyFiltered = allEvents.filter((e: any) => selectedCurrencies.has(e.currency))
-    const filteredEvents = filter === 'all' ? currencyFiltered : currencyFiltered.filter((e: any) => e.impact === filter)
-    const todayEvents = filteredEvents.filter((e: any) => e.isToday)
-    const upcomingEvents = filteredEvents.filter((e: any) => !e.isToday)
+    const allEvents = data?.events || []
+    const currencyFiltered = allEvents.filter((event) => selectedCurrencies.has(event.currency))
+    const filteredEvents = filter === 'all' ? currencyFiltered : currencyFiltered.filter((event) => event.impact === filter)
+    const todayEvents = filteredEvents.filter((event) => event.isToday)
+    const upcomingEvents = filteredEvents.filter((event) => !event.isToday)
 
     // Group upcoming by date
-    const upcomingByDate: Record<string, any[]> = {}
-    upcomingEvents.forEach((evt: any) => {
+    const upcomingByDate: Record<string, CalendarEvent[]> = {}
+    upcomingEvents.forEach((evt) => {
         if (!upcomingByDate[evt.date]) upcomingByDate[evt.date] = []
         upcomingByDate[evt.date].push(evt)
     })
 
-    const highImpactToday = todayEvents.filter((e: any) => e.impact === 'high')
-    const currencies = [...new Set(todayEvents.map((e: any) => e.currency))] as string[]
+    const highImpactToday = todayEvents.filter((event) => event.impact === 'high')
+    const currencies = [...new Set(todayEvents.map((event) => event.currency))]
 
     return (
         <div className="space-y-6">
@@ -91,7 +125,7 @@ export default function CalendarPage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={() => fetchData(false)}
+                                onClick={() => { void fetchData(false) }}
                                 disabled={refreshing}
                                 className="flex items-center gap-1.5 bg-[#111] border border-[#222] rounded-xl px-3 py-2 text-sm text-gray-400 hover:text-[#ccf381] hover:border-[#ccf381]/30 transition-all"
                             >
@@ -179,7 +213,7 @@ export default function CalendarPage() {
                         <div className="relative p-6">
                             <div className="flex items-center gap-2 mb-5">
                                 <TrendingUp className="w-4 h-4 text-amber-400" />
-                                <h2 className="text-sm font-bold text-amber-400 uppercase tracking-wider">สรุปวันนี้ (Today's Summary)</h2>
+                                <h2 className="text-sm font-bold text-amber-400 uppercase tracking-wider">สรุปวันนี้ (Today&apos;s Summary)</h2>
                             </div>
 
                             {loading ? (
@@ -218,7 +252,7 @@ export default function CalendarPage() {
                                                 <p className="text-sm font-bold text-red-400 mb-1">⚠️ มีข่าวสำคัญวันนี้!</p>
                                                 <p className="text-xs text-gray-500 mb-2">ควรระวังช่วงเวลาประกาศข่าว ลดขนาด Lot หรือรอให้ความผันผวนสงบก่อนเทรด</p>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {highImpactToday.map((e: any, i: number) => (
+                                                    {highImpactToday.map((e, i) => (
                                                         <span key={i} className="flex items-center gap-1.5 text-[11px] font-bold bg-red-500/10 text-red-400 px-2.5 py-1 rounded-lg border border-red-500/20">
                                                             <Clock size={10} />
                                                             {e.time} — {e.title} <span className="text-red-600">({e.currency})</span>
@@ -244,7 +278,7 @@ export default function CalendarPage() {
                                 <span className="text-[10px] font-bold text-gray-600 bg-white/5 px-2 py-0.5 rounded-full">{todayEvents.length}</span>
                             </div>
                             <div className="divide-y divide-white/[0.04]">
-                                {todayEvents.map((evt: any, i: number) => (
+                                {todayEvents.map((evt, i) => (
                                     <EventRow key={`today-${i}`} event={evt} index={i} expandedEvent={expandedEvent} setExpandedEvent={setExpandedEvent} />
                                 ))}
                             </div>
@@ -267,7 +301,7 @@ export default function CalendarPage() {
                                     <span className="text-[10px] font-bold text-gray-600 bg-white/5 px-2 py-0.5 rounded-full">{events.length}</span>
                                 </div>
                                 <div className="divide-y divide-white/[0.04]">
-                                    {events.map((evt: any, i: number) => (
+                                    {events.map((evt, i) => (
                                         <EventRow key={`${date}-${i}`} event={evt} index={baseIndex + i + 1000} expandedEvent={expandedEvent} setExpandedEvent={setExpandedEvent} />
                                     ))}
                                 </div>
@@ -313,7 +347,7 @@ export default function CalendarPage() {
     )
 }
 
-function EventRow({ event, index, expandedEvent, setExpandedEvent }: { event: any, index: number, expandedEvent: number | null, setExpandedEvent: (i: number | null) => void }) {
+function EventRow({ event, index, expandedEvent, setExpandedEvent }: { event: CalendarEvent, index: number, expandedEvent: number | null, setExpandedEvent: (i: number | null) => void }) {
     const cfg = IMPACT_CONFIG[event.impact] || IMPACT_CONFIG.low
     const isExpanded = expandedEvent === index
 

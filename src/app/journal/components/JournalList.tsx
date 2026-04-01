@@ -3,8 +3,9 @@
 import { JournalEntry } from '../actions'
 import { JournalEntryCard } from './JournalEntryCard'
 import { BookOpen } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
 
-export function JournalList({ entries, dict }: { entries: JournalEntry[], dict: any }) {
+export function JournalList({ entries, dict }: { entries: JournalEntry[], dict: Dictionary }) {
     if (entries.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -13,7 +14,7 @@ export function JournalList({ entries, dict }: { entries: JournalEntry[], dict: 
                 </div>
                 <div className="text-center py-12">
                     <p className="text-gray-400 mb-2">{dict.journal.noEntries}</p>
-                    <p className="text-sm text-gray-600">{dict.journal.startDocumenting}</p>
+                    <p className="text-sm text-gray-600">{dict.journal.startWriting}</p>
                 </div>
             </div>
         )

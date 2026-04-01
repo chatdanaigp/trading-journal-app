@@ -3,24 +3,29 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Trophy, Target, Flame, TrendingUp, BarChart3, Shield } from 'lucide-react'
+import { Target, Flame, TrendingUp, BarChart3, Shield } from 'lucide-react'
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
+import type { PublicProfileResponse } from '@/types/models'
+
+type PublicProfileErrorResponse = {
+    error: string
+}
 
 export default function PublicProfilePage() {
     const params = useParams()
     const username = params.username as string
-    const [data, setData] = useState<any>(null)
+    const [data, setData] = useState<PublicProfileResponse | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         fetch(`/api/public-profile?username=${username}`)
             .then(r => r.json())
-            .then(d => {
-                if (d.error) setError(d.error)
-                else setData(d)
+            .then((response: PublicProfileResponse | PublicProfileErrorResponse) => {
+                if ('error' in response) setError(response.error)
+                else setData(response)
             })
             .catch(() => setError('Failed to load profile'))
             .finally(() => setLoading(false))
@@ -41,6 +46,8 @@ export default function PublicProfilePage() {
             </div>
         </div>
     )
+
+    if (!data) return null
 
     const { profile, stats, equityCurve, strategies } = data
 
@@ -93,7 +100,7 @@ export default function PublicProfilePage() {
                                     <YAxis stroke="#555" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px' }}
-                                        formatter={(val: any) => [`${Number(val).toFixed(1)}%`, 'Performance']}
+                                        formatter={(value: number | string | undefined) => [`${Number(value || 0).toFixed(1)}%`, 'Performance']}
                                     />
                                     <Area type="monotone" dataKey="percent" stroke="#ccf381" strokeWidth={2.5} fillOpacity={1} fill="url(#colorPublic)" dot={false} />
                                 </AreaChart>
@@ -114,13 +121,13 @@ export default function PublicProfilePage() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="relative z-10 pt-4 space-y-2">
-                            {strategies.map((s: any) => (
-                                <div key={s.name} className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-xl border border-white/5">
+                            {strategies.map((strategy) => (
+                                <div key={strategy.name} className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-xl border border-white/5">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#ccf381]/10 border border-[#ccf381]/25 text-[#ccf381]">#{s.name}</span>
-                                        <span className="text-xs text-gray-500">{s.count} trades</span>
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#ccf381]/10 border border-[#ccf381]/25 text-[#ccf381]">#{strategy.name}</span>
+                                        <span className="text-xs text-gray-500">{strategy.count} trades</span>
                                     </div>
-                                    <span className={`text-sm font-black ${s.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{s.winRate}% WR</span>
+                                    <span className={`text-sm font-black ${strategy.winRate >= 50 ? 'text-[#ccf381]' : 'text-red-400'}`}>{strategy.winRate}% WR</span>
                                 </div>
                             ))}
                         </CardContent>
@@ -148,7 +155,7 @@ export default function PublicProfilePage() {
     )
 }
 
-function StatsCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: any, color: string }) {
+function StatsCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string | number, color: string }) {
     const colorMap: Record<string, string> = {
         green: 'text-[#ccf381] bg-[#ccf381]/10 border-[#ccf381]/20',
         red: 'text-red-400 bg-red-500/10 border-red-500/20',

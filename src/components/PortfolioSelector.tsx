@@ -3,17 +3,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { Briefcase, Plus, ChevronDown, X, Trash2 } from 'lucide-react'
 import useSWR, { mutate as globalMutate } from 'swr'
+import type { PortfolioRecord } from '@/types/models'
+import type { Dictionary } from '@/utils/dictionaries'
 
-const fetcher = (url: string) => fetch(url).then(r => r.json())
+const fetcher = async (url: string): Promise<PortfolioRecord[]> => {
+    const response = await fetch(url)
+    return (await response.json()) as PortfolioRecord[]
+}
 
 interface PortfolioSelectorProps {
     value: string | null
     onChange: (portfolioId: string | null) => void
-    dict?: any
+    dict?: Dictionary
 }
 
 export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorProps) {
-    const { data: portfolios = [] } = useSWR('/api/portfolios', fetcher)
+    const { data: portfolios = [] } = useSWR<PortfolioRecord[]>('/api/portfolios', fetcher)
     const [isOpen, setIsOpen] = useState(false)
     const [isCreating, setIsCreating] = useState(false)
     const [newName, setNewName] = useState('')
@@ -33,7 +38,7 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
     }, [])
 
     const selectedName = value
-        ? (portfolios.find((p: any) => p.id === value)?.name || 'Portfolio')
+        ? (portfolios.find((portfolio) => portfolio.id === value)?.name || 'Portfolio')
         : (portfolios[0]?.name || 'Portfolio')
 
     async function handleCreate() {
@@ -44,7 +49,7 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
             body: JSON.stringify({ name: newName.trim() })
         })
         if (res.ok) {
-            const newPortfolio = await res.json()
+            const newPortfolio = (await res.json()) as PortfolioRecord
             if (newPortfolio && newPortfolio.id) {
                 onChange(newPortfolio.id)
             }
@@ -59,7 +64,7 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
         if (!confirm(dict?.portfolio?.deleteConfirm || 'Delete this portfolio? Trades will move to your default portfolio.')) return
         await fetch(`/api/portfolios?id=${id}`, { method: 'DELETE' })
         if (value === id) {
-            const other = portfolios.find((p: any) => p.id !== id)
+            const other = portfolios.find((portfolio) => portfolio.id !== id)
             onChange(other ? other.id : null)
         }
         globalMutate('/api/portfolios')
@@ -85,19 +90,19 @@ export function PortfolioSelector({ value, onChange, dict }: PortfolioSelectorPr
 
                     {/* Portfolios list */}
                     <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                        {portfolios.map((p: any) => (
+                        {portfolios.map((portfolio) => (
                             <button
-                                key={p.id}
-                                onClick={() => { onChange(p.id); setIsOpen(false) }}
+                                key={portfolio.id}
+                                onClick={() => { onChange(portfolio.id); setIsOpen(false) }}
                                 className={`w-full px-3 py-3 text-left text-xs font-bold flex items-center gap-2.5 transition-colors border-b border-white/5 group ${
-                                    value === p.id ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
+                                    value === portfolio.id ? 'bg-[#ccf381]/10 text-[#ccf381]' : 'text-gray-400 hover:bg-[#252525]'
                                 }`}
                             >
-                                <span className={`w-2 h-2 rounded-full shrink-0 ${value === p.id ? 'bg-[#ccf381]' : 'bg-gray-600'}`} />
-                                <span className="truncate flex-1">{p.name}</span>
-                                {value === p.id && <span className="text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${value === portfolio.id ? 'bg-[#ccf381]' : 'bg-gray-600'}`} />
+                                <span className="truncate flex-1">{portfolio.name}</span>
+                                {value === portfolio.id && <span className="text-[9px] bg-[#ccf381]/20 text-[#ccf381] px-1.5 py-0.5 rounded-md font-bold">Active</span>}
                                 <span
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }}
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(portfolio.id) }}
                                     className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all cursor-pointer p-0.5"
                                 >
                                     <Trash2 size={11} />

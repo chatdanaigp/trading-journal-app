@@ -1,5 +1,12 @@
 import { createClient } from '@/utils/supabase/server'
+import type { ImportedTradeRecord } from '@/types/models'
 import { NextRequest, NextResponse } from 'next/server'
+
+type ImportFormat = 'generic' | 'mt4' | 'mt5'
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : 'Failed to parse CSV'
+}
 
 export async function POST(req: NextRequest) {
     const supabase = await createClient()
@@ -10,7 +17,7 @@ export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData()
         const file = formData.get('file') as File
-        const format = formData.get('format') as string || 'generic'
+        const format = (formData.get('format') as ImportFormat | null) ?? 'generic'
 
         if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
 
@@ -19,7 +26,7 @@ export async function POST(req: NextRequest) {
 
         if (lines.length < 2) return NextResponse.json({ error: 'File is empty or has no data rows' }, { status: 400 })
 
-        let trades: any[] = []
+        let trades: ImportedTradeRecord[] = []
 
         if (format === 'mt4' || format === 'mt5') {
             trades = parseMT4MT5(lines, user.id)
@@ -40,14 +47,14 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json({ success: true, imported: trades.length })
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('CSV import error:', err)
-        return NextResponse.json({ error: err.message || 'Failed to parse CSV' }, { status: 500 })
+        return NextResponse.json({ error: getErrorMessage(err) }, { status: 500 })
     }
 }
 
-function parseMT4MT5(lines: string[], userId: string): any[] {
-    const trades: any[] = []
+function parseMT4MT5(lines: string[], userId: string): ImportedTradeRecord[] {
+    const trades: ImportedTradeRecord[] = []
     // MT4/MT5 history CSV usually has headers like:
     // Ticket, Open Time, Type, Size, Item, Price, S/L, T/P, Close Time, Close Price, Profit
     // Find header row
@@ -112,8 +119,8 @@ function parseMT4MT5(lines: string[], userId: string): any[] {
     return trades
 }
 
-function parseGenericCSV(lines: string[], userId: string): any[] {
-    const trades: any[] = []
+function parseGenericCSV(lines: string[], userId: string): ImportedTradeRecord[] {
+    const trades: ImportedTradeRecord[] = []
     const delimiter = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ','
 
     const headers = lines[0].split(delimiter).map(h => h.trim().toLowerCase())
@@ -137,7 +144,7 @@ function parseGenericCSV(lines: string[], userId: string): any[] {
 
         const symbol = symbolIdx >= 0 ? (cols[symbolIdx] || 'XAUUSD').toUpperCase() : 'XAUUSD'
 
-        let type = 'BUY'
+        let type: ImportedTradeRecord['type'] = 'BUY'
         if (typeIdx >= 0) {
             const t = cols[typeIdx]?.toLowerCase() || ''
             type = t.includes('sell') || t.includes('short') ? 'SELL' : 'BUY'

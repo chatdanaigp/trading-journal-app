@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getTradingDayStr, getTradingDay } from '@/utils/date-helpers'
+import { getTradingDayStr } from '@/utils/date-helpers'
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)

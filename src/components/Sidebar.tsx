@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Trophy, Settings, LogOut, Wallet, BarChart3, HelpCircle, Menu, X, Shield, Target, List, CalendarDays, User as UserIcon } from 'lucide-react'
@@ -100,9 +101,11 @@ export function Sidebar({ dict }: { dict: SidebarDictionary }) {
                 {user && (
                     <div className="mb-6 p-3 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] flex items-center gap-3">
                         {discordAvatar ? (
-                            <img
+                            <Image
                                 src={discordAvatar}
                                 alt={discordName}
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-full border-2 border-[#5865F2]"
                             />
                         ) : (

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import React from 'react'
 
 import { useState } from 'react'
@@ -14,30 +15,15 @@ import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
 import { getTradingDay } from '@/utils/date-helpers'
 import type { dictionaries } from '@/utils/dictionaries'
+import type { HistoryTradeRecord } from '@/types/models'
 
 type AppDictionary = typeof dictionaries.EN
 
-type TradeRecord = {
-    id: string
-    created_at: string | null
-    symbol: string | null
-    type: string | null
-    lot_size: number | null
-    entry_price: number | null
-    exit_price: number | null
-    profit: number | null
-    stop_loss: number | null
-    strategy?: string | null
-    screenshot_url?: string | null
-    notes?: string | null
-}
-
-export function TradeList({ trades, username, dict, className, hideHeader, currency }: { trades: TradeRecord[]; username?: string; dict?: AppDictionary; className?: string; hideHeader?: boolean; currency?: string }) {
+export function TradeList({ trades, username, dict, className, hideHeader, currency }: { trades: HistoryTradeRecord[]; username?: string; dict?: AppDictionary; className?: string; hideHeader?: boolean; currency?: string }) {
     const isUSC = currency === 'USC'
-    const symbol = isUSC ? 'USC' : '$'
-    const [editingTrade, setEditingTrade] = useState<TradeRecord | null>(null)
-    const [sharingTrade, setSharingTrade] = useState<TradeRecord | null>(null)
-    const [viewingTrade, setViewingTrade] = useState<TradeRecord | null>(null)
+    const [editingTrade, setEditingTrade] = useState<HistoryTradeRecord | null>(null)
+    const [sharingTrade, setSharingTrade] = useState<HistoryTradeRecord | null>(null)
+    const [viewingTrade, setViewingTrade] = useState<HistoryTradeRecord | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [viewingScreenshot, setViewingScreenshot] = useState<string | null>(null)
     const { mutate } = useSWRConfig()
@@ -52,7 +38,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
 
     return (
         <>
-            <Card className="relative overflow-hidden border-0 shadow-2xl h-full flex flex-col bg-[#0d0d0d]">
+            <Card className={cn("relative overflow-hidden border-0 shadow-2xl h-full flex flex-col bg-[#0d0d0d]", className)}>
                 <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#050505] z-0" />
                 <div className="absolute inset-0 border border-white/5 rounded-xl z-20 pointer-events-none" />
                 
@@ -197,7 +183,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                                                     t.screenshot_url ? "w-20 h-12 border-white/10 group-hover/detail:border-[#ccf381]/40" : "w-20 h-12 bg-white/5 border-white/10 group-hover/detail:bg-white/10"
                                                                 )}>
                                                                     {t.screenshot_url ? (
-                                                                        <img src={t.screenshot_url} alt="Chart" className="w-full h-full object-cover" />
+                                                                        <Image src={t.screenshot_url} alt="Chart" fill unoptimized className="object-cover" sizes="80px" />
                                                                     ) : (
                                                                         <div className="w-full h-full flex items-center justify-center">
                                                                             <Eye size={12} className="text-gray-500 group-hover/detail:text-white" />
@@ -305,7 +291,9 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                             className="w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40 cursor-pointer group relative shadow-2xl"
                                             onClick={() => { setViewingTrade(null); setViewingScreenshot(t.screenshot_url ?? null) }}
                                         >
-                                            <img src={t.screenshot_url} alt="Trade Chart" className="w-full h-auto max-h-[500px] object-contain" />
+                                            <div className="relative w-full h-[320px] sm:h-[420px] lg:h-[500px]">
+                                                <Image src={t.screenshot_url} alt="Trade Chart" fill unoptimized className="object-contain" sizes="(min-width: 1024px) 60vw, 100vw" />
+                                            </div>
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                                                 <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-center gap-2">
                                                     <Eye size={16} className="text-white" />
@@ -402,12 +390,19 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                         <X size={24} />
                     </button>
                     <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center p-2">
-                        <img
-                            src={viewingScreenshot}
-                            alt="Trade Chart"
-                            className="max-w-full max-h-full rounded-xl border border-white/10 shadow-2xl object-contain animate-in zoom-in-95 duration-300"
+                        <div
+                            className="relative w-full h-full max-w-full max-h-full"
                             onClick={(e) => e.stopPropagation()}
-                        />
+                        >
+                            <Image
+                                src={viewingScreenshot}
+                                alt="Trade Chart"
+                                fill
+                                unoptimized
+                                className="rounded-xl border border-white/10 shadow-2xl object-contain animate-in zoom-in-95 duration-300"
+                                sizes="100vw"
+                            />
+                        </div>
                     </div>
                 </div>
             )}

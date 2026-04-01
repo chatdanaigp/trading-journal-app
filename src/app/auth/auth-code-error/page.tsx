@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function AuthCodeErrorPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
@@ -5,7 +7,7 @@ export default function AuthCodeErrorPage() {
                 <div className="space-y-2">
                     <h1 className="text-4xl font-bold text-red-500">Authentication Error</h1>
                     <p className="text-gray-400">
-                        Sorry, we couldn't complete your login with Discord.
+                        Sorry, we couldn&apos;t complete your login with Discord.
                     </p>
                 </div>
 
@@ -19,18 +21,18 @@ export default function AuthCodeErrorPage() {
                 </div>
 
                 <div className="space-y-3">
-                    <a
+                    <Link
                         href="/login"
                         className="inline-block w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                     >
                         Try Again
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         href="/"
                         className="inline-block w-full border border-gray-700 hover:bg-gray-900 text-gray-300 font-semibold py-3 px-6 rounded-lg transition-colors"
                     >
                         Go Home
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

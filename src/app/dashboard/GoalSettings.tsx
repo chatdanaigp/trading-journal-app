@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
+import type { Dictionary } from '@/utils/dictionaries'
 
-export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, initialCurrency?: string, portfolioId?: string | null, dict?: any }) {
+export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, initialCurrency?: string, portfolioId?: string | null, dict?: Dictionary }) {
     const { mutate } = useSWRConfig()
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
     const [goalPercent, setGoalPercent] = useState<number | string>(initialGoalPercent)
@@ -43,12 +44,12 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
             }
 
             // Force SWR to revalidate everything starting with /api/
-            await mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+            await mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
             
             setIsOpen(false)
-        } catch (e: any) {
-            console.error('Error saving goals:', e)
-            setError(e.message || 'An unexpected error occurred')
+        } catch (error: unknown) {
+            console.error('Error saving goals:', error)
+            setError(error instanceof Error ? error.message : 'An unexpected error occurred')
         } finally {
             setIsLoading(false)
         }

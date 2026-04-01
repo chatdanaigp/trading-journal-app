@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { updateTrade } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,9 +9,10 @@ import { useState, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ImagePlus, X } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
+import type { HistoryTradeRecord } from '@/types/models'
 
 interface EditTradeFormProps {
-    initialData: any
+    initialData: HistoryTradeRecord
     onSuccess: () => void
 }
 
@@ -42,7 +44,6 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [sl, setSl] = useState(initialData.stop_loss || '')
     const [tp, setTp] = useState(initialData.take_profit || '')
     const [strategy, setStrategy] = useState(initialData.strategy || '')
-    const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(initialData.screenshot_url || null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -72,13 +73,9 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
         // Calculate Exit if Entry, Lot, Profit exist
         if (!isNaN(currentEntry) && !isNaN(currentLot) && !isNaN(currentProfit) && currentLot !== 0) {
             const priceDistance = currentProfit / (currentLot * 100)
-            let calculatedExit = 0
-
-            if (currentType === 'BUY') {
-                calculatedExit = currentEntry + priceDistance
-            } else {
-                calculatedExit = currentEntry - priceDistance
-            }
+            const calculatedExit = currentType === 'BUY'
+                ? currentEntry + priceDistance
+                : currentEntry - priceDistance
 
             setExit(calculatedExit.toFixed(2))
         }
@@ -109,7 +106,7 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                 setMessage({ type: 'success', text: 'Trade updated successfully!' })
                 
                 // Invalidate all API keys instantly
-                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+                mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
 
                 setTimeout(() => {
                     onSuccess() // Close modal
@@ -117,7 +114,7 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to update trade' })
             }
-        } catch (e) {
+        } catch {
             setMessage({ type: 'error', text: 'An unexpected error occurred' })
         } finally {
             setLoading(false)
@@ -406,14 +403,13 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                     onChange={(e) => { 
                         const file = e.target.files?.[0]; 
                         if (file) { 
-                            setScreenshotFile(file); 
                             setScreenshotPreview(URL.createObjectURL(file)); 
                         } 
                     }} 
                 />
                 {screenshotPreview ? (
                     <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-[#333] group">
-                        <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
+                        <Image src={screenshotPreview} alt="Preview" fill unoptimized className="object-cover" sizes="100vw" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                             <Button type="button" onClick={() => fileInputRef.current?.click()} variant="ghost" size="icon" className="text-white hover:bg-white/10">
                                 <ImagePlus size={24} />
@@ -421,7 +417,6 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                             <Button 
                                 type="button" 
                                 onClick={() => { 
-                                    setScreenshotFile(null); 
                                     setScreenshotPreview(null); 
                                     if (fileInputRef.current) fileInputRef.current.value = ''; 
                                 }} 

@@ -4,7 +4,16 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Card, CardContent } from "@/components/ui/card"
 import { GoalSettings } from './GoalSettings'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import type { Dictionary } from '@/utils/dictionaries'
+
+type AuraParticle = {
+    id: number
+    initialX: number
+    duration: number
+    delay: number
+    size: number
+}
 
 export function ProfitTree({
     netProfit,
@@ -21,7 +30,7 @@ export function ProfitTree({
     commissionPerLot?: number,
     portfolioId?: string | null,
     currency?: string,
-    dict?: any
+    dict?: Dictionary
 }) {
     const isUSC = currency === 'USC'
     // 1. Calculate Target
@@ -36,7 +45,6 @@ export function ProfitTree({
     // 3. Determine Tree Stage
     let treeImage = "/images/tree/level_1.jpg"
     let stageName = dict?.dashboard?.stages?.seed || "Seed Phase"
-    let headerColor = "text-[#ccf381]"
     let scale = 1
 
     if (rawProgress > 100) {
@@ -61,12 +69,16 @@ export function ProfitTree({
         scale = 1.0
     }
 
-    // 4. Aura Particles (Client-side only to avoid hydration mismatch)
-    const [mounted, setMounted] = useState(false)
-    useEffect(() => {
-        setMounted(true)
-    }, [])
-
+    // 4. Aura Particles
+    const [particles] = useState<AuraParticle[]>(() =>
+        Array.from({ length: 25 }, (_, index) => ({
+            id: index,
+            initialX: ((index * 37) % 400) - 200,
+            duration: 3 + ((index * 17) % 4),
+            delay: ((index * 13) % 30) / 10,
+            size: 4 + ((index * 11) % 10),
+        }))
+    )
     return (
         <Card className="bg-gradient-to-br from-[#1e1e1e] to-[#0d0d0d] border border-[#252525] shadow-xl relative overflow-hidden h-full min-h-[500px] rounded-2xl group">
             {/* Decor */}
@@ -97,42 +109,40 @@ export function ProfitTree({
             </div>
 
             {/* Aura Particles (Moved to be ON TOP of the image) */}
-            {mounted && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
-                    {[...Array(25)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            className="absolute rounded-full bg-[#ccf381]"
-                            initial={{
-                                opacity: 0,
-                                scale: 0,
-                                x: Math.random() * 400 - 200,
-                                y: 100
-                            }}
-                            animate={{
-                                opacity: [0, 0.8, 0], // Much more visible
-                                scale: [0, 2.5, 0],   // Larger growth
-                                y: -400               // Higher float
-                            }}
-                            transition={{
-                                duration: Math.random() * 4 + 3,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: Math.random() * 3
-                            }}
-                            style={{
-                                left: '50%',
-                                top: '60%',
-                                width: Math.random() * 10 + 4, // Larger base size (4-14px)
-                                height: Math.random() * 10 + 4,
-                                filter: 'blur(2px)', // Less blur to keep it distinct
-                                boxShadow: '0 0 20px 2px #ccf381', // Strong glow
-                                mixBlendMode: 'screen' // Additive blending for "light" effect
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
+                {particles.map((particle) => (
+                    <motion.div
+                        key={particle.id}
+                        className="absolute rounded-full bg-[#ccf381]"
+                        initial={{
+                            opacity: 0,
+                            scale: 0,
+                            x: particle.initialX,
+                            y: 100
+                        }}
+                        animate={{
+                            opacity: [0, 0.8, 0],
+                            scale: [0, 2.5, 0],
+                            y: -400
+                        }}
+                        transition={{
+                            duration: particle.duration,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: particle.delay
+                        }}
+                        style={{
+                            left: '50%',
+                            top: '60%',
+                            width: particle.size,
+                            height: particle.size,
+                            filter: 'blur(2px)',
+                            boxShadow: '0 0 20px 2px #ccf381',
+                            mixBlendMode: 'screen'
+                        }}
+                    />
+                ))}
+            </div>
 
             <CardContent className="p-6 flex flex-col justify-between h-full relative z-10 pointer-events-none">
                 {/* Header (Pointer events auto for interactivity) */}
@@ -169,7 +179,7 @@ export function ProfitTree({
                     <motion.h3
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        className={`text-center text-3xl font-black tracking-widest uppercase mb-2 ${headerColor} drop-shadow-lg`}
+                        className="text-center text-3xl font-black tracking-widest uppercase mb-2 text-[#ccf381] drop-shadow-lg"
                     >
                         {stageName}
                     </motion.h3>

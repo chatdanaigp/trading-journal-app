@@ -6,8 +6,9 @@ import { loginWithOAuth } from '../auth/actions'
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
 
-function LoginContent({ dict }: { dict: any }) {
+function LoginContent({ dict }: { dict: Dictionary }) {
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
     const [loading, setLoading] = useState(false)
@@ -53,7 +54,7 @@ function LoginContent({ dict }: { dict: any }) {
     )
 }
 
-export default function LoginClient({ dict }: { dict: any }) {
+export default function LoginClient({ dict }: { dict: Dictionary }) {
     return (
         <Suspense fallback={
             <div className="flex min-h-screen items-center justify-center bg-gray-950">

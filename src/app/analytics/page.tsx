@@ -8,19 +8,7 @@ import { MonthlyInsight } from './components/MonthlyInsight'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui/Skeleton'
-import { useEffect, useState } from 'react'
-import type { dictionaries } from '@/utils/dictionaries'
-
-type AppDictionary = typeof dictionaries.EN
-
-function useLang() {
-    const [dict, setDict] = useState<AppDictionary | null>(null)
-    useEffect(() => {
-        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
-        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
-    }, [])
-    return dict
-}
+import { useClientDictionary } from '@/hooks/useClientDictionary'
 
 function AnalyticsSkeleton() {
     return (
@@ -41,7 +29,7 @@ function AnalyticsSkeleton() {
 
 export default function AnalyticsPage() {
     const { data, isLoading } = useAnalyticsData()
-    const dict = useLang()
+    const dict = useClientDictionary()
     const now = new Date()
 
     if (isLoading || !data || !dict) return <AnalyticsSkeleton />

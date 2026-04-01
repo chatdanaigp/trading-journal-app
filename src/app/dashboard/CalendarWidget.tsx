@@ -7,32 +7,26 @@ import {
     endOfMonth,
     eachDayOfInterval,
     isSameDay,
-    getDay,
-    addMonths,
-    subMonths
+    getDay
 } from 'date-fns'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/utils/cn'
 import { getTradingDayStr } from '@/utils/date-helpers'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { AnimatePresence } from 'framer-motion'
+import { useSearchParams } from 'next/navigation'
 import { Modal } from '@/components/ui/Modal'
+import type { Dictionary } from '@/utils/dictionaries'
+import type { HistoryTradeRecord } from '@/types/models'
 
-// Local cn helper if not imported
-function localCn(...classes: (string | undefined | null | false)[]) {
-    return classes.filter(Boolean).join(' ')
+type DayStats = {
+    dailyProfit: number
+    dailyPoints: number
+    winCount: number
+    lossCount: number
+    tradeCount: number
+    dailyTrades: HistoryTradeRecord[]
 }
 
-type Trade = {
-    id: string
-    created_at: string
-    profit: number | null
-    lot_size: number | null
-}
-
-export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }) {
-    const router = useRouter()
+export function CalendarWidget({ trades, dict }: { trades: HistoryTradeRecord[]; dict?: Dictionary }) {
     const searchParams = useSearchParams()
 
     // Read initial month/year from URL, or default to now
@@ -42,7 +36,7 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
         ? new Date(Number(urlYear), Number(urlMonth) - 1, 1)
         : new Date()
 
-    const [currentDate, setCurrentDate] = useState(initialDate)
+    const [currentDate] = useState(initialDate)
     const [selectedDay, setSelectedDay] = useState<Date | null>(null)
 
     // Get all days in the current month
@@ -54,28 +48,8 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
     const startDayConfig = getDay(monthStart) // 0 = Sunday
     const emptyDays = Array(startDayConfig).fill(null)
 
-    // Navigate months with URL sync
-    const updateUrlParams = (date: Date) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set('month', (date.getMonth() + 1).toString())
-        params.set('year', date.getFullYear().toString())
-        router.push(`?${params.toString()}`, { scroll: false })
-    }
-
-    const nextMonth = () => {
-        const next = addMonths(currentDate, 1)
-        setCurrentDate(next)
-        updateUrlParams(next)
-    }
-
-    const prevMonth = () => {
-        const prev = subMonths(currentDate, 1)
-        setCurrentDate(prev)
-        updateUrlParams(prev)
-    }
-
     // Group trades by date and calculate daily PnL
-    const getDayStats = (day: Date) => {
+    const getDayStats = (day: Date): DayStats | null => {
         // Format the calendar cell date to a locally constructed YYYY-MM-DD string
         const cellDayStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
 
@@ -121,7 +95,6 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                     {daysInMonth.map((day) => {
                         const stats = getDayStats(day)
                         let bgColor = "bg-[#252525]/30 border border-white/5 hover:bg-[#2a2a2a]"
-                        let textColor = "text-gray-500"
                         let profitColor = ""
 
                         if (stats) {
@@ -214,7 +187,7 @@ export function CalendarWidget({ trades, dict }: { trades: Trade[], dict?: any }
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-[#222] pb-2">{dict?.dashboard?.tradeHistory || 'Trade History'}</h3>
                                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {selectedDayStats.dailyTrades.map((trade: any) => (
+                                        {selectedDayStats.dailyTrades.map((trade) => (
                                             <div key={trade.id} className="flex justify-between items-center p-3 bg-[#1a1a1a] hover:bg-[#222] transition-colors rounded-xl border border-[#222]">
                                                 <div className="flex items-center gap-3">
                                                     <div className={cn("px-2 py-1 rounded text-xs font-bold", trade.type === 'BUY' ? "bg-blue-500/20 text-blue-400" : "bg-red-500/20 text-red-500")}>

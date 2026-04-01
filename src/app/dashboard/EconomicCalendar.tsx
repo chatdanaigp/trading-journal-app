@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, ChevronDown, ChevronUp } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
+import type { CalendarApiResponse, CalendarEvent } from '@/types/models'
 
 const IMPACT_STYLES: Record<string, { dot: string, text: string }> = {
     high: { dot: 'bg-red-500', text: 'text-red-400' },
@@ -10,21 +12,21 @@ const IMPACT_STYLES: Record<string, { dot: string, text: string }> = {
     low: { dot: 'bg-green-500', text: 'text-green-400' }
 }
 
-export function EconomicCalendar({ dict }: { dict?: any }) {
-    const [data, setData] = useState<any>(null)
+export function EconomicCalendar({ dict }: { dict?: Dictionary }) {
+    const [data, setData] = useState<CalendarApiResponse | null>(null)
     const [expanded, setExpanded] = useState(false)
 
     useEffect(() => {
         fetch('/api/calendar')
             .then(r => r.json())
-            .then(d => setData(d))
+            .then((payload: CalendarApiResponse) => setData(payload))
             .catch(() => {})
     }, [])
 
     if (!data || !data.events?.length) return null
 
-    const todayEvents = data.events.filter((e: any) => e.isToday)
-    const upcomingEvents = data.events.filter((e: any) => !e.isToday)
+    const todayEvents = data.events.filter((event) => event.isToday)
+    const upcomingEvents = data.events.filter((event) => !event.isToday)
 
     return (
         <Card className="relative border-0 shadow-2xl overflow-hidden group">
@@ -57,7 +59,7 @@ export function EconomicCalendar({ dict }: { dict?: any }) {
                                 📅 Today
                             </div>
                         )}
-                        {todayEvents.map((evt: any, i: number) => (
+                        {todayEvents.map((evt, i) => (
                             <EventRow key={`today-${i}`} event={evt} />
                         ))}
 
@@ -67,7 +69,7 @@ export function EconomicCalendar({ dict }: { dict?: any }) {
                                 Upcoming
                             </div>
                         )}
-                        {upcomingEvents.slice(0, 5).map((evt: any, i: number) => (
+                        {upcomingEvents.slice(0, 5).map((evt, i) => (
                             <EventRow key={`up-${i}`} event={evt} />
                         ))}
                     </div>
@@ -77,7 +79,7 @@ export function EconomicCalendar({ dict }: { dict?: any }) {
     )
 }
 
-function EventRow({ event }: { event: any }) {
+function EventRow({ event }: { event: CalendarEvent }) {
     const style = IMPACT_STYLES[event.impact] || IMPACT_STYLES.low
 
     return (

@@ -1,5 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
+import type { JournalApiResponse } from '@/types/models'
+
+type JournalStatsRow = {
+    trading_day: string
+    followed_plan: boolean
+}
 
 export async function GET() {
     const supabase = await createClient()
@@ -22,11 +28,16 @@ export async function GET() {
         .eq('user_id', user.id)
         .order('trading_day', { ascending: false })
 
+    if (entriesError || statsError) {
+        const errorMessage = entriesError?.message || statsError?.message || 'Failed to load journal data'
+        return NextResponse.json({ error: errorMessage }, { status: 500 })
+    }
+
     const entryList = entries || []
-    const statsList = statsData || []
+    const statsList: JournalStatsRow[] = statsData || []
 
     const totalEntries = statsList.length
-    const followedCount = statsList.filter((e: any) => e.followed_plan).length
+    const followedCount = statsList.filter((entry) => entry.followed_plan).length
     const followedPlanRate = totalEntries > 0 ? (followedCount / totalEntries) * 100 : 0
 
     // Calculate streak
@@ -42,7 +53,7 @@ export async function GET() {
         else break
     }
 
-    return NextResponse.json({
+    return NextResponse.json<JournalApiResponse>({
         entries: entryList,
         stats: { totalEntries, followedPlanRate, streakDays }
     })

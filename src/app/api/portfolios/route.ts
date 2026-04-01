@@ -7,13 +7,14 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-    let { data, error } = await supabase
+    const { data: existingPortfolios, error } = await supabase
         .from('portfolios')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    let data = existingPortfolios
 
     // Auto-create "Main Account" if no portfolios exist
     if (!data || data.length === 0) {

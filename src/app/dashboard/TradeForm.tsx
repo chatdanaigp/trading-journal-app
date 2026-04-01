@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { createTrade } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,18 +8,17 @@ import { Label } from '@/components/ui/label'
 import { useState, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { LotSizeCombobox } from '@/components/ui/LotSizeCombobox'
-import { isSameDay } from 'date-fns'
-import { getTradingDay } from '@/utils/date-helpers'
-import { CheckCircle2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ImagePlus, X, Sparkles } from 'lucide-react'
+import { CheckCircle2, ImagePlus, X } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import { StrategyDropdown } from '@/components/ui/StrategyDropdown'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/utils/cn'
+import type { Dictionary } from '@/utils/dictionaries'
+import type { HistoryTradeRecord } from '@/types/models'
 
-export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, portfolioId = null, currency = 'USD' }: { dict?: any, trades?: any[], portSize?: number, goalPercent?: number, portfolioId?: string | null, currency?: string }) {
+export function TradeForm({ dict, portfolioId = null, currency = 'USD' }: { dict?: Dictionary, trades?: HistoryTradeRecord[], portSize?: number, goalPercent?: number, portfolioId?: string | null, currency?: string }) {
     const isUSC = currency === 'USC'
     const currencySymbol = isUSC ? '' : '$'
-    const suffix = isUSC ? ' USC' : ''
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
@@ -38,19 +38,11 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
     const [sl, setSl] = useState('')
     const [tp, setTp] = useState('')
     const [strategy, setStrategy] = useState('')
-    const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const STRATEGY_PRESETS = ['Breakout', 'Reversal', 'Trend', 'Scalping', 'News', 'Range', 'FVG', 'OB', 'BOS', 'CHoCH', 'Liquidity', 'SMC', 'S/D', 'EMA', 'Fibonacci', 'Divergence', 'VBP', 'VWAP', 'Other']
 
-    const computeRR = () => {
-        const slVal = parseFloat(sl)
-        const tpVal = parseFloat(tp)
-        if (isNaN(slVal) || isNaN(tpVal) || slVal === 0) return null
-        return (tpVal / slVal).toFixed(1)
-    }
-    const plannedRR = computeRR()
     const actualProfit = profitAmount ? (profitSign === '-' ? `-${profitAmount}` : profitAmount) : ''
 
     const handleCalculation = (changedField: string, val: string) => {
@@ -70,7 +62,7 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
 
         if (!isNaN(currentEntry) && !isNaN(currentLot) && !isNaN(currentProfit) && currentLot !== 0) {
             const priceDistance = currentProfit / (currentLot * 100)
-            let calculatedExit = currentType === 'BUY' ? currentEntry + priceDistance : currentEntry - priceDistance
+            const calculatedExit = currentType === 'BUY' ? currentEntry + priceDistance : currentEntry - priceDistance
             setExit(calculatedExit.toFixed(2))
         }
     }
@@ -93,14 +85,14 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
                 setTimeout(() => setShowSuccessOverlay(false), 2000)
                 setMessage({ type: 'success', text: 'Trade saved successfully!' })
                 formRef.current?.reset()
-                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+                mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
                 setSymbol('XAUUSD')
                 setTradeDate(new Date().toISOString().split('T')[0])
-                setEntry(''); setExit(''); setLot(''); setProfitAmount(''); setProfitSign('+'); setPoints(null); setSl(''); setTp(''); setStrategy(''); setScreenshotFile(null); setScreenshotPreview(null);
+                setEntry(''); setExit(''); setLot(''); setProfitAmount(''); setProfitSign('+'); setPoints(null); setSl(''); setTp(''); setStrategy(''); setScreenshotPreview(null);
             } else {
                 setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
             }
-        } catch (e) {
+        } catch {
             setMessage({ type: 'error', text: 'An unexpected error occurred' })
         } finally {
             setLoading(false)
@@ -196,13 +188,13 @@ export function TradeForm({ dict, trades = [], portSize = 0, goalPercent = 0, po
 
                         <div className="flex flex-col gap-2">
                              <Label className="text-gray-400 text-xs flex items-center gap-1.5"><ImagePlus size={10} className="text-[#ccf381]" /> {dict?.tradeForm?.screenshot || 'Chart Screenshot'}</Label>
-                             <input ref={fileInputRef} type="file" name="screenshot" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) { setScreenshotFile(file); setScreenshotPreview(URL.createObjectURL(file)); } }} />
+                             <input ref={fileInputRef} type="file" name="screenshot" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) { setScreenshotPreview(URL.createObjectURL(file)); } }} />
                              {screenshotPreview ? (
                                 <div className="relative w-full aspect-video md:aspect-[21/9] rounded-xl overflow-hidden border border-[#333] group">
-                                    <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover" />
+                                    <Image src={screenshotPreview} alt="Preview" fill unoptimized className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                         <Button type="button" onClick={() => fileInputRef.current?.click()} variant="ghost" size="icon" className="text-white hover:bg-white/10"><ImagePlus size={24} /></Button>
-                                        <Button type="button" onClick={() => { setScreenshotFile(null); setScreenshotPreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} variant="ghost" size="icon" className="text-red-400 hover:bg-red-400/10"><X size={24} /></Button>
+                                        <Button type="button" onClick={() => { setScreenshotPreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} variant="ghost" size="icon" className="text-red-400 hover:bg-red-400/10"><X size={24} /></Button>
                                     </div>
                                 </div>
                              ) : (

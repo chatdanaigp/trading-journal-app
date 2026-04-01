@@ -1,18 +1,19 @@
 import React from 'react'
+import type { Dictionary } from '@/utils/dictionaries'
 
 interface TradeShareCardProps {
     trade: {
-        symbol: string
-        type: string
-        lot_size: number
-        entry_price: number
-        exit_price?: number
-        profit: number
-        created_at: string
+        symbol: string | null
+        type: string | null
+        lot_size: number | null
+        entry_price: number | null
+        exit_price?: number | null
+        profit: number | null
+        created_at: string | null
     }
     username?: string
     points?: number
-    dict?: any
+    dict?: Dictionary
     currency?: string
 }
 
@@ -33,7 +34,7 @@ export function TradeShareCard({ trade, username, points, dict, currency }: Trad
             : trade.entry_price - diff
     }
 
-    const dateObj = new Date(trade.created_at)
+    const dateObj = trade.created_at ? new Date(trade.created_at) : new Date()
     const expiryDate = dateObj.toLocaleDateString('en-GB', {
         month: '2-digit', year: '2-digit'
     }) // MM/YY format
@@ -125,7 +126,7 @@ export function TradeShareCard({ trade, username, points, dict, currency }: Trad
                         letterSpacing: '0.12em', textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 0 rgba(255,255,255,0.05)',
                         fontFamily: fontSlab, marginBottom: '12px', lineHeight: '1' // Equal margin
                     }}>
-                        {trade.symbol}
+                        {trade.symbol || 'N/A'}
                     </div>
                     {/* Details below symbol */}
                     <div style={{ display: 'flex', gap: '20px', fontSize: '10px', letterSpacing: '0.08em', alignItems: 'center' }}>
@@ -133,7 +134,7 @@ export function TradeShareCard({ trade, username, points, dict, currency }: Trad
                             color: isProfit ? '#22c55e' : '#ef4444', fontWeight: 'bold',
                             textTransform: 'uppercase', background: 'rgba(0,0,0,0.2)', padding: '2px 6px', borderRadius: '4px',
                             border: `1px solid ${isProfit ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`
-                        }}>{trade.type}</span>
+                        }}>{trade.type || 'TRADE'}</span>
                         <span style={{ color: '#9ca3af', fontFamily: fontMono, fontWeight: 'bold' }}>{expiryDate}</span>
                     </div>
                 </div>

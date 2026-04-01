@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useLeaderboardData } from '@/hooks/usePageData'
 import { Trophy } from 'lucide-react'
 import Link from 'next/link'
@@ -7,18 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, TableSkeleton, Skeleton } from '@/components/ui/Skeleton'
-import { useEffect, useState } from 'react'
+import { useClientDictionary } from '@/hooks/useClientDictionary'
+import type { Dictionary } from '@/utils/dictionaries'
+import type { LeaderboardEntry } from '@/types/models'
 
-function useLang() {
-    const [dict, setDict] = useState<any>(null)
-    useEffect(() => {
-        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
-        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
-    }, [])
-    return dict
-}
-
-function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: any) {
+function getRankBadge(totalTrades: number, netProfit: number, winRate: number, dict: Dictionary) {
     if (totalTrades >= 200 && netProfit >= 10000 && winRate >= 75) return { badge: '🌟', name: dict?.leaderboard?.badges?.master || 'Master', color: 'from-yellow-400 to-yellow-600' }
     if (totalTrades >= 100 && netProfit >= 5000 && winRate >= 70) return { badge: '👑', name: dict?.leaderboard?.badges?.diamond || 'Diamond', color: 'from-cyan-400 to-blue-600' }
     if (totalTrades >= 50 && netProfit >= 2000 && winRate >= 60) return { badge: '💎', name: dict?.leaderboard?.badges?.platinum || 'Platinum', color: 'from-purple-400 to-purple-600' }
@@ -42,7 +36,7 @@ function LeaderboardSkeleton() {
 
 export default function LeaderboardPage() {
     const { data, isLoading } = useLeaderboardData()
-    const dict = useLang()
+    const dict = useClientDictionary()
 
     if (isLoading || !data || !dict) return <LeaderboardSkeleton />
 
@@ -79,7 +73,7 @@ export default function LeaderboardPage() {
                             <Card key={secondPlace.out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥈</div>
                                 <CardHeader className="text-center pt-10 pb-2">
-                                    {secondPlace.avatar_url && <img src={secondPlace.avatar_url} alt={secondPlace.username || 'Trader'} className="w-16 h-16 rounded-full border-2 border-gray-400 mx-auto mb-3" />}
+                                    {secondPlace.avatar_url && <Image src={secondPlace.avatar_url} alt={secondPlace.username || secondPlace.full_name || dict.leaderboard.traderDefault} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-gray-400 mx-auto mb-3" />}
                                     <CardTitle className="text-xl font-bold text-gray-200">{secondPlace.username || secondPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.runnerUp}</p>
                                 </CardHeader>
@@ -93,7 +87,7 @@ export default function LeaderboardPage() {
                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-7xl drop-shadow-[0_0_20px_rgba(255,215,0,0.5)]">👑</div>
                                 <div className="absolute inset-0 bg-gradient-to-b from-[#ccf381]/10 to-transparent pointer-events-none rounded-xl" />
                                 <CardHeader className="text-center pt-12 pb-2">
-                                    {firstPlace.avatar_url && <img src={firstPlace.avatar_url} alt={firstPlace.username || 'Champion'} className="w-20 h-20 rounded-full border-4 border-[#ccf381] mx-auto mb-3 shadow-lg shadow-[#ccf381]/30" />}
+                                    {firstPlace.avatar_url && <Image src={firstPlace.avatar_url} alt={firstPlace.username || firstPlace.full_name || dict.leaderboard.championDefault} width={80} height={80} className="w-20 h-20 rounded-full border-4 border-[#ccf381] mx-auto mb-3 shadow-lg shadow-[#ccf381]/30" />}
                                     <CardTitle className="text-2xl font-black text-[#ccf381] drop-shadow-md">{firstPlace.username || firstPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-[#ccf381]/80 uppercase tracking-widest font-bold">{dict.leaderboard.champion}</p>
                                 </CardHeader>
@@ -106,7 +100,7 @@ export default function LeaderboardPage() {
                             <Card key={thirdPlace.out_user_id} className="border-[#333] bg-[#1a1a1a]/60 backdrop-blur-md relative group hover:-translate-y-2 transition-transform duration-300">
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg">🥉</div>
                                 <CardHeader className="text-center pt-10 pb-2">
-                                    {thirdPlace.avatar_url && <img src={thirdPlace.avatar_url} alt={thirdPlace.username || 'Trader'} className="w-16 h-16 rounded-full border-2 border-orange-600 mx-auto mb-3" />}
+                                    {thirdPlace.avatar_url && <Image src={thirdPlace.avatar_url} alt={thirdPlace.username || thirdPlace.full_name || dict.leaderboard.traderDefault} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-orange-600 mx-auto mb-3" />}
                                     <CardTitle className="text-xl font-bold text-gray-200">{thirdPlace.username || thirdPlace.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}</CardTitle>
                                     <p className="text-xs text-gray-500 uppercase tracking-widest">{dict.leaderboard.thirdPlace}</p>
                                 </CardHeader>
@@ -136,19 +130,27 @@ export default function LeaderboardPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#222]">
-                                {leaderboard?.map((trader: any, index: number) => {
+                                {leaderboard?.map((trader: LeaderboardEntry, index: number) => {
                                     const rank = getRankBadge(trader.total_trades, trader.net_profit, trader.win_rate, dict)
                                     const isCurrentUser = trader.out_user_id === currentUserId
+                                    const profileHref = trader.username ? `/profile/${trader.username}` : null
                                     return (
                                         <tr key={trader.out_user_id} className={`hover:bg-[#ccf381]/5 transition-colors group ${isCurrentUser ? 'bg-[#ccf381]/10 border-l-4 border-l-[#ccf381]' : ''}`}>
                                             <td className="p-4 font-mono text-gray-500 group-hover:text-[#ccf381] font-bold">#{index + 1}</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">
-                                                    {trader.avatar_url && <img src={trader.avatar_url} alt={trader.username || trader.full_name} className="w-8 h-8 rounded-full border border-gray-600" />}
-                                                    <Link href={`/public-profile/${trader.out_user_id}`} className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}>
-                                                        {trader.username || trader.full_name || dict?.leaderboard?.anonymous || 'Anonymous'}
-                                                        {isCurrentUser && <span className="ml-2 text-xs">({dict?.leaderboard?.you || 'You'})</span>}
-                                                    </Link>
+                                                    {trader.avatar_url && <Image src={trader.avatar_url} alt={trader.username || trader.full_name || dict.leaderboard.traderDefault} width={32} height={32} className="w-8 h-8 rounded-full border border-gray-600" />}
+                                                    {profileHref ? (
+                                                        <Link href={profileHref} className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'} group-hover:translate-x-1 transition-transform`}>
+                                                            {trader.username || trader.full_name || dict.leaderboard.anonymous}
+                                                            {isCurrentUser && <span className="ml-2 text-xs">{dict.leaderboard.you}</span>}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className={`font-bold ${isCurrentUser ? 'text-[#ccf381]' : 'text-white'}`}>
+                                                            {trader.full_name || dict.leaderboard.anonymous}
+                                                            {isCurrentUser && <span className="ml-2 text-xs">{dict.leaderboard.you}</span>}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="p-4"><span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${rank.color} text-white font-bold`}>{rank.badge} {rank.name}</span></td>

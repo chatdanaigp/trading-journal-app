@@ -15,6 +15,7 @@ export const dictionaries = {
             vsLastPeriod: "vs last period",
             totalTrades: "Total Trades",
             pointsThisMonth: "Points (This Month)",
+            netPts: "Net Points",
             today: "Today",
             thisWeek: "This Week",
             recentTransactions: "Recent Transactions",
@@ -101,10 +102,13 @@ export const dictionaries = {
             riskReward: "RR",
             plannedRR: "Planned RR",
             strategy: "Strategy",
+            selectStrategy: "Select Strategy...",
             screenshot: "Chart Screenshot",
             viewScreenshot: "View Chart",
             uploadImage: "Upload Image",
-            changeImage: "Change Image"
+            changeImage: "Change Image",
+            searchLot: "Filter list...",
+            noResults: "No matching sizes."
         },
         sidebar: {
             dashboardLabel: "DASHBOARD",
@@ -175,7 +179,10 @@ export const dictionaries = {
         },
         portfolio: {
             allTrades: "All Trades",
-            create: "New Portfolio"
+            create: "New Portfolio",
+            selectPortfolio: "Select Portfolio",
+            namePlaceholder: "Portfolio name...",
+            deleteConfirm: "Delete this portfolio? Trades will move to your default portfolio."
         },
         calendar: {
             title: "Economic Calendar",
@@ -356,9 +363,11 @@ export const dictionaries = {
             subtitle: "Push your limits and complete trading goals.",
             adminQuests: "System Quests",
             portfolioQuest: "Portfolio Building Quest",
+            dailyTitle: "Daily Challenge",
             locked: "Locked",
             unlocked: "Completed",
             dailyTarget: "Daily Target",
+            todayGoal: "Today's Target",
             netToday: "Net Profit Today",
             tradingDays: "Based on 20 trading days/month",
             progress: "Progress",
@@ -392,6 +401,7 @@ export const dictionaries = {
             vsLastPeriod: "เทียบกับช่วงก่อน",
             totalTrades: "จำนวนเทรดทั้งหมด",
             pointsThisMonth: "ระยะ (Points) เดือนนี้",
+            netPts: "แต้มสุทธิ",
             today: "วันนี้",
             thisWeek: "สัปดาห์นี้",
             recentTransactions: "รายการล่าสุด",
@@ -478,10 +488,13 @@ export const dictionaries = {
             riskReward: "RR",
             plannedRR: "RR ที่ตั้งไว้",
             strategy: "กลยุทธ์",
+            selectStrategy: "เลือกกลยุทธ์...",
             screenshot: "ภาพกราฟ",
             viewScreenshot: "ดูกราฟ",
             uploadImage: "อัพโหลดรูป",
-            changeImage: "เปลี่ยนรูป"
+            changeImage: "เปลี่ยนรูป",
+            searchLot: "ค้นหาขนาดล็อต...",
+            noResults: "ไม่พบขนาดล็อตที่ตรงกัน"
         },
         sidebar: {
             dashboardLabel: "แดชบอร์ด",
@@ -552,7 +565,10 @@ export const dictionaries = {
         },
         portfolio: {
             allTrades: "ทุกออเดอร์",
-            create: "สร้างพอร์ตใหม่"
+            create: "สร้างพอร์ตใหม่",
+            selectPortfolio: "เลือกพอร์ต",
+            namePlaceholder: "ชื่อพอร์ต...",
+            deleteConfirm: "ลบพอร์ตนี้หรือไม่? รายการเทรดจะถูกย้ายไปยังพอร์ตหลักของคุณ"
         },
         calendar: {
             title: "ปฏิทินเศรษฐกิจ",
@@ -733,9 +749,11 @@ export const dictionaries = {
             subtitle: "ท้าทายขีดจำกัดและพิชิตเป้าหมายการเทรดของคุณ",
             adminQuests: "ภารกิจจากระบบ",
             portfolioQuest: "เควสปั้นพอร์ต (เป้าหมายรายวัน)",
+            dailyTitle: "ภารกิจรายวัน",
             locked: "ยังไม่สำเร็จ",
             unlocked: "สำเร็จแล้ว",
             dailyTarget: "เป้าหมายรายวัน",
+            todayGoal: "เป้าหมายวันนี้",
             netToday: "กำไรวันนี้",
             tradingDays: "คำนวณจาก 20 วันเทรด/เดือน",
             progress: "ความคืบหน้า",
@@ -759,6 +777,8 @@ export const dictionaries = {
         }
     }
 }
+
+export type Dictionary = typeof dictionaries.EN
 
 export function getDictionary(lang: Language) {
     return dictionaries[lang]

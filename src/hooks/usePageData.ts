@@ -1,10 +1,11 @@
 'use client'
 
 import useSWR from 'swr'
+import type { AnalyticsPageData, ChallengeApiResponse, DashboardPageData, HistoryApiResponse, JournalApiResponse, LeaderboardApiResponse } from '@/types/models'
 
-const fetcher = (url: string) => fetch(url).then(res => {
+const fetcher = async <T>(url: string): Promise<T> => fetch(url).then(res => {
     if (!res.ok) throw new Error('API error')
-    return res.json()
+    return res.json() as Promise<T>
 })
 
 const swrConfig = {
@@ -21,7 +22,7 @@ export function useDashboardData(month?: number, year?: number, portfolioId?: st
     if (portfolioId) params.set('portfolio_id', portfolioId)
     const query = params.toString()
 
-    return useSWR(
+    return useSWR<DashboardPageData>(
         `/api/dashboard${query ? `?${query}` : ''}`,
         fetcher,
         swrConfig
@@ -29,19 +30,19 @@ export function useDashboardData(month?: number, year?: number, portfolioId?: st
 }
 
 export function useAnalyticsData() {
-    return useSWR('/api/analytics', fetcher, swrConfig)
+    return useSWR<AnalyticsPageData>('/api/analytics', fetcher, swrConfig)
 }
 
 export function useJournalData() {
-    return useSWR('/api/journal', fetcher, swrConfig)
+    return useSWR<JournalApiResponse>('/api/journal', fetcher, swrConfig)
 }
 
 export function useLeaderboardData() {
-    return useSWR('/api/leaderboard', fetcher, swrConfig)
+    return useSWR<LeaderboardApiResponse>('/api/leaderboard', fetcher, swrConfig)
 }
 
 export function useChallengeData() {
-    return useSWR('/api/challenge', fetcher, swrConfig)
+    return useSWR<ChallengeApiResponse>('/api/challenge', fetcher, swrConfig)
 }
 
 export function useHistoryData(month?: number, year?: number) {
@@ -50,7 +51,7 @@ export function useHistoryData(month?: number, year?: number) {
     if (year !== undefined) params.set('year', year.toString())
     const query = params.toString()
 
-    return useSWR(
+    return useSWR<HistoryApiResponse>(
         `/api/history${query ? `?${query}` : ''}`,
         fetcher,
         swrConfig

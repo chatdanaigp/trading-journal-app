@@ -4,13 +4,23 @@ import { Readable } from 'stream'
 
 const FOLDER_ID = '1YzE6DVO6pfbpt0fuFTNRnjFnUSr5MgM-'
 
+type GoogleServiceAccountCredentials = {
+    client_email: string
+    private_key: string
+    [key: string]: string
+}
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : 'Upload failed'
+}
+
 function getAuth() {
     const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!credentials) {
         throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY environment variable is not set')
     }
 
-    const parsed = JSON.parse(credentials)
+    const parsed = JSON.parse(credentials) as GoogleServiceAccountCredentials
     
     return new google.auth.GoogleAuth({
         credentials: parsed,
@@ -80,10 +90,10 @@ export async function POST(request: NextRequest) {
             webViewUrl: webViewUrl,
             fileId: fileId,
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Google Drive upload error:', error)
         return NextResponse.json(
-            { error: error.message || 'Upload failed' },
+            { error: getErrorMessage(error) },
             { status: 500 }
         )
     }

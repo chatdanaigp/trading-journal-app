@@ -28,7 +28,6 @@ export async function GET() {
     // Analyze
     const totalTrades = trades.length
     const wins = trades.filter(t => Number(t.profit) > 0)
-    const losses = trades.filter(t => Number(t.profit) < 0)
     const winRate = Math.round((wins.length / totalTrades) * 100)
     const netProfit = trades.reduce((s, t) => s + (Number(t.profit) || 0), 0)
 

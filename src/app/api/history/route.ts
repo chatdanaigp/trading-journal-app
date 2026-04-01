@@ -1,5 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
+import type { HistoryApiResponse, HistoryTradeRecord } from '@/types/models'
+
+type HistoryProfile = {
+    username: string | null
+    commission_per_lot: number | null
+}
+
+type HistoryPortfolio = {
+    id: string
+    commission_per_lot: number | null
+}
 
 export async function GET(request: Request) {
     const supabase = await createClient()
@@ -48,9 +59,11 @@ export async function GET(request: Request) {
 
     // Create a map for quick commission lookup
     const commissionMap = new Map<string | null, number>()
-    commissionMap.set(null, (profile as any)?.commission_per_lot || 0)
-    portfolios?.forEach(p => {
-        commissionMap.set(p.id, p.commission_per_lot || (profile as any)?.commission_per_lot || 0)
+    const typedProfile = profile as HistoryProfile | null
+    const typedPortfolios = (portfolios || []) as HistoryPortfolio[]
+    commissionMap.set(null, typedProfile?.commission_per_lot || 0)
+    typedPortfolios.forEach((portfolio) => {
+        commissionMap.set(portfolio.id, portfolio.commission_per_lot || typedProfile?.commission_per_lot || 0)
     })
 
     const username = (user.user_metadata?.full_name as string)
@@ -60,14 +73,14 @@ export async function GET(request: Request) {
         || 'Trader'
 
     // Calculate dynamic net profit
-    const tradeList = (trades || []).map((t: any) => {
-        const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
-        const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
+    const tradeList = ((trades || []) as HistoryTradeRecord[]).map((trade) => {
+        const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
+        const netProfit = (trade.profit || 0) - ((trade.lot_size || 0) * commission)
         // Keep profit as Gross for display, store net_profit separately if needed or just return gross in 'profit'
-        return { ...t, profit: t.profit, net_profit: netProfit, commission_applied: commission }
+        return { ...trade, profit: trade.profit, net_profit: netProfit, commission_applied: commission }
     })
 
-    return NextResponse.json({
+    return NextResponse.json<HistoryApiResponse>({
         trades: tradeList,
         username,
     })

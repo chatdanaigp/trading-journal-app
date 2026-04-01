@@ -6,16 +6,7 @@ import { Target, Trophy, Lock, CheckCircle2, TrendingUp, Sparkles } from 'lucide
 import { PortfolioQuestClient } from './PortfolioQuestClient'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, Skeleton } from '@/components/ui/Skeleton'
-import { useEffect, useState } from 'react'
-
-function useLang() {
-    const [dict, setDict] = useState<any>(null)
-    useEffect(() => {
-        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
-        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
-    }, [])
-    return dict
-}
+import { useClientDictionary } from '@/hooks/useClientDictionary'
 
 function ChallengeSkeleton() {
     return (
@@ -36,7 +27,7 @@ function ChallengeSkeleton() {
 
 export default function ChallengePage() {
     const { data, isLoading } = useChallengeData()
-    const dict = useLang()
+    const dict = useClientDictionary()
 
     if (isLoading || !data || !dict) return <ChallengeSkeleton />
 

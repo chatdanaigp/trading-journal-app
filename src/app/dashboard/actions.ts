@@ -4,6 +4,27 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import type { TradeRecord } from '@/types/models'
+
+type ProfileCommissionSettings = {
+    commission_per_lot: number | null
+}
+
+type ProfileGoalUpdate = {
+    port_size: number
+    profit_goal_percent: number
+    commission_per_lot: number
+    currency: string
+    is_portfolio_quest_active?: boolean
+}
+
+function getErrorMessage(error: unknown, fallback = 'Unknown error') {
+    if (error instanceof Error) {
+        return error.message
+    }
+
+    return fallback
+}
 
 async function getAdminClient() {
     return createSupabaseClient(
@@ -35,8 +56,6 @@ export async function createTrade(formData: FormData) {
     const stopLoss = formData.get('stopLoss')
     const takeProfit = formData.get('takeProfit')
     const strategy = formData.get('strategy') as string
-    const commissionPerLot = formData.get('commissionPerLot') // This is usually null now but keeping for safety
-
     let screenshotUrl = null
 
     try {
@@ -59,9 +78,9 @@ export async function createTrade(formData: FormData) {
                 return { error: `Upload failed: ${uploadError.message}` }
             }
         }
-    } catch (uploadErr: any) {
+    } catch (uploadErr: unknown) {
         console.error('Catastrophic upload error during create:', uploadErr)
-        return { error: `Upload error: ${uploadErr.message}` }
+        return { error: `Upload error: ${getErrorMessage(uploadErr)}` }
     }
 
     const exactCreatedAt = formData.get('exactCreatedAt') as string
@@ -220,9 +239,9 @@ export async function updateTrade(formData: FormData) {
                 return { error: `Upload failed: ${uploadError.message}` }
             }
         }
-    } catch (uploadErr: any) {
+    } catch (uploadErr: unknown) {
         console.error('Catastrophic upload error during update:', uploadErr)
-        return { error: `Upload error: ${uploadErr.message || 'Unknown error'}` }
+        return { error: `Upload error: ${getErrorMessage(uploadErr)}` }
     }
 
     const { error } = await supabase
@@ -401,7 +420,7 @@ export async function updateProfileGoals(portSize: number, profitGoalPercent: nu
 
     if (!user) return { error: 'Not authenticated' }
 
-    const updateData: any = {
+    const updateData: ProfileGoalUpdate = {
         port_size: portSize,
         profit_goal_percent: profitGoalPercent,
         commission_per_lot: commissionPerLot || 0,
@@ -463,15 +482,15 @@ export async function repairRecentTrades() {
     if (!trades || trades.length === 0) return { success: true, repaired: 0 }
 
     // Fetch settings to know what was deducted
-    const { data: profile } = await supabase.from('profiles').select('commission_per_lot').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('commission_per_lot').eq('id', user.id).single<ProfileCommissionSettings>()
     const { data: portfolios } = await supabase.from('portfolios').select('id, commission_per_lot').eq('user_id', user.id)
 
     const commissionMap = new Map<string | null, number>()
-    commissionMap.set(null, (profile as any)?.commission_per_lot || 0)
-    portfolios?.forEach(p => commissionMap.set(p.id, p.commission_per_lot || (profile as any)?.commission_per_lot || 0))
+    commissionMap.set(null, profile?.commission_per_lot || 0)
+    portfolios?.forEach((portfolio) => commissionMap.set(portfolio.id, portfolio.commission_per_lot || profile?.commission_per_lot || 0))
 
     let repairedCount = 0
-    for (const trade of trades) {
+    for (const trade of trades as TradeRecord[]) {
         const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
         if (commission > 0) {
             const deduction = (trade.lot_size || 0) * commission

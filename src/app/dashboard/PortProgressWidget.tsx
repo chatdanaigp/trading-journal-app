@@ -1,14 +1,14 @@
 'use client'
 
 import { LazyMotion, domAnimation, m } from 'framer-motion'
-import { Target, TrendingUp, Wallet } from 'lucide-react'
+import { Target } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
 
 interface PortProgressWidgetProps {
     portSize: number
     goalPercent: number
-    totalNetProfit: number
     netProfitToday: number
-    dict: any
+    dict?: Dictionary
     currency?: string
 }
 
@@ -18,7 +18,7 @@ export function PortProgressWidget({
     netProfitToday,
     dict,
     currency
-}: Omit<PortProgressWidgetProps, 'totalNetProfit'>) {
+}: PortProgressWidgetProps) {
     const isUSC = currency === 'USC'
     const symbol = isUSC ? '' : '$'
     const suffix = isUSC ? ' USC' : ''

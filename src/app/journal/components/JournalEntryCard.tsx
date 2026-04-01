@@ -24,7 +24,7 @@ export function JournalEntryCard({ entry }: { entry: JournalEntry }) {
         await deleteJournalEntry(entry.id)
         
         // Globally refresh all SWR cached API routes instantly
-        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
         
         setDeleting(false)
     }

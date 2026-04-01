@@ -5,11 +5,18 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
+import type { Dictionary } from '@/utils/dictionaries'
+
+type ImportResult = {
+    success?: boolean
+    imported?: number
+    error?: string
+}
 
 interface ImportModalProps {
     isOpen: boolean
     onClose: () => void
-    dict?: any
+    dict?: Dictionary
 }
 
 export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
@@ -69,11 +76,11 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
             formData.append('format', format)
 
             const res = await fetch('/api/import', { method: 'POST', body: formData })
-            const data = await res.json()
+            const data = await res.json() as ImportResult
 
             if (data.success) {
                 setResult({ type: 'success', text: `Successfully imported ${data.imported} trades!` })
-                mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+                mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
                 setTimeout(() => {
                     setFile(null)
                     setPreview([])
@@ -84,7 +91,7 @@ export function ImportModal({ isOpen, onClose, dict }: ImportModalProps) {
             } else {
                 setResult({ type: 'error', text: data.error || 'Import failed' })
             }
-        } catch (err) {
+        } catch {
             setResult({ type: 'error', text: 'Network error. Please try again.' })
         } finally {
             setLoading(false)

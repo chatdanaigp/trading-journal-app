@@ -7,16 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { BookOpen, Flame, CheckCircle } from 'lucide-react'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, Skeleton } from '@/components/ui/Skeleton'
-import { useEffect, useState } from 'react'
-
-function useLang() {
-    const [dict, setDict] = useState<any>(null)
-    useEffect(() => {
-        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
-        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
-    }, [])
-    return dict
-}
+import { useClientDictionary } from '@/hooks/useClientDictionary'
 
 function JournalSkeleton() {
     return (
@@ -41,7 +32,7 @@ function JournalSkeleton() {
 
 export default function JournalPage() {
     const { data, isLoading } = useJournalData()
-    const dict = useLang()
+    const dict = useClientDictionary()
 
     if (isLoading || !data || !dict) return <JournalSkeleton />
 

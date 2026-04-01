@@ -5,12 +5,24 @@ import { toPng } from 'html-to-image'
 import { motion } from 'framer-motion'
 import { TradeShareCard } from './TradeShareCard'
 import { X, Download, Loader2 } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
+
+type ShareableTrade = {
+    symbol: string | null
+    lot_size: number | null
+    profit: number | null
+    created_at: string | null
+    currency?: string | null
+    type: string | null
+    entry_price: number | null
+    exit_price: number | null
+}
 
 interface TradeShareModalProps {
-    trade: any
+    trade: ShareableTrade
     username?: string
     onClose: () => void
-    dict?: any
+    dict?: Dictionary
     currency?: string
 }
 
@@ -31,7 +43,8 @@ export function TradeShareModal({ trade, username, onClose, dict, currency }: Tr
                 pixelRatio: 2, // Retina quality
             })
             const link = document.createElement('a')
-            link.download = `trade-${trade.symbol}-${new Date(trade.created_at).toISOString().split('T')[0]}.png`
+            const exportDate = trade.created_at ? new Date(trade.created_at).toISOString().split('T')[0] : 'trade'
+            link.download = `trade-${trade.symbol || 'asset'}-${exportDate}.png`
             link.href = dataUrl
             link.click()
         } catch (err) {
@@ -78,7 +91,7 @@ export function TradeShareModal({ trade, username, onClose, dict, currency }: Tr
                 >
                     {/* This ref is what gets captured */}
                     <div ref={cardRef} style={{ display: 'inline-block', lineHeight: 0, minWidth: 'min-content' }} className="w-full">
-                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} currency={currency || trade.currency || (dict?.dashboard?.currency)} />
+                        <TradeShareCard trade={trade} username={username} points={points} dict={dict} currency={currency || trade.currency || 'USD'} />
                     </div>
                 </div>
 

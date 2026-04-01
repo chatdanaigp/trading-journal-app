@@ -3,21 +3,12 @@
 import { useHistoryData } from '@/hooks/usePageData'
 import { TradeList } from '@/app/dashboard/TradeList'
 import { PageSkeleton } from '@/components/ui/Skeleton'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { History, ChevronLeft, ChevronRight } from 'lucide-react'
 import { format, subMonths, addMonths, isThisMonth } from 'date-fns'
-
-// Hook to load locale dictionary safely on client
-function useLang() {
-    const [dict, setDict] = useState<any>(null)
-    useEffect(() => {
-        const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
-        import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
-    }, [])
-    return dict
-}
+import { useClientDictionary } from '@/hooks/useClientDictionary'
 
 export default function HistoryPage() {
     const [currentDate, setCurrentDate] = useState(new Date())
@@ -25,7 +16,7 @@ export default function HistoryPage() {
     const year = currentDate.getFullYear()
 
     const { data, isLoading } = useHistoryData(month, year)
-    const dict = useLang()
+    const dict = useClientDictionary()
 
     if (isLoading || !data || !dict) return <PageSkeleton />
 

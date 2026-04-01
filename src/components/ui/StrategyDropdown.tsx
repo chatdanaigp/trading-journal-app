@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Check, ChevronDown, Sparkles } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import { Label } from './label'
+import type { Dictionary } from '@/utils/dictionaries'
 
 export function StrategyDropdown({
     value,
@@ -14,7 +15,7 @@ export function StrategyDropdown({
     value: string
     onChange: (val: string) => void
     options: string[]
-    dict?: any
+    dict?: Dictionary
 }) {
     const [open, setOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)

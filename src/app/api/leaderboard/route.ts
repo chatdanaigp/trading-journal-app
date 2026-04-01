@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { startOfMonth, endOfMonth } from 'date-fns'
+import type { LeaderboardApiResponse, LeaderboardEntry } from '@/types/models'
 
 export async function GET() {
     const supabase = await createClient()
@@ -13,10 +14,11 @@ export async function GET() {
     const monthEnd = endOfMonth(now).toISOString()
 
     // Try monthly RPC first, fall back to all-time
-    let { data: leaderboard, error } = await supabase.rpc('get_leaderboard', {
+    const { data: monthlyLeaderboard, error } = await supabase.rpc('get_leaderboard', {
         start_date: monthStart,
         end_date: monthEnd
     })
+    let leaderboard = monthlyLeaderboard
 
     if (error) {
         console.log('[Leaderboard API] Monthly RPC failed:', error.message, '...falling back to all-time RPC')
@@ -27,8 +29,8 @@ export async function GET() {
         }
     }
 
-    return NextResponse.json({
-        leaderboard: leaderboard || [],
+    return NextResponse.json<LeaderboardApiResponse>({
+        leaderboard: (leaderboard || []) as LeaderboardEntry[],
         currentUserId: user.id
     })
 }

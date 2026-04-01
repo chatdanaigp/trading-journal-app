@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Target, Clock, Sparkles, DollarSign, Percent, Loader2, XCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { updateProfileGoals } from '@/app/dashboard/actions'
 import { isSameDay } from 'date-fns'
 import { getTradingDay } from '@/utils/date-helpers'
+import type { Dictionary } from '@/utils/dictionaries'
+import type { TradeRecord } from '@/types/models'
 
 export function PortfolioQuestClient({
     dict,
@@ -16,11 +18,11 @@ export function PortfolioQuestClient({
     isQuestActive,
     trades
 }: {
-    dict: any
+    dict: Dictionary
     initialPortSize: number
     initialGoalPercent: number
     isQuestActive: boolean
-    trades: any[]
+    trades: TradeRecord[]
 }) {
     const [isActive, setIsActive] = useState(isQuestActive)
     const [portSize, setPortSize] = useState<number | string>(initialPortSize)
@@ -29,11 +31,11 @@ export function PortfolioQuestClient({
 
     // Calculate today's net profit on the client so it respects the user's browser timezone
     const today = getTradingDay(new Date())
-    const todayTrades = trades.filter((t: any) => {
-        if (!t.created_at) return false
-        return isSameDay(getTradingDay(t.created_at), today)
+    const todayTrades = trades.filter((trade) => {
+        if (!trade.created_at) return false
+        return isSameDay(getTradingDay(trade.created_at), today)
     })
-    const netProfitToday = todayTrades.reduce((sum: number, t: any) => sum + (t.profit || 0), 0)
+    const netProfitToday = todayTrades.reduce((sum, trade) => sum + (trade.profit || 0), 0)
 
     const validPortSize = Number(portSize) || 0
     const validGoalPercent = Number(goalPercent) || 0

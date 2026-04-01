@@ -6,8 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, Shield, CheckCircle, XCircle } from 'lucide-react'
+import type { Dictionary } from '@/utils/dictionaries'
 
-export default function VerifyClient({ dict }: { dict: any }) {
+type VerifyResponse = {
+    error?: string
+}
+
+export default function VerifyClient({ dict }: { dict: Dictionary }) {
     const router = useRouter()
     const [clientId, setClientId] = useState('')
     const [loading, setLoading] = useState(false)
@@ -26,7 +31,7 @@ export default function VerifyClient({ dict }: { dict: any }) {
                 body: JSON.stringify({ clientId: clientId.trim() }),
             })
 
-            const data = await response.json()
+            const data = (await response.json()) as VerifyResponse
 
             if (!response.ok) {
                 setError(data.error || dict.verify.errorDefault)
@@ -39,7 +44,7 @@ export default function VerifyClient({ dict }: { dict: any }) {
                 router.push('/dashboard')
             }, 1500)
 
-        } catch (err) {
+        } catch {
             setError(dict.verify.errorConn)
             setLoading(false)
         }

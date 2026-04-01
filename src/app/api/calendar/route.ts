@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { CalendarApiResponse, CalendarEvent, CalendarImpact } from '@/types/models'
 
 // Forex Factory free JSON API
 const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json'
@@ -6,7 +7,24 @@ const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json'
 // Gold/Forex related currencies
 const RELEVANT_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'NZD', 'CAD', 'CHF', 'CNY']
 
-function generateAnalysis(event: any): string {
+type RawCalendarEvent = {
+    title: string
+    country: string
+    impact?: string | null
+    forecast?: string | null
+    previous?: string | null
+    date: string
+}
+
+function normalizeImpact(impact: string | null | undefined): CalendarImpact {
+    const normalized = (impact || 'Low').toLowerCase()
+    if (normalized === 'high' || normalized === 'medium' || normalized === 'low') {
+        return normalized
+    }
+    return 'low'
+}
+
+function generateAnalysis(event: RawCalendarEvent): string {
     const { title, country, impact, forecast, previous } = event
     const titleLower = title.toLowerCase()
 
@@ -115,18 +133,18 @@ export async function GET() {
         })
 
         if (!res.ok) {
-            return NextResponse.json({ events: [], error: 'Failed to fetch calendar data' })
+            return NextResponse.json<CalendarApiResponse>({ events: [], error: 'Failed to fetch calendar data' })
         }
 
-        const rawEvents = await res.json()
+        const rawEvents = await res.json() as RawCalendarEvent[]
 
         // Get today's date in Thailand timezone
         const nowTH = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }))
         const todayStr = `${nowTH.getFullYear()}-${String(nowTH.getMonth() + 1).padStart(2, '0')}-${String(nowTH.getDate()).padStart(2, '0')}`
 
         const events = rawEvents
-            .filter((evt: any) => RELEVANT_CURRENCIES.includes(evt.country))
-            .map((evt: any) => {
+            .filter((evt) => RELEVANT_CURRENCIES.includes(evt.country))
+            .map<CalendarEvent>((evt) => {
                 // Parse date and convert to Thailand time (GMT+7)
                 const utcDate = new Date(evt.date)
                 const thDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000) + (utcDate.getTimezoneOffset() * 60 * 1000))
@@ -134,7 +152,7 @@ export async function GET() {
                 const thDateStr = `${thDate.getFullYear()}-${String(thDate.getMonth() + 1).padStart(2, '0')}-${String(thDate.getDate()).padStart(2, '0')}`
                 const thTimeStr = `${String(thDate.getHours()).padStart(2, '0')}:${String(thDate.getMinutes()).padStart(2, '0')}`
 
-                const impact = (evt.impact || 'Low').toLowerCase()
+                const normalizedImpact = normalizeImpact(evt.impact)
                 const isToday = thDateStr === todayStr
 
                 return {
@@ -143,24 +161,24 @@ export async function GET() {
                     timezone: 'TH (GMT+7)',
                     title: evt.title,
                     currency: evt.country,
-                    impact: impact === 'holiday' ? 'low' : impact,
+                    impact: normalizedImpact,
                     isToday,
                     forecast: evt.forecast || null,
                     previous: evt.previous || null,
-                    analysis: generateAnalysis({ ...evt, impact }),
-                    isHoliday: impact === 'holiday',
+                    analysis: generateAnalysis(evt),
+                    isHoliday: (evt.impact || '').toLowerCase() === 'holiday',
                 }
             })
-            .sort((a: any, b: any) => {
+            .sort((a, b) => {
                 // Sort by date then time
                 if (a.date !== b.date) return a.date.localeCompare(b.date)
                 return a.time.localeCompare(b.time)
             })
 
-        return NextResponse.json({ date: todayStr, events })
+        return NextResponse.json<CalendarApiResponse>({ date: todayStr, events })
 
     } catch (error) {
         console.error('Calendar API error:', error)
-        return NextResponse.json({ events: [], error: 'Failed to fetch calendar data' })
+        return NextResponse.json<CalendarApiResponse>({ events: [], error: 'Failed to fetch calendar data' })
     }
 }

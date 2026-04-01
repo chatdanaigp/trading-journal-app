@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
+import type { Dictionary } from '@/utils/dictionaries'
 
 export function LotSizeCombobox({
     value,
@@ -11,7 +12,7 @@ export function LotSizeCombobox({
 }: {
     value: string
     onChange: (val: string) => void
-    dict?: Record<string, string | any>
+    dict?: Dictionary
 }) {
     const [open, setOpen] = useState(false)
     const [search, setSearch] = useState('')
