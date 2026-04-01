@@ -35,9 +35,9 @@ export function getTradingDay(dateInput: string | Date): Date {
     for (const part of parts) p[part.type] = part.value;
 
     // Construct the date components
-    let year = parseInt(p.year, 10);
-    let month = parseInt(p.month, 10);
-    let day = parseInt(p.day, 10);
+    const year = parseInt(p.year, 10);
+    const month = parseInt(p.month, 10);
+    const day = parseInt(p.day, 10);
 
     // Return a guaranteed UTC Date representing midnight of this trading day.
     // This ensures isSameDay compares correctly regardless of the runtime environment.
@@ -68,9 +68,9 @@ export function getTradingDayStr(dateInput: string | Date): string {
     const p: Record<string, string> = {};
     for (const part of parts) p[part.type] = part.value;
 
-    let year = parseInt(p.year, 10);
-    let month = parseInt(p.month, 10);
-    let day = parseInt(p.day, 10);
+    const year = parseInt(p.year, 10);
+    const month = parseInt(p.month, 10);
+    const day = parseInt(p.day, 10);
 
     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }

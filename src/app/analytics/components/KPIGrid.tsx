@@ -3,8 +3,11 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { AnalyticsData } from '../actions'
 import { TrendingUp, TrendingDown, Activity, Target, Zap, ArrowUpDown } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function KPIGrid({ stats, dict }: { stats: AnalyticsData['stats'], dict: any }) {
+type AppDictionary = typeof dictionaries.EN
+
+export function KPIGrid({ stats, dict }: { stats: AnalyticsData['stats'], dict: AppDictionary }) {
     return (
         <div className="grid grid-cols-12 gap-6">
             {/* Hero Card: Net Profit — Col 4 */}

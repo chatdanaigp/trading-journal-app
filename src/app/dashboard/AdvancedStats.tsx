@@ -1,5 +1,6 @@
 import React from 'react'
 import { TrendingUp, TrendingDown, Activity, BarChart3, Scale } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
 interface AdvancedStatsProps {
     stats: {
@@ -21,7 +22,7 @@ interface AdvancedStatsProps {
             profit: string
         }
     }
-    dict?: any
+    dict?: typeof dictionaries.EN
     currency?: string
 }
 

@@ -7,7 +7,7 @@ import { cn } from '@/utils/cn'
 
 export function TopNavigation({ className, showDate = true }: { className?: string; showDate?: boolean }) {
     const [clientId, setClientId] = useState<string | null>(null)
-    const supabase = createClient()
+    const [supabase] = useState(() => createClient())
 
     useEffect(() => {
         async function fetchClientId() {
@@ -25,7 +25,7 @@ export function TopNavigation({ className, showDate = true }: { className?: stri
             }
         }
         fetchClientId()
-    }, [])
+    }, [supabase])
 
     return (
         <div className={cn("flex flex-wrap items-center justify-end gap-2 sm:gap-3", className)}>

@@ -4,6 +4,9 @@
   --background: #f8f8fb;
   --foreground: #1c1c1e;
   --primary: #34c759;
+  --font-geist-sans: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-geist-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  --font-sarabun: "Noto Sans Thai", "Th Sarabun New", Tahoma, sans-serif;
   /* iOS Green */
   --accent: #007aff;
   /* iOS Blue */

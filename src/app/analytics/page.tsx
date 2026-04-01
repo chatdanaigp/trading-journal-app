@@ -9,9 +9,12 @@ import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { CardSkeleton, ChartSkeleton, Skeleton } from '@/components/ui/Skeleton'
 import { useEffect, useState } from 'react'
+import type { dictionaries } from '@/utils/dictionaries'
+
+type AppDictionary = typeof dictionaries.EN
 
 function useLang() {
-    const [dict, setDict] = useState<any>(null)
+    const [dict, setDict] = useState<AppDictionary | null>(null)
     useEffect(() => {
         const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
         import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
@@ -56,8 +59,8 @@ export default function AnalyticsPage() {
                 <StaggerItem>
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight">{(dict as any)?.analytics?.monthlyTitle || 'Monthly Analytics'} ({now.toLocaleString('default', { month: 'long' })})</h1>
-                            <p className="text-gray-500">{(dict as any)?.analytics?.monthlySubtitle || 'Performance for the current month'}</p>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.monthlyTitle || 'Monthly Analytics'} ({now.toLocaleString('default', { month: 'long' })})</h1>
+                            <p className="text-gray-500">{dict.analytics.monthlySubtitle || 'Performance for the current month'}</p>
                         </div>
                         <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-[#ccf381] font-bold shadow-[0_0_10px_rgba(204,243,129,0.1)]">
                             Month-To-Date (MTD)
@@ -75,8 +78,8 @@ export default function AnalyticsPage() {
                 <StaggerItem className="pt-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight">{(dict as any)?.analytics?.yearlyTitle || 'Yearly Overview'} ({now.getFullYear()})</h1>
-                            <p className="text-gray-500">{(dict as any)?.analytics?.yearlySubtitle || 'Comprehensive performance for the current year'}</p>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.yearlyTitle || 'Yearly Overview'} ({now.getFullYear()})</h1>
+                            <p className="text-gray-500">{dict.analytics.yearlySubtitle || 'Comprehensive performance for the current year'}</p>
                         </div>
                         <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-gray-400 font-bold">
                             Year-To-Date (YTD)
@@ -95,8 +98,8 @@ export default function AnalyticsPage() {
                 <StaggerItem className="pt-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333] pb-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight">{(dict as any)?.analytics?.insightsTitle || 'Trading Insights'}</h1>
-                            <p className="text-gray-500">{(dict as any)?.analytics?.insightsSubtitle || 'Session, Strategy & Pattern Analysis'}</p>
+                            <h1 className="text-3xl font-bold text-white tracking-tight">{dict.analytics.insightsTitle || 'Trading Insights'}</h1>
+                            <p className="text-gray-500">{dict.analytics.insightsSubtitle || 'Session, Strategy & Pattern Analysis'}</p>
                         </div>
                         <div className="bg-[#1a1a1a] border border-[#333] rounded-full px-4 py-2 text-sm text-amber-400 font-bold">
                             Deep Analysis

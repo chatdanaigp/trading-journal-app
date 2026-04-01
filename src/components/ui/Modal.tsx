@@ -15,10 +15,9 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }: ModalProps) {
-    const [mounted, setMounted] = useState(false)
+    const [mounted] = useState(() => typeof window !== 'undefined')
 
     useEffect(() => {
-        setMounted(true)
         if (isOpen) {
             document.body.style.overflow = 'hidden'
         } else {

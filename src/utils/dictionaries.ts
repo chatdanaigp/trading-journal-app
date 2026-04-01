@@ -24,6 +24,9 @@ export const dictionaries = {
             myForest: "My Forest",
             goalTarget: "Goal Target",
             currentProfit: "Current Profit",
+            goalHitTitle: "Target Reached!",
+            goalHitDesc: "Congratulations, you hit your daily profit target.",
+            goalHitBtn: "Awesome",
             setGoals: "Set Goals",
             asset: "Asset",
             sideLot: "Side / Lot",
@@ -49,6 +52,8 @@ export const dictionaries = {
             avgWin: "Avg Win",
             avgLoss: "Avg Loss",
             sideAnalysis: "Side Analysis",
+            longs: "Longs",
+            shorts: "Shorts",
             profitFactorCard: "Profit Factor",
             pfTarget: "Target: > 1.5",
             // Equity Chart
@@ -121,6 +126,11 @@ export const dictionaries = {
         analytics: {
             title: "Analytics",
             subtitle: "Deep dive into your trading performance.",
+            monthlyTitle: "Monthly Analytics",
+            monthlySubtitle: "Performance for the current month",
+            yearlyTitle: "Yearly Overview",
+            yearlySubtitle: "Comprehensive performance for the current year",
+            monthlyReview: "Monthly Stats Review",
             allTimeView: "All Time View",
             netProfit: "Net Profit",
             profitFactor: "Profit Factor",
@@ -337,6 +347,7 @@ export const dictionaries = {
             emailLabel: "Email",
             passwordLabel: "Password",
             emailPlaceholder: "admin@example.com",
+            passwordPlaceholder: "Enter your password",
             signInBtn: "Sign In to Admin Panel",
             backToUserLogin: "← Back to User Login"
         },
@@ -390,6 +401,9 @@ export const dictionaries = {
             myForest: "ป่ากำไรของฉัน",
             goalTarget: "เป้าหมาย",
             currentProfit: "กำไรปัจจุบัน",
+            goalHitTitle: "ถึงเป้าหมายแล้ว!",
+            goalHitDesc: "ยินดีด้วย คุณได้ทำกำไรตามเป้าต่อวันแล้ว!",
+            goalHitBtn: "สุดยอดไปเลย",
             setGoals: "ตั้งเป้าหมาย",
             asset: "สินทรัพย์",
             sideLot: "ฝั่ง / หลอด",
@@ -415,6 +429,8 @@ export const dictionaries = {
             avgWin: "กำไรเฉลี่ย",
             avgLoss: "ขาดทุนเฉลี่ย",
             sideAnalysis: "วิเคราะห์ฝั่งเทรด",
+            longs: "ฝั่ง Buy",
+            shorts: "ฝั่ง Sell",
             profitFactorCard: "สัดส่วนกำไร (Profit Factor)",
             pfTarget: "เป้าหมาย: > 1.5",
             // Equity Chart
@@ -487,6 +503,11 @@ export const dictionaries = {
         analytics: {
             title: "วิเคราะห์ผล",
             subtitle: "เจาะลึกผลลัพธ์และพัฒนาการเทรดของคุณ",
+            monthlyTitle: "สรุปผลรายเดือน",
+            monthlySubtitle: "ผลงานของเดือนปัจจุบัน",
+            yearlyTitle: "ภาพรวมรายปี",
+            yearlySubtitle: "สรุปผลงานตลอดปีปัจจุบัน",
+            monthlyReview: "สรุปสถิติรายเดือน",
             allTimeView: "ข้อมูลทั้งหมด",
             netProfit: "กำไรสุทธิ",
             profitFactor: "สัดส่วนกำไร (Profit Factor)",
@@ -703,6 +724,7 @@ export const dictionaries = {
             emailLabel: "อีเมล",
             passwordLabel: "รหัสผ่าน",
             emailPlaceholder: "admin@example.com",
+            passwordPlaceholder: "กรอกรหัสผ่านของคุณ",
             signInBtn: "เข้าสู่ระบบการจัดการ",
             backToUserLogin: "← กลับไปหน้าเข้าสู่ระบบทั่วไป"
         },
@@ -741,4 +763,3 @@ export const dictionaries = {
 export function getDictionary(lang: Language) {
     return dictionaries[lang]
 }
-

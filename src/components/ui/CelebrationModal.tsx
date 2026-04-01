@@ -3,8 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Trophy, X, Target } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, currency }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: any, currency?: string }) {
+type CelebrationDictionary = typeof dictionaries.EN
+
+export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, currency }: { dailyTarget: number, netToday: number, isQuestActive: boolean, dict: CelebrationDictionary, currency?: string }) {
     const isUSC = currency === 'USC'
     const symbol = isUSC ? '' : '$'
     const suffix = isUSC ? ' USC' : ''
@@ -13,6 +16,15 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, c
 
     useEffect(() => {
         if (!isQuestActive || dailyTarget <= 0) return
+
+        const scheduleCelebration = () => {
+            const openTimer = window.setTimeout(() => setIsOpen(true), 0)
+            const closeTimer = window.setTimeout(() => setIsOpen(false), 7000)
+            return () => {
+                window.clearTimeout(openTimer)
+                window.clearTimeout(closeTimer)
+            }
+        }
 
         const todayStr = new Date().toISOString().split('T')[0]
         const storedDate = localStorage.getItem('tj_celebrated_date')
@@ -23,11 +35,8 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, c
 
             // If we somehow start a new day already above target, celebrate
             if (netToday >= dailyTarget) {
-                setIsOpen(true)
-                const timer = setTimeout(() => setIsOpen(false), 7000)
-                // Sync the ref
                 prevNetToday.current = netToday
-                return () => clearTimeout(timer)
+                return scheduleCelebration()
             }
 
             // Sync the ref
@@ -41,11 +50,8 @@ export function CelebrationModal({ dailyTarget, netToday, isQuestActive, dict, c
         const wasPreviouslyBelow = prevNetToday.current < dailyTarget
 
         if (isCurrentlyAbove && wasPreviouslyBelow) {
-            setIsOpen(true)
-            const timer = setTimeout(() => setIsOpen(false), 7000)
-
             prevNetToday.current = netToday
-            return () => clearTimeout(timer)
+            return scheduleCelebration()
         }
 
         // 3. Keep tracking the profit locally per-session so rapid toggles evaluate properly

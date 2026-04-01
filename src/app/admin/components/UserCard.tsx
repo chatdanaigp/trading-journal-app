@@ -1,24 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { updateUserProfile, deleteUserProfile, deleteUserTrades } from '../actions'
-import { Trash2, Save, ChevronDown, ChevronUp, AlertTriangle, User, BarChart3, DollarSign, Loader2 } from 'lucide-react'
+import type { AdminUserSummary } from '../actions'
+import type { dictionaries } from '@/utils/dictionaries'
+import { Trash2, Save, ChevronDown, ChevronUp, AlertTriangle, User, BarChart3, Loader2 } from 'lucide-react'
 import { useSWRConfig } from 'swr'
 
-type UserData = {
-    id: string
-    username: string | null
-    full_name: string | null
-    avatar_url: string | null
-    port_size: number | null
-    profit_goal_percent: number | null
-    client_id: string | null
-    totalTrades: number
-    totalProfit: number
-    winRate: number
-}
+type AppDictionary = typeof dictionaries.EN
 
-export function UserCard({ user, dict }: { user: UserData, dict: any }) {
+export function UserCard({ user, dict }: { user: AdminUserSummary, dict: AppDictionary }) {
     const [expanded, setExpanded] = useState(false)
     const [editing, setEditing] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -39,7 +31,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
             port_size: portSize,
             profit_goal_percent: goalPercent,
         })
-        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        mutate((key: unknown) => typeof key === 'string' && key.startsWith('/api/'))
         setSaving(false)
         setEditing(false)
     }
@@ -47,7 +39,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     async function handleDeleteUser() {
         setDeleting(true)
         await deleteUserProfile(user.id)
-        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        mutate((key: unknown) => typeof key === 'string' && key.startsWith('/api/'))
         setDeleting(false)
         setConfirmDelete(false)
     }
@@ -55,7 +47,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
     async function handleDeleteTrades() {
         if (!confirm('Delete ALL trades for this user? This cannot be undone.')) return
         await deleteUserTrades(user.id)
-        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        mutate((key: unknown) => typeof key === 'string' && key.startsWith('/api/'))
     }
 
     return (
@@ -68,7 +60,7 @@ export function UserCard({ user, dict }: { user: UserData, dict: any }) {
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                     {user.avatar_url ? (
-                        <img src={user.avatar_url} alt={user.full_name || ''} className="w-10 h-10 rounded-full border-2 border-[#5865F2]" />
+                        <Image src={user.avatar_url} alt={user.full_name || ''} width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#5865F2]" unoptimized />
                     ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-white font-bold border-2 border-[#5865F2]">
                             {(user.full_name || user.username || 'U')[0].toUpperCase()}

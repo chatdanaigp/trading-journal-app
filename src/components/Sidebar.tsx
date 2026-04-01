@@ -7,14 +7,17 @@ import { cn } from '@/utils/cn'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function Sidebar({ dict }: { dict: any }) {
+type SidebarDictionary = typeof dictionaries.EN
+
+export function Sidebar({ dict }: { dict: SidebarDictionary }) {
     const pathname = usePathname()
     const [user, setUser] = useState<User | null>(null)
     const [clientId, setClientId] = useState<string | null>(null)
     const [isUserAdmin, setIsUserAdmin] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
-    const supabase = createClient()
+    const [supabase] = useState(() => createClient())
 
     useEffect(() => {
         async function getUser() {
@@ -33,12 +36,7 @@ export function Sidebar({ dict }: { dict: any }) {
             }
         }
         getUser()
-    }, [])
-
-    // Close mobile sidebar on navigation
-    useEffect(() => {
-        setMobileOpen(false)
-    }, [pathname])
+    }, [supabase])
 
     const links = [
         { name: dict.sidebar.overview, href: '/dashboard', icon: LayoutDashboard },
@@ -135,6 +133,7 @@ export function Sidebar({ dict }: { dict: any }) {
                                 key={link.name}
                                 href={link.href}
                                 prefetch={true}
+                                onClick={() => setMobileOpen(false)}
                                 className={cn(
                                     "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group active:scale-[0.98]",
                                     isActive
@@ -153,6 +152,7 @@ export function Sidebar({ dict }: { dict: any }) {
                         <Link
                             href="/admin"
                             prefetch={true}
+                            onClick={() => setMobileOpen(false)}
                             className={cn(
                                 "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group mt-4 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 active:scale-[0.98]",
                                 pathname === '/admin' ? "opacity-100" : "opacity-90"
@@ -172,6 +172,7 @@ export function Sidebar({ dict }: { dict: any }) {
                             key={link.name}
                             href={link.href}
                             prefetch={true}
+                            onClick={() => setMobileOpen(false)}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#1f1f1f] transition-all active:scale-[0.98]"
                         >
                             <link.icon className="w-5 h-5" />
@@ -181,6 +182,7 @@ export function Sidebar({ dict }: { dict: any }) {
 
                     <button
                         onClick={async () => {
+                            setMobileOpen(false)
                             await supabase.auth.signOut()
                             window.location.href = '/login'
                         }}

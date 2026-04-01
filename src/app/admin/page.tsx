@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { isAdmin, getAllUsers } from './actions'
+import type { AdminUserSummary } from './actions'
 import { UserCard } from './components/UserCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Shield, ShieldAlert, Users, BarChart3, ArrowLeft } from 'lucide-react'
@@ -8,6 +9,15 @@ import Link from 'next/link'
 import { getDictionary } from '@/utils/dictionaries'
 import { getCurrentLanguage } from '@/utils/dictionaries-server'
 import { TopNavigation } from '@/components/TopNavigation'
+
+type AdminTradePreview = {
+    trade_id: string
+    trader_full_name: string | null
+    symbol: string | null
+    type: string | null
+    profit: number | null
+    created_at: string
+}
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -58,7 +68,8 @@ export default async function AdminPage() {
 
     const totalUsers = users.length
     const totalTrades = trades?.length || 0
-    const totalProfit = users.reduce((sum: number, u: { totalProfit: number }) => sum + u.totalProfit, 0)
+    const totalProfit = users.reduce((sum: number, u: AdminUserSummary) => sum + u.totalProfit, 0)
+    const recentTrades = (trades || []) as AdminTradePreview[]
 
     return (
         <div className="min-h-screen bg-[#050505] text-white p-4 lg:p-8 relative overflow-hidden">
@@ -147,14 +158,14 @@ export default async function AdminPage() {
                             <span className="text-xs text-gray-500 bg-[#1a1a1a] px-2 py-0.5 rounded-full border border-white/5 ml-2">{totalUsers} {dict.admin.users}</span>
                         </div>
                         <div className="space-y-3">
-                            {users.map((user: any) => (
+                            {users.map((user: AdminUserSummary) => (
                                 <UserCard key={user.id} user={user} dict={dict} />
                             ))}
                         </div>
                     </div>
 
                     {/* Trade Activity */}
-                    {trades && trades.length > 0 && (
+                    {recentTrades.length > 0 && (
                         <div className="overflow-hidden">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className="w-1 h-6 bg-blue-500 rounded-full inline-block" />
@@ -176,7 +187,9 @@ export default async function AdminPage() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/5">
-                                            {trades.slice(0, 20).map((trade: any) => (
+                                            {recentTrades.slice(0, 20).map((trade) => {
+                                                const tradeProfit = trade.profit ?? 0
+                                                return (
                                                 <tr key={trade.trade_id} className="hover:bg-white/[0.02] transition-colors">
                                                     <td className="p-4">
                                                         <div className="flex items-center gap-2">
@@ -192,14 +205,15 @@ export default async function AdminPage() {
                                                             {trade.type}
                                                         </span>
                                                     </td>
-                                                    <td className={`p-4 text-right font-bold ${trade.profit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
-                                                        {trade.profit ? `${trade.profit > 0 ? '+' : ''}$${trade.profit.toLocaleString()}` : '-'}
+                                                    <td className={`p-4 text-right font-bold ${tradeProfit >= 0 ? 'text-[#ccf381]' : 'text-red-400'}`}>
+                                                        {trade.profit !== null ? `${tradeProfit > 0 ? '+' : ''}$${tradeProfit.toLocaleString()}` : '-'}
                                                     </td>
                                                     <td className="p-4 text-right text-gray-500 text-xs">
                                                         {new Date(trade.created_at).toLocaleDateString()}
                                                     </td>
                                                 </tr>
-                                            ))}
+                                                )
+                                            })}
                                         </tbody>
                                     </table>
                                 </CardContent>

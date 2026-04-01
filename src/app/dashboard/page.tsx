@@ -18,11 +18,12 @@ import { PageSkeleton } from '@/components/ui/Skeleton'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { PortProgressWidget } from './PortProgressWidget'
-import { isSameDay } from 'date-fns'
-import { getTradingDay } from '@/utils/date-helpers'
+import type { dictionaries } from '@/utils/dictionaries'
+
+type AppDictionary = typeof dictionaries.EN
 
 function useLang() {
-    const [dict, setDict] = useState<any>(null)
+    const [dict, setDict] = useState<AppDictionary | null>(null)
     useEffect(() => {
         const lang = (document.cookie.match(/tj_language=(\w+)/)?.[1] || 'EN') as 'EN' | 'TH'
         import('@/utils/dictionaries').then(mod => setDict(mod.dictionaries[lang]))
@@ -43,8 +44,11 @@ export default function DashboardPage() {
     // Persist portfolio selection
     useEffect(() => {
         const saved = localStorage.getItem('tj_selected_portfolio')
-        if (saved) setPortfolioId(saved)
-        setIsInitialized(true)
+        const timer = window.setTimeout(() => {
+            if (saved) setPortfolioId(saved)
+            setIsInitialized(true)
+        }, 0)
+        return () => window.clearTimeout(timer)
     }, [])
 
     const handlePortfolioChange = (id: string | null) => {
@@ -69,8 +73,8 @@ export default function DashboardPage() {
             <StaggerItem>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.overview}</h1>
-                        <p className="text-gray-500 text-sm lg:text-base">{dict.welcome}</p>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{dict.dashboard.overview}</h1>
+                        <p className="text-gray-500 text-sm lg:text-base">{dict.dashboard.welcome}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <PortfolioSelector value={portfolioId} onChange={handlePortfolioChange} dict={dict} />
@@ -101,10 +105,10 @@ export default function DashboardPage() {
                         </div>
                         <CardContent className="p-6 relative z-30">
                             <div className="flex justify-between items-start mb-1">
-                                <p className="text-gray-500 font-medium tracking-wide text-xs uppercase">{dict.netProfit}</p>
+                                <p className="text-gray-500 font-medium tracking-wide text-xs uppercase">{dict.dashboard.netProfit}</p>
                                 {portSize > 0 && (
                                     <p className="text-gray-500 font-medium tracking-wide text-[10px] uppercase text-right opacity-90 mt-0.5">
-                                        {dict?.totalEquity || 'Total Balance'}
+                                        {dict.dashboard.totalEquity || 'Total Balance'}
                                     </p>
                                 )}
                             </div>
@@ -214,7 +218,7 @@ export default function DashboardPage() {
             {/* Charts */}
             <div className="grid grid-cols-12 gap-6">
                 <StaggerItem className="col-span-12">
-                    <AdvancedStats stats={stats as any} dict={dict} currency={currency} />
+                    <AdvancedStats stats={stats} dict={dict} currency={currency} />
                 </StaggerItem>
                 <StaggerItem className="col-span-12">
                     <EquityChart trades={trades} dict={dict} />

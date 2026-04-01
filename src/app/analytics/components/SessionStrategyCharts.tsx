@@ -5,7 +5,8 @@ import { AnalyticsData } from '../actions'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
-import { Clock, Tag, Calendar, Flame } from 'lucide-react'
+import { Clock, Tag, Flame } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
 const SESSION_COLORS: Record<string, string> = {
     'Asian': '#f472b6',
@@ -16,7 +17,9 @@ const SESSION_COLORS: Record<string, string> = {
 
 const DAY_COLORS = ['#facc15', '#f472b6', '#4ade80', '#fb923c', '#60a5fa']
 
-export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dict: any }) {
+type AppDictionary = typeof dictionaries.EN
+
+export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dict: AppDictionary }) {
     const { sessionPerformance, strategyPerformance, dayOfWeekPerformance, streaks } = data
 
     if (data.stats.totalTrades === 0) return null
@@ -79,7 +82,7 @@ export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dic
                                     <YAxis stroke="#555" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                        formatter={(val: any, name: any) => [`$${Number(val).toFixed(2)}`, 'P&L']}
+                                        formatter={(val?: number | string) => [`$${Number(val ?? 0).toFixed(2)}`, 'P&L']}
                                     />
                                     <Bar dataKey="profit" radius={[6, 6, 0, 0]} barSize={32}>
                                         {(dayOfWeekPerformance || []).map((_entry, index) => (
@@ -165,7 +168,7 @@ export function SessionStrategyCharts({ data, dict }: { data: AnalyticsData, dic
                         <CardContent className="relative z-10 pt-6">
                             {(strategyPerformance && strategyPerformance.length > 0) ? (
                                 <div className="space-y-3">
-                                    {strategyPerformance.map((s, i) => {
+                                    {strategyPerformance.map((s) => {
                                         const maxProfit = Math.max(...strategyPerformance.map(x => Math.abs(x.profit)), 1)
                                         const barWidth = Math.min(Math.abs(s.profit) / maxProfit * 100, 100)
                                         return (

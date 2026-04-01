@@ -2,7 +2,27 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { getTradingDayStr } from '@/utils/date-helpers'
+
+type AdminProfileRow = {
+    id: string
+    username: string | null
+    full_name: string | null
+    avatar_url: string | null
+    port_size: number | null
+    profit_goal_percent: number | null
+    client_id: string | null
+}
+
+type AdminTradeRow = {
+    user_id: string
+    profit: number | string | null
+}
+
+export type AdminUserSummary = AdminProfileRow & {
+    totalTrades: number
+    totalProfit: number
+    winRate: number
+}
 
 // Security: Check if user is an authorized admin
 export async function isAdmin(): Promise<boolean> {
@@ -37,26 +57,27 @@ export async function getAllUsers() {
     
     // We already have `get_all_trades_admin` which returns all trades.
     const [{ data: profiles }, { data: allTrades }] = await Promise.all([
-        supabase.from('profiles').select('*'),
+        supabase.from('profiles').select('id, username, full_name, avatar_url, port_size, profit_goal_percent, client_id'),
         supabase.rpc('get_all_trades_admin')
     ]);
 
     if (!profiles) return [];
     
-    const trades = allTrades || [];
+    const typedProfiles = profiles as AdminProfileRow[]
+    const trades = (allTrades || []) as AdminTradeRow[]
 
-    return profiles.map((u: any) => {
-        const userTrades = trades.filter((t: any) => t.user_id === u.id)
+    return typedProfiles.map((u): AdminUserSummary => {
+        const userTrades = trades.filter((t) => t.user_id === u.id)
         const totalTrades = userTrades.length
         
         // Calculate Win Rate strictly based on profit > 0
-        const winCount = userTrades.filter((t: any) => (Number(t.profit) || 0) > 0).length
-        const lossCount = userTrades.filter((t: any) => (Number(t.profit) || 0) < 0).length
+        const winCount = userTrades.filter((t) => (Number(t.profit) || 0) > 0).length
+        const lossCount = userTrades.filter((t) => (Number(t.profit) || 0) < 0).length
         const classifiedTrades = winCount + lossCount;
         const winRate = classifiedTrades > 0 ? (winCount / classifiedTrades) * 100 : 0;
         
         // Total Profit
-        const totalProfit = userTrades.reduce((sum: number, t: any) => sum + (Number(t.profit) || 0), 0)
+        const totalProfit = userTrades.reduce((sum: number, t) => sum + (Number(t.profit) || 0), 0)
 
         return {
             id: u.id,
@@ -84,7 +105,7 @@ export async function updateUserProfile(userId: string, data: {
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { data: result, error } = await supabase.rpc('admin_update_profile', {
+    const { error } = await supabase.rpc('admin_update_profile', {
         target_user_id: userId,
         new_username: data.username || null,
         new_full_name: data.full_name || null,
@@ -107,7 +128,7 @@ export async function deleteUserTrades(userId: string) {
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { data: result, error } = await supabase.rpc('admin_delete_user_trades', {
+    const { error } = await supabase.rpc('admin_delete_user_trades', {
         target_user_id: userId,
     })
 
@@ -126,7 +147,7 @@ export async function deleteUserJournalEntries(userId: string) {
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { data: result, error } = await supabase.rpc('admin_delete_user_journal', {
+    const { error } = await supabase.rpc('admin_delete_user_journal', {
         target_user_id: userId,
     })
 
@@ -145,7 +166,7 @@ export async function deleteUserProfile(userId: string) {
 
     if (!(await isAdmin())) return { error: 'Unauthorized' }
 
-    const { data: result, error } = await supabase.rpc('admin_delete_user', {
+    const { error } = await supabase.rpc('admin_delete_user', {
         target_user_id: userId,
     })
 

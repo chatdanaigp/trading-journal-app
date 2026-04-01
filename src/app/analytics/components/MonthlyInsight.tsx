@@ -2,10 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Brain, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { Brain, ChevronDown, ChevronUp } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function MonthlyInsight({ dict }: { dict?: any }) {
-    const [data, setData] = useState<any>(null)
+type AppDictionary = typeof dictionaries.EN
+
+type MonthlyInsightData = {
+    hasData: boolean
+    month: string
+    summary: {
+        totalTrades: number
+        winRate: number
+        netProfit: number
+    }
+}
+
+export function MonthlyInsight({ dict }: { dict?: AppDictionary }) {
+    const [data, setData] = useState<MonthlyInsightData | null>(null)
     const [loading, setLoading] = useState(true)
     const [expanded, setExpanded] = useState(false)
 

@@ -7,8 +7,11 @@ import {
     BarChart, Bar, Cell, PieChart, Pie
 } from 'recharts'
 import { BarChart3 } from 'lucide-react'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: any }) {
+type AppDictionary = typeof dictionaries.EN
+
+export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: AppDictionary }) {
     if (data.stats.totalTrades === 0) {
         return (
             <Card className="border-0 shadow-2xl overflow-hidden relative group">
@@ -57,7 +60,7 @@ export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: any
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                                         itemStyle={{ color: '#ccf381' }}
-                                        formatter={(val: any) => [`$${Number(val).toFixed(2)}`, 'Equity']}
+                                        formatter={(val?: number | string) => [`$${Number(val ?? 0).toFixed(2)}`, 'Equity']}
                                     />
                                     <Area type="monotone" dataKey="profit" stroke="#ccf381" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfitAnalytics)" dot={false} />
                                 </AreaChart>
@@ -99,7 +102,7 @@ export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: any
                                         </Pie>
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                            formatter={(val: any, name: any) => [`${val} ${dict.analytics.tradesPlural}`, name]}
+                                            formatter={(val?: number | string, name?: string) => [`${val ?? 0} ${dict.analytics.tradesPlural}`, name ?? '']}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -155,7 +158,7 @@ export function AnalyticsCharts({ data, dict }: { data: AnalyticsData, dict: any
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#0d0d0d', borderColor: '#333', color: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                                         itemStyle={{ color: '#ef4444' }}
-                                        formatter={(val: any) => [`-$${Number(val).toFixed(2)}`, 'Drawdown']}
+                                        formatter={(val?: number | string) => [`-$${Number(val ?? 0).toFixed(2)}`, 'Drawdown']}
                                     />
                                     <Area type="monotone" dataKey="drawdown" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorDrawdown)" dot={false} />
                                 </AreaChart>

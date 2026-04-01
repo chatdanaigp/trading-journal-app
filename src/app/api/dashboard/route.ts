@@ -3,6 +3,30 @@ import { NextResponse } from 'next/server'
 import { startOfMonth, endOfMonth, isSameWeek } from 'date-fns'
 import { getTradingDayStr, getTradingDay } from '@/utils/date-helpers'
 
+type TradeRow = {
+    id: string
+    created_at: string
+    portfolio_id: string | null
+    symbol: string | null
+    type: string | null
+    profit: number | null
+    lot_size: number | null
+}
+
+type PortfolioRow = {
+    id: string
+    name: string | null
+    port_size: number | null
+    profit_goal_percent: number | null
+    commission_per_lot: number | null
+    currency: string | null
+}
+
+type TradeWithNet = TradeRow & {
+    net_profit: number
+    commission_applied: number
+}
+
 export async function GET(request: Request) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -78,7 +102,9 @@ export async function GET(request: Request) {
     // Create a map for quick commission lookup
     const commissionMap = new Map<string | null, number>()
     commissionMap.set(null, profile?.commission_per_lot || 0)
-    portfolios?.forEach(p => {
+    const typedPortfolios = (portfolios || []) as PortfolioRow[]
+
+    typedPortfolios.forEach((p) => {
         commissionMap.set(p.id, p.commission_per_lot || profile?.commission_per_lot || 0)
     })
 
@@ -89,7 +115,7 @@ export async function GET(request: Request) {
         || 'Trader'
 
     // Map trades for stats (Net) and display (Gross)
-    const tradeList = (trades || []).map((t: any) => {
+    const tradeList: TradeWithNet[] = (trades as TradeRow[]).map((t) => {
         const commission = commissionMap.get(t.portfolio_id) || commissionMap.get(null) || 0
         const netProfit = (t.profit || 0) - ((t.lot_size || 0) * commission)
         return { ...t, net_profit: netProfit, commission_applied: commission }
@@ -101,23 +127,23 @@ export async function GET(request: Request) {
     }))
 
     const totalTrades = tradeList.length
-    const winTrades = tradeList.filter((t: any) => (t.net_profit || 0) > 0).length
-    const totalNetProfit = tradeList.reduce((sum: number, t: any) => sum + (t.net_profit || 0), 0)
-    const grossProfitNet = tradeList.filter((t: any) => (t.net_profit || 0) > 0).reduce((sum: number, t: any) => sum + (t.net_profit || 0), 0)
-    const grossLossNet = Math.abs(tradeList.filter((t: any) => (t.net_profit || 0) < 0).reduce((sum: number, t: any) => sum + (t.net_profit || 0), 0))
-    const lossTrades = tradeList.filter((t: any) => (t.net_profit || 0) < 0).length
+    const winTrades = tradeList.filter((t) => (t.net_profit || 0) > 0).length
+    const totalNetProfit = tradeList.reduce((sum: number, t) => sum + (t.net_profit || 0), 0)
+    const grossProfitNet = tradeList.filter((t) => (t.net_profit || 0) > 0).reduce((sum: number, t) => sum + (t.net_profit || 0), 0)
+    const grossLossNet = Math.abs(tradeList.filter((t) => (t.net_profit || 0) < 0).reduce((sum: number, t) => sum + (t.net_profit || 0), 0))
+    const lossTrades = tradeList.filter((t) => (t.net_profit || 0) < 0).length
 
     const winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0'
     const profitFactor = grossLossNet > 0 ? (grossProfitNet / grossLossNet).toFixed(2) : (grossProfitNet > 0 ? '∞' : '0.00')
     const averageWin = winTrades > 0 ? (grossProfitNet / winTrades).toFixed(2) : '0.00'
     const averageLoss = lossTrades > 0 ? (grossLossNet / lossTrades).toFixed(2) : '0.00'
-    const totalLots = tradeList.reduce((sum: number, t: any) => sum + (t.lot_size || 0), 0).toFixed(2)
+    const totalLots = tradeList.reduce((sum: number, t) => sum + (t.lot_size || 0), 0).toFixed(2)
 
     // Long vs Short
-    const longTrades = tradeList.filter((t: any) => t.type === 'BUY')
-    const shortTrades = tradeList.filter((t: any) => t.type === 'SELL')
-    const longWinRate = longTrades.length > 0 ? ((longTrades.filter((t: any) => (t.net_profit || 0) > 0).length / longTrades.length) * 100).toFixed(1) : '0.0'
-    const shortWinRate = shortTrades.length > 0 ? ((shortTrades.filter((t: any) => (t.net_profit || 0) > 0).length / shortTrades.length) * 100).toFixed(1) : '0.0'
+    const longTrades = tradeList.filter((t) => t.type === 'BUY')
+    const shortTrades = tradeList.filter((t) => t.type === 'SELL')
+    const longWinRate = longTrades.length > 0 ? ((longTrades.filter((t) => (t.net_profit || 0) > 0).length / longTrades.length) * 100).toFixed(1) : '0.0'
+    const shortWinRate = shortTrades.length > 0 ? ((shortTrades.filter((t) => (t.net_profit || 0) > 0).length / shortTrades.length) * 100).toFixed(1) : '0.0'
 
     const stats = {
         totalTrades,
@@ -127,28 +153,26 @@ export async function GET(request: Request) {
         averageWin,
         averageLoss,
         totalLots,
-        longStats: { count: longTrades.length, winRate: longWinRate, profit: longTrades.reduce((s: number, t: any) => s + (t.net_profit || 0), 0).toFixed(2) },
-        shortStats: { count: shortTrades.length, winRate: shortWinRate, profit: shortTrades.reduce((s: number, t: any) => s + (t.net_profit || 0), 0).toFixed(2) }
+        longStats: { count: longTrades.length, winRate: longWinRate, profit: longTrades.reduce((s: number, t) => s + (t.net_profit || 0), 0).toFixed(2) },
+        shortStats: { count: shortTrades.length, winRate: shortWinRate, profit: shortTrades.reduce((s: number, t) => s + (t.net_profit || 0), 0).toFixed(2) }
     }
 
     // Goals: prefer portfolio-specific, fallback to profile
     let portSize = profile?.port_size ?? 1000
     let goalPercent = profile?.profit_goal_percent ?? 10
-    let commissionPerLot = profile?.commission_per_lot ?? 0
     const isQuestActive = profile?.is_portfolio_quest_active || false
 
     // If a specific portfolio is selected, use its settings
     const portfolioGoals = (portfolioId && portfolioId !== 'null') 
-        ? portfolios?.find(p => p.id === portfolioId) 
+        ? typedPortfolios.find((p) => p.id === portfolioId) 
         : null
 
     if (portfolioId && portfolioId !== 'null') {
         const portfolio = portfolioGoals
         if (portfolio) {
             // Use portfolio settings if they exist, otherwise fallback to profile defaults
-            portSize = (portfolio as any).port_size ?? portSize
-            goalPercent = (portfolio as any).profit_goal_percent ?? goalPercent
-            commissionPerLot = (portfolio as any).commission_per_lot ?? commissionPerLot
+            portSize = portfolio.port_size ?? portSize
+            goalPercent = portfolio.profit_goal_percent ?? goalPercent
         }
     }
     
@@ -163,7 +187,7 @@ export async function GET(request: Request) {
     const isCurrentMonth = todayMonthStr === targetMonthStr
 
     let monthlyPoints = 0, weeklyPoints = 0, dailyPoints = 0, dailyProfit = 0
-    tradeList.forEach((trade: any) => {
+    tradeList.forEach((trade) => {
         const lot = trade.lot_size || 0.01
         const grossProfit = trade.profit || 0
         const netProfit = trade.net_profit || 0
@@ -190,7 +214,7 @@ export async function GET(request: Request) {
     const monthlyGoalAmount = portSize * (goalPercent / 100)
     const dailyTargetAmount = monthlyGoalAmount / TRADING_DAYS_PER_MONTH
 
-    const currency = (portfolioGoals as any)?.currency || profile?.currency || 'USD'
+    const currency = portfolioGoals?.currency || profile?.currency || 'USD'
     
     return NextResponse.json({
         trades: displayTrades,

@@ -3,7 +3,8 @@
 import React from 'react'
 
 import { useState } from 'react'
-import { Pencil, Share2, Trash2, ImageIcon, X, Eye, ArrowUpRight, ArrowDownRight, Clock, Target, Shield, TrendingUp, Hash, BarChart3, Zap, MoreHorizontal, Edit2, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { Share2, Trash2, ImageIcon, X, Eye, ArrowUpRight, ArrowDownRight, Clock, Target, Shield, TrendingUp, Hash, BarChart3, Zap, Edit2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { Card, CardContent } from '@/components/ui/card'
 import { useSWRConfig } from 'swr'
@@ -12,13 +13,31 @@ import { EditTradeForm } from './EditTradeForm'
 import { TradeShareModal } from './TradeShareModal'
 import { cn } from '@/utils/cn'
 import { getTradingDay } from '@/utils/date-helpers'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export function TradeList({ trades, username, dict, className, hideHeader, currency }: { trades: any[], username?: string, dict?: any, className?: string, hideHeader?: boolean, currency?: string }) {
+type AppDictionary = typeof dictionaries.EN
+
+type TradeRecord = {
+    id: string
+    created_at: string | null
+    symbol: string | null
+    type: string | null
+    lot_size: number | null
+    entry_price: number | null
+    exit_price: number | null
+    profit: number | null
+    stop_loss: number | null
+    strategy?: string | null
+    screenshot_url?: string | null
+    notes?: string | null
+}
+
+export function TradeList({ trades, username, dict, className, hideHeader, currency }: { trades: TradeRecord[]; username?: string; dict?: AppDictionary; className?: string; hideHeader?: boolean; currency?: string }) {
     const isUSC = currency === 'USC'
     const symbol = isUSC ? 'USC' : '$'
-    const [editingTrade, setEditingTrade] = useState<any | null>(null)
-    const [sharingTrade, setSharingTrade] = useState<any | null>(null)
-    const [viewingTrade, setViewingTrade] = useState<any | null>(null)
+    const [editingTrade, setEditingTrade] = useState<TradeRecord | null>(null)
+    const [sharingTrade, setSharingTrade] = useState<TradeRecord | null>(null)
+    const [viewingTrade, setViewingTrade] = useState<TradeRecord | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [viewingScreenshot, setViewingScreenshot] = useState<string | null>(null)
     const { mutate } = useSWRConfig()
@@ -27,7 +46,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
         if (!confirm('Are you sure you want to delete this trade?')) return
         setDeletingId(tradeId)
         await deleteTrade(tradeId)
-        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/'))
+        mutate((key: unknown) => typeof key === 'string' && key.startsWith('/api/'))
         setDeletingId(null)
     }
 
@@ -41,7 +60,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                     {!hideHeader && (
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">{dict?.dashboard?.recentTransactions || "Recent Transactions"}</h2>
-                            <a href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</a>
+                            <Link href="/journal" className="text-sm text-[#ccf381] hover:underline">{dict?.dashboard?.viewJournal || "View Journal"}</Link>
                         </div>
                     )}
 
@@ -80,7 +99,6 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                             const pts = lot !== 0 ? Math.abs(Math.round(profitValue / lot)) : 0
 
                                             // Calculate RR: Actual Points / Planned SL Distance (Pts)
-                                            const entry = t.entry_price || 0
                                             const slPoints = t.stop_loss || 0
 
                                             let actualRRDisplay = "1:0"
@@ -90,9 +108,9 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                                 actualRRDisplay = `1:${formattedRR}`
                                             }
 
-                                            const tDate = new Date(t.created_at || Date.now())
-                                            const tradingDay = getTradingDay(t.created_at || Date.now())
-                                            const dayOfWeek = tradingDay.getDay()
+                                            const createdAt = t.created_at ? new Date(t.created_at) : null
+                                            const tradingDay = t.created_at ? getTradingDay(t.created_at) : null
+                                            const dayOfWeek = tradingDay?.getDay() ?? 0
                                             let dayBorderColor = "border-l-transparent"
 
                                             switch (dayOfWeek) {
@@ -110,7 +128,11 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                                         <div className="flex flex-col">
                                                             <span className="text-white font-bold text-base truncate">{t.symbol || 'XAUUSD'}</span>
                                                             <div className="flex items-center gap-2 mt-1">
-                                                                <span className="text-gray-500 text-[10px]">{tDate.toLocaleDateString('th-TH')} • {tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                <span className="text-gray-500 text-[10px]">
+                                                                    {createdAt
+                                                                        ? `${createdAt.toLocaleDateString('th-TH')} • ${createdAt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`
+                                                                        : 'No timestamp'}
+                                                                </span>
                                                                 {t.strategy && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 whitespace-nowrap">#{t.strategy}</span>}
                                                             </div>
                                                         </div>
@@ -251,7 +273,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
             >
                 {viewingTrade && (() => {
                     const t = viewingTrade
-                    const tDate = new Date(t.created_at || Date.now())
+                    const tDate = t.created_at ? new Date(t.created_at) : null
                     const lot = t.lot_size || 0.01
                     const p = Math.round((t.profit || 0) * 100) / 100
                     const pts = lot !== 0 ? Math.abs(Math.round(p / lot)) : 0
@@ -281,7 +303,7 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                     <div className="lg:flex-1">
                                         <div
                                             className="w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40 cursor-pointer group relative shadow-2xl"
-                                            onClick={() => { setViewingTrade(null); setViewingScreenshot(t.screenshot_url) }}
+                                            onClick={() => { setViewingTrade(null); setViewingScreenshot(t.screenshot_url ?? null) }}
                                         >
                                             <img src={t.screenshot_url} alt="Trade Chart" className="w-full h-auto max-h-[500px] object-contain" />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
@@ -331,12 +353,12 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
                                         "grid gap-2.5",
                                         t.screenshot_url ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"
                                     )}>
-                                        <DetailItem icon={<Clock size={12} />} label="Timestamp" value={`${tDate.toLocaleDateString('th-TH')} • ${tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`} />
-                                        <DetailItem icon={t.type === 'BUY' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />} label="Type" value={t.type} valueClass={t.type === 'BUY' ? 'text-green-400' : 'text-red-400'} />
+                                        <DetailItem icon={<Clock size={12} />} label="Timestamp" value={tDate ? `${tDate.toLocaleDateString('th-TH')} • ${tDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}` : 'No timestamp'} />
+                                        <DetailItem icon={t.type === 'BUY' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />} label="Type" value={t.type ?? '-'} valueClass={t.type === 'BUY' ? 'text-green-400' : 'text-red-400'} />
                                         <DetailItem icon={<TrendingUp size={12} />} label="Volume" value={String(t.lot_size)} />
                                         <DetailItem icon={<BarChart3 size={12} />} label="Strategy" value={t.strategy || '-'} valueClass="text-[#ccf381]" />
-                                        <DetailItem icon={<Target size={12} />} label="Entry" value={t.entry_price?.toLocaleString()} />
-                                        <DetailItem icon={<Zap size={12} />} label="Exit" value={t.exit_price?.toLocaleString() || '-'} />
+                                        <DetailItem icon={<Target size={12} />} label="Entry" value={t.entry_price?.toLocaleString() ?? '-'} />
+                                        <DetailItem icon={<Zap size={12} />} label="Exit" value={t.exit_price?.toLocaleString() ?? '-'} />
                                         <DetailItem icon={isProfit ? <Target size={12} /> : isLoss ? <Shield size={12} /> : <TrendingUp size={12} />} label={isProfit ? "Take Profit" : isLoss ? "Stop Loss" : "Breakeven"} value={isBE ? "BE" : pts.toLocaleString()} valueClass={isProfit ? "text-[#ccf381]" : isLoss ? "text-red-400" : "text-white"} />
                                         <DetailItem icon={<Hash size={12} />} label="Actual RR" value={actualRRDisplay} valueClass={slPoints > 0 && (pts / slPoints) >= 1 ? "text-[#ccf381]" : isBE ? "text-white" : "text-red-400"} />
                                     </div>

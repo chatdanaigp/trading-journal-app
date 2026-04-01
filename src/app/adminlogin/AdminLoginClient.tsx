@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { adminLogin } from '../auth/actions'
 import { Shield, Loader2, Lock, Mail, KeyRound, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
+import type { dictionaries } from '@/utils/dictionaries'
 
-export default function AdminLoginClient({ dict }: { dict: any }) {
+type AppDictionary = typeof dictionaries.EN
+
+export default function AdminLoginClient({ dict }: { dict: AppDictionary }) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 

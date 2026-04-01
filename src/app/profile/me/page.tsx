@@ -7,9 +7,15 @@ import { TopNavigation } from '@/components/TopNavigation'
 import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 
+type Profile = {
+    username: string | null
+    is_public: boolean | null
+    bio: string | null
+}
+
 export default function MyProfilePage() {
-    const supabase = createClient()
-    const [profile, setProfile] = useState<any>(null)
+    const [supabase] = useState(() => createClient())
+    const [profile, setProfile] = useState<Profile | null>(null)
     const [loading, setLoading] = useState(true)
     const [isPublic, setIsPublic] = useState(false)
     const [bio, setBio] = useState('')
@@ -35,35 +41,61 @@ export default function MyProfilePage() {
             setLoading(false)
         }
         load()
-    }, [])
+    }, [supabase])
 
     async function handleToggle() {
         setToggling(true)
         const newVal = !isPublic
         setIsPublic(newVal)
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-            await supabase.from('profiles').update({ is_public: newVal }).eq('id', user.id)
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                setIsPublic(!newVal)
+                return
+            }
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ is_public: newVal })
+                .eq('id', user.id)
+
+            if (error) {
+                setIsPublic(!newVal)
+            }
+        } finally {
+            setToggling(false)
         }
-        setToggling(false)
     }
 
     async function handleSaveBio() {
         setSaving(true)
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-            await supabase.from('profiles').update({ bio }).eq('id', user.id)
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ bio })
+                .eq('id', user.id)
+
+            if (error) return
+
+            setBioSaved(true)
+            setTimeout(() => setBioSaved(false), 2000)
+        } finally {
+            setSaving(false)
         }
-        setSaving(false)
-        setBioSaved(true)
-        setTimeout(() => setBioSaved(false), 2000)
     }
 
-    function copyUrl() {
+    async function copyUrl() {
         if (!profile?.username) return
-        navigator.clipboard.writeText(`${window.location.origin}/profile/${profile.username}`)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+        try {
+            await navigator.clipboard.writeText(`${window.location.origin}/profile/${profile.username}`)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch {
+            setCopied(false)
+        }
     }
 
     if (loading) {
