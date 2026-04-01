@@ -63,6 +63,35 @@ export type TradeRecord = {
     portfolio_id: string | null
 }
 
+/**
+ * Full trade row as stored in the database.
+ * Extends TradeRecord with all optional columns.
+ */
+export type FullTradeRecord = TradeRecord & {
+    user_id: string
+    entry_price: number | null
+    exit_price: number | null
+    stop_loss: number | null
+    take_profit: number | null
+    screenshot_url: string | null
+    notes: string | null
+}
+
+/**
+ * User profile row from the profiles table.
+ */
+export type ProfileRecord = {
+    id: string
+    username: string | null
+    avatar_url: string | null
+    bio: string | null
+    port_size: number | null
+    profit_goal_percent: number | null
+    is_portfolio_quest_active: boolean
+    commission_per_lot: number | null
+    currency: string | null
+}
+
 export type PortfolioRecord = {
     id: string
     user_id?: string
