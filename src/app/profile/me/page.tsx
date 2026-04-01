@@ -5,7 +5,10 @@ import { Shield, Globe, Eye, EyeOff, Copy, Check, ExternalLink, Lock } from 'luc
 import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { TopNavigation } from '@/components/TopNavigation'
 import { createClient } from '@/utils/supabase/client'
+import { useClientDictionary } from '@/hooks/useClientDictionary'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type Profile = {
     username: string | null
@@ -23,6 +26,7 @@ export default function MyProfilePage() {
     const [saving, setSaving] = useState(false)
     const [copied, setCopied] = useState(false)
     const [toggling, setToggling] = useState(false)
+    const dict = useClientDictionary()
 
     useEffect(() => {
         async function load() {
@@ -61,6 +65,7 @@ export default function MyProfilePage() {
 
             if (error) {
                 setIsPublic(!newVal)
+                showError('Failed to update profile visibility')
             }
         } finally {
             setToggling(false)
@@ -78,9 +83,13 @@ export default function MyProfilePage() {
                 .update({ bio })
                 .eq('id', user.id)
 
-            if (error) return
+            if (error) {
+                showError('Failed to save bio')
+                return
+            }
 
             setBioSaved(true)
+            showSuccess(dict?.profile?.savedBio || '✅ Saved!')
             setTimeout(() => setBioSaved(false), 2000)
         } finally {
             setSaving(false)
@@ -98,14 +107,14 @@ export default function MyProfilePage() {
         }
     }
 
-    if (loading) {
+    if (loading || !dict) {
         return (
             <div className="space-y-8">
                 <TopNavigation />
                 <div className="space-y-4 animate-pulse">
-                    <div className="h-10 w-48 bg-white/5 rounded-xl" />
-                    <div className="h-64 w-full bg-white/5 rounded-xl" />
-                    <div className="h-32 w-full bg-white/5 rounded-xl" />
+                    <Skeleton className="h-10 w-48" />
+                    <Skeleton className="h-64 w-full" />
+                    <Skeleton className="h-32 w-full" />
                 </div>
             </div>
         )
@@ -117,9 +126,9 @@ export default function MyProfilePage() {
                 <TopNavigation />
                 <div className="flex flex-col items-center justify-center min-h-[50vh] text-center gap-4">
                     <Lock className="w-16 h-16 text-gray-700" />
-                    <p className="text-xl font-bold text-gray-400">Please sign in to view your profile</p>
+                    <p className="text-xl font-bold text-gray-400">{dict.profile.signInMessage}</p>
                     <Link href="/login" className="px-4 py-2 bg-[#ccf381] text-black font-bold rounded-xl text-sm hover:bg-[#bbe075] transition-colors">
-                        Sign In
+                        {dict.profile.signInBtn}
                     </Link>
                 </div>
             </div>
@@ -139,9 +148,9 @@ export default function MyProfilePage() {
                     <div className="border-b border-[#222] pb-5">
                         <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
                             <Globe className="w-7 h-7 text-blue-400" />
-                            My Public Profile
+                            {dict.profile.myProfileTitle}
                         </h1>
-                        <p className="text-gray-500 mt-1 text-sm">Control what the world sees about your trading</p>
+                        <p className="text-gray-500 mt-1 text-sm">{dict.profile.myProfileSubtitle}</p>
                     </div>
                 </StaggerItem>
 
@@ -155,7 +164,7 @@ export default function MyProfilePage() {
                             <h2 className="text-xl font-black text-white truncate">@{profile?.username || 'unknown'}</h2>
                             <div className="flex items-center gap-1.5 mt-1">
                                 <Shield size={12} className="text-[#ccf381]" />
-                                <span className="text-[10px] font-bold text-[#ccf381] tracking-wider uppercase">Verified Trader Profile</span>
+                                <span className="text-[10px] font-bold text-[#ccf381] tracking-wider uppercase">{dict.profile.verifiedTrader}</span>
                             </div>
                         </div>
                         {isPublic && profile?.username && (
@@ -165,7 +174,7 @@ export default function MyProfilePage() {
                                 className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold hover:bg-blue-500/20 transition-colors"
                             >
                                 <ExternalLink size={12} />
-                                View Public
+                                {dict.profile.viewPublic}
                             </Link>
                         )}
                     </div>
@@ -183,9 +192,9 @@ export default function MyProfilePage() {
                                     }
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-white">Public Profile</p>
+                                    <p className="text-sm font-bold text-white">{dict.profile.publicToggle}</p>
                                     <p className="text-[11px] text-gray-600 mt-0.5">
-                                        {isPublic ? '✅ Visible to anyone on the internet' : '🔒 Hidden — only you can see this'}
+                                        {isPublic ? dict.profile.publicVisible : dict.profile.privateHidden}
                                     </p>
                                 </div>
                             </div>
@@ -208,7 +217,7 @@ export default function MyProfilePage() {
                                     className="flex items-center gap-1 text-[11px] font-bold text-gray-500 hover:text-[#ccf381] transition-colors shrink-0"
                                 >
                                     {copied ? <Check size={12} className="text-[#ccf381]" /> : <Copy size={12} />}
-                                    {copied ? 'Copied!' : 'Copy'}
+                                    {copied ? dict.profile.copiedUrl : dict.profile.copyUrl}
                                 </button>
                             </div>
                         )}
@@ -219,14 +228,14 @@ export default function MyProfilePage() {
                 <StaggerItem>
                     <div className="p-5 bg-[#0f0f0f] rounded-2xl border border-white/5 space-y-3">
                         <div className="flex items-center justify-between">
-                            <label className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Bio / Description</label>
+                            <label className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">{dict.profile.bioLabel}</label>
                             <span className="text-[10px] text-gray-700">{bio.length}/200</span>
                         </div>
                         <textarea
                             value={bio}
                             onChange={(e) => setBio(e.target.value)}
                             maxLength={200}
-                            placeholder="Tell the world about your trading journey..."
+                            placeholder={dict.profile.bioPlaceholder}
                             className="w-full h-24 bg-[#050505] border border-[#2a2a2a] rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:border-[#ccf381]/50 focus:ring-1 focus:ring-[#ccf381]/20 outline-none resize-none transition-all"
                         />
                         <button
@@ -234,7 +243,7 @@ export default function MyProfilePage() {
                             disabled={saving}
                             className="w-full py-2.5 rounded-xl bg-[#ccf381] text-black text-sm font-bold hover:bg-[#bbe075] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {saving ? 'Saving...' : bioSaved ? '✅ Saved!' : 'Save Bio'}
+                            {saving ? dict.profile.savingBio : bioSaved ? dict.profile.savedBio : dict.profile.saveBio}
                         </button>
                     </div>
                 </StaggerItem>
@@ -244,7 +253,7 @@ export default function MyProfilePage() {
                     <div className="flex gap-3 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
                         <Lock className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                         <div className="text-xs text-gray-500 leading-relaxed">
-                            <span className="text-blue-400 font-bold">Privacy Protected:</span> Your public profile only shows Win Rate, Profit Factor, and Streak percentages. <strong className="text-white">Dollar amounts and account balances are never exposed.</strong>
+                            {dict.profile.infoDesc}
                         </div>
                     </div>
                 </StaggerItem>

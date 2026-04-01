@@ -9,6 +9,7 @@ import { useState, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ImagePlus, X } from 'lucide-react'
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import type { HistoryTradeRecord } from '@/types/models'
 
 interface EditTradeFormProps {
@@ -18,7 +19,6 @@ interface EditTradeFormProps {
 
 export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const { mutate } = useSWRConfig()
 
     // Form State (initialized with props)
@@ -83,7 +83,6 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
     async function handleSubmit(formData: FormData) {
         setLoading(true)
-        setMessage(null)
 
         // Capture exact local time for the selected date
         const tradeDateStr = formData.get('tradeDate') as string;
@@ -103,7 +102,7 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
             const result = await updateTrade(formData)
 
             if (result?.success) {
-                setMessage({ type: 'success', text: 'Trade updated successfully!' })
+                showSuccess('Trade updated successfully!')
                 
                 // Invalidate all API keys instantly
                 mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
@@ -112,10 +111,10 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
                     onSuccess() // Close modal
                 }, 1000)
             } else {
-                setMessage({ type: 'error', text: result?.error || 'Failed to update trade' })
+                showError(result?.error || 'Failed to update trade')
             }
         } catch {
-            setMessage({ type: 'error', text: 'An unexpected error occurred' })
+            showError('An unexpected error occurred')
         } finally {
             setLoading(false)
         }
@@ -123,13 +122,6 @@ export function EditTradeForm({ initialData, onSuccess }: EditTradeFormProps) {
 
     return (
         <form action={handleSubmit} className="grid gap-5">
-            {/* Status Message */}
-            {message && (
-                <div className={`p-4 rounded-xl text-sm font-bold flex items-center justify-center ${message.type === 'success' ? 'bg-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/20 text-red-400'}`}>
-                    {message.text}
-                </div>
-            )}
-
             {/* Row 1: Date + Symbol */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">

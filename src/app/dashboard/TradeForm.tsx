@@ -13,6 +13,7 @@ import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import { StrategyDropdown } from '@/components/ui/StrategyDropdown'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/utils/cn'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import type { Dictionary } from '@/utils/dictionaries'
 import type { HistoryTradeRecord } from '@/types/models'
 
@@ -20,7 +21,6 @@ export function TradeForm({ dict, portfolioId = null, currency = 'USD' }: { dict
     const isUSC = currency === 'USC'
     const currencySymbol = isUSC ? '' : '$'
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
     const { mutate } = useSWRConfig()
@@ -69,7 +69,6 @@ export function TradeForm({ dict, portfolioId = null, currency = 'USD' }: { dict
 
     async function handleSubmit(formData: FormData) {
         setLoading(true)
-        setMessage(null)
         const tradeDateStr = formData.get('tradeDate') as string;
         if (tradeDateStr) {
             const [year, month, day] = tradeDateStr.split('-').map(Number);
@@ -83,17 +82,17 @@ export function TradeForm({ dict, portfolioId = null, currency = 'USD' }: { dict
             if (result?.success) {
                 setShowSuccessOverlay(true)
                 setTimeout(() => setShowSuccessOverlay(false), 2000)
-                setMessage({ type: 'success', text: 'Trade saved successfully!' })
+                showSuccess(dict?.dashboard?.quickTrade ? 'บันทึกเทรดสำเร็จ!' : 'Trade saved successfully!')
                 formRef.current?.reset()
                 mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
                 setSymbol('XAUUSD')
                 setTradeDate(new Date().toISOString().split('T')[0])
                 setEntry(''); setExit(''); setLot(''); setProfitAmount(''); setProfitSign('+'); setPoints(null); setSl(''); setTp(''); setStrategy(''); setScreenshotPreview(null);
             } else {
-                setMessage({ type: 'error', text: result?.error || 'Failed to save trade' })
+                showError(result?.error || 'Failed to save trade')
             }
         } catch {
-            setMessage({ type: 'error', text: 'An unexpected error occurred' })
+            showError('An unexpected error occurred')
         } finally {
             setLoading(false)
         }
@@ -111,11 +110,6 @@ export function TradeForm({ dict, portfolioId = null, currency = 'USD' }: { dict
 
                 <form ref={formRef} action={handleSubmit} className="flex flex-col flex-grow justify-between gap-5 relative z-10">
                     <input type="hidden" name="portfolioId" value={portfolioId || ''} />
-                    {message && (
-                        <div className={`mb-5 p-4 rounded-xl text-sm font-bold flex items-center justify-center ${message.type === 'success' ? 'bg-[#ccf381]/20 text-[#ccf381]' : 'bg-red-500/20 text-red-400'}`}>
-                            {message.text}
-                        </div>
-                    )}
 
                     <div className="flex flex-col gap-5">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

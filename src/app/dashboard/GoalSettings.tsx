@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Settings, Target, DollarSign, Percent, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
+import { showSuccess, showError } from '@/components/ui/Toast'
 import type { Dictionary } from '@/utils/dictionaries'
 
 export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommissionPerLot, initialCurrency, portfolioId, dict }: { initialPortSize: number, initialGoalPercent: number, initialCommissionPerLot?: number, initialCurrency?: string, portfolioId?: string | null, dict?: Dictionary }) {
@@ -14,7 +15,6 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
     const [currency, setCurrency] = useState<string>(initialCurrency || 'USD')
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
-    const [error, setError] = useState<string | null>(null)
 
     // Sync state with props when they change (e.g. portfolio switch)
     useEffect(() => {
@@ -26,7 +26,6 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
     
     async function handleSave() {
         setIsLoading(true)
-        setError(null)
         try {
             const validPortSize = Number(portSize)
             const validGoalPercent = Number(goalPercent)
@@ -39,17 +38,17 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
             }
 
             if (result?.error) {
-                setError(result.error)
+                showError(result.error)
                 return
             }
 
             // Force SWR to revalidate everything starting with /api/
             await mutate((key) => typeof key === 'string' && key.startsWith('/api/'))
-            
+            showSuccess(dict?.dashboard?.saveGoals ? 'บันทึกเป้าหมายสำเร็จ!' : 'Goals saved!')
             setIsOpen(false)
         } catch (error: unknown) {
             console.error('Error saving goals:', error)
-            setError(error instanceof Error ? error.message : 'An unexpected error occurred')
+            showError(error instanceof Error ? error.message : 'An unexpected error occurred')
         } finally {
             setIsLoading(false)
         }
@@ -88,11 +87,6 @@ export function GoalSettings({ initialPortSize, initialGoalPercent, initialCommi
                 </button>
             </div>
 
-            {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-3 py-2 rounded-lg text-[10px] font-bold">
-                    {error}
-                </div>
-            )}
 
             {/* Inputs */}
             <div className="grid grid-cols-2 gap-3">

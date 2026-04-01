@@ -3,20 +3,17 @@
 import { JournalEntry } from '../actions'
 import { JournalEntryCard } from './JournalEntryCard'
 import { BookOpen } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { Dictionary } from '@/utils/dictionaries'
 
 export function JournalList({ entries, dict }: { entries: JournalEntry[], dict: Dictionary }) {
     if (entries.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="p-6 bg-[#1a1a1a] rounded-full mb-4 border border-white/5">
-                    <BookOpen className="w-10 h-10 text-gray-600" />
-                </div>
-                <div className="text-center py-12">
-                    <p className="text-gray-400 mb-2">{dict.journal.noEntries}</p>
-                    <p className="text-sm text-gray-600">{dict.journal.startWriting}</p>
-                </div>
-            </div>
+            <EmptyState
+                icon={BookOpen}
+                title={dict.journal.noEntries}
+                subtitle={dict.journal.startWriting}
+            />
         )
     }
 

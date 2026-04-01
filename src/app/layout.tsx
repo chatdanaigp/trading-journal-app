@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import NextTopLoader from 'nextjs-toploader';
+import { Toaster } from '@/components/ui/Toast';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default async function RootLayout({
           shadow="0 0 10px #34c759,0 0 5px #34c759"
           zIndex={16000}
         />
+        <Toaster />
         {children}
       </body>
     </html>

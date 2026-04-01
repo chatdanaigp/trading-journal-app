@@ -52,7 +52,15 @@ export function TradeList({ trades, username, dict, className, hideHeader, curre
 
                     <div className="flex flex-1 min-h-0 flex-col p-0">
                         {trades.length === 0 ? (
-                            <div className="flex flex-1 items-center justify-center p-10 text-center text-gray-500">{dict?.dashboard?.noTradesWait || "No trades yet."}</div>
+                            <div className="flex flex-1 items-center justify-center p-6">
+                                <div className="flex flex-col items-center text-center">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center mb-4">
+                                        <BarChart3 className="w-6 h-6 text-gray-600" />
+                                    </div>
+                                    <p className="text-sm font-bold text-gray-400 mb-1">{dict?.dashboard?.noTradesWait || "No trades yet."}</p>
+                                    <p className="text-xs text-gray-600">{dict?.dashboard?.quickTrade ? `↑ ${dict.dashboard.quickTrade}` : '↑ Log your first trade above'}</p>
+                                </div>
+                            </div>
                         ) : (
                             <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar overflow-x-hidden rounded-xl border border-white/5 bg-black/20">
                                 <table className="w-full text-left relative table-fixed">

@@ -208,7 +208,17 @@ export const dictionaries = {
             bioPlaceholder: "Tell the world about your trading journey...",
             saveBio: "Save Bio",
             infoTitle: "🔒 Privacy Note",
-            infoDesc: "Your public profile only shows percentages (Win Rate, Profit Factor) and streaks. Dollar amounts and account balances are NEVER exposed."
+            infoDesc: "Your public profile only shows percentages (Win Rate, Profit Factor) and streaks. Dollar amounts and account balances are NEVER exposed.",
+            signInMessage: "Please sign in to view your profile",
+            signInBtn: "Sign In",
+            verifiedTrader: "Verified Trader Profile",
+            viewPublic: "View Public",
+            publicVisible: "✅ Visible to anyone on the internet",
+            privateHidden: "🔒 Hidden — only you can see this",
+            savingBio: "Saving...",
+            savedBio: "✅ Saved!",
+            copyUrl: "Copy",
+            copiedUrl: "Copied!"
         },
         leaderboard: {
             title: "Global Leaderboard",
@@ -594,7 +604,17 @@ export const dictionaries = {
             bioPlaceholder: "เล่าเรื่องการเทรดของคุณให้โลกรู้...",
             saveBio: "บันทึก",
             infoTitle: "🔒 หมายเหตุความเป็นส่วนตัว",
-            infoDesc: "โปรไฟล์สาธารณะแสดงเฉพาะเปอร์เซ็นต์ (Win Rate, Profit Factor) และ Streak เท่านั้น ยอดเงินและยอดบัญชีจะไม่ถูกเปิดเผย"
+            infoDesc: "โปรไฟล์สาธารณะแสดงเฉพาะเปอร์เซ็นต์ (Win Rate, Profit Factor) และ Streak เท่านั้น ยอดเงินและยอดบัญชีจะไม่ถูกเปิดเผย",
+            signInMessage: "กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์ของคุณ",
+            signInBtn: "เข้าสู่ระบบ",
+            verifiedTrader: "เทรดเดอร์ยืนยันตัวตน",
+            viewPublic: "ดูสาธารณะ",
+            publicVisible: "✅ ทุกคนสามารถเข้าดูได้",
+            privateHidden: "🔒 ซ่อนไว้ — เฉพาะคุณเท่านั้นที่มองเห็น",
+            savingBio: "กำลังบันทึก...",
+            savedBio: "✅ บันทึกแล้ว!",
+            copyUrl: "คัดลอก",
+            copiedUrl: "คัดลอกแล้ว!"
         },
         leaderboard: {
             title: "ตารางอันดับผู้นำ",
