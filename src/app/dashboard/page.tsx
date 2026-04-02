@@ -15,9 +15,11 @@ import { StaggerContainer, StaggerItem } from '@/components/ui/animations'
 import { CelebrationModal } from '@/components/ui/CelebrationModal'
 import { TopNavigation } from '@/components/TopNavigation'
 import { PageSkeleton } from '@/components/ui/Skeleton'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { format, subMonths, addMonths, isThisMonth } from 'date-fns'
 import { PortProgressWidget } from './PortProgressWidget'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { dictionaries } from '@/utils/dictionaries'
 
 type AppDictionary = typeof dictionaries.EN
@@ -57,9 +59,23 @@ export default function DashboardPage() {
         else localStorage.removeItem('tj_selected_portfolio')
     }
 
+    const router = useRouter()
+    const pathname = usePathname()
+
+    const handleMonthChange = (newDate: Date) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('month', (newDate.getMonth() + 1).toString())
+        params.set('year', newDate.getFullYear().toString())
+        router.push(`${pathname}?${params.toString()}`)
+    }
+
     const { data, isLoading } = useDashboardData(month, year, isInitialized ? portfolioId : undefined)
 
     if (isLoading || !data || !dict || !isInitialized) return <PageSkeleton />
+
+    const displayDate = typeof month === 'number' && typeof year === 'number' 
+        ? new Date(year, month - 1, 1) 
+        : new Date()
 
     const { trades, allTrades, stats, username, points, dailyTargetAmount, isQuestActive, portSize, goalPercent, goals } = data
     const { monthlyPoints, weeklyPoints, dailyPoints, dailyProfit } = points
@@ -251,6 +267,25 @@ export default function DashboardPage() {
                                 <div className="flex-grow flex flex-col">
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">{dict?.dashboard?.tradingCalendar || 'Trading Calendar'}</h2>
+                                        
+                                        <div className="flex items-center gap-2 bg-[#1a1a1a] border border-[#333] rounded-lg px-2 py-1">
+                                            <button 
+                                                onClick={() => handleMonthChange(subMonths(displayDate, 1))} 
+                                                className="p-1 hover:text-[#ccf381] transition-colors"
+                                            >
+                                                <ChevronLeft size={16} />
+                                            </button>
+                                            <span className="font-bold min-w-[100px] text-center text-xs text-gray-200 uppercase tracking-wider">
+                                                {format(displayDate, 'MMM yyyy')}
+                                            </span>
+                                            <button 
+                                                onClick={() => handleMonthChange(addMonths(displayDate, 1))} 
+                                                disabled={isThisMonth(displayDate)}
+                                                className={`p-1 transition-colors ${isThisMonth(displayDate) ? 'text-gray-600 cursor-not-allowed' : 'hover:text-[#ccf381]'}`}
+                                            >
+                                                <ChevronRight size={16} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <CalendarWidget trades={allTrades} dict={dict} />
                                 </div>
