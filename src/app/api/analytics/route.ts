@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { getTradingDayStr, getTradingDay } from '@/utils/date-helpers'
+import { buildCommissionMap, getCommission } from '@/lib/trade-calculations'
 
 type TradeRow = {
     created_at: string
@@ -9,15 +10,6 @@ type TradeRow = {
     portfolio_id: string | null
     profit: number | null
     lot_size: number | null
-}
-
-type CommissionProfile = {
-    commission_per_lot: number | null
-}
-
-type CommissionPortfolio = {
-    id: string
-    commission_per_lot: number | null
 }
 
 function calculateAnalytics(trades: TradeRow[]) {
@@ -190,14 +182,10 @@ export async function GET() {
         .select('id, commission_per_lot')
         .eq('user_id', user.id)
 
-    const typedProfile = profile as CommissionProfile | null
-    const typedPortfolios = (portfolios || []) as CommissionPortfolio[]
-
-    const commissionMap = new Map<string | null, number>()
-    commissionMap.set(null, typedProfile?.commission_per_lot || 0)
-    typedPortfolios.forEach((portfolio) => {
-        commissionMap.set(portfolio.id, portfolio.commission_per_lot || typedProfile?.commission_per_lot || 0)
-    })
+    const commissionMap = buildCommissionMap(
+        (profile as { commission_per_lot: number | null } | null)?.commission_per_lot || 0,
+        ((portfolios || []) as { id: string; commission_per_lot: number | null }[]).map(p => ({ id: p.id, commission_per_lot: p.commission_per_lot }))
+    )
 
     const todayStr = getTradingDayStr(new Date())
     const currentMonthPrefix = todayStr.substring(0, 7)
@@ -220,7 +208,7 @@ export async function GET() {
     }
 
     const allTrades = (allTradesRaw as TradeRow[]).map((trade) => {
-        const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
+        const commission = getCommission(commissionMap, trade.portfolio_id)
         const netProfit = (trade.profit || 0) - ((trade.lot_size || 0) * commission)
         return { ...trade, profit: netProfit }
     })

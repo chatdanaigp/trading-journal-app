@@ -5,7 +5,7 @@ import { AnalyticsData } from '../actions'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
-import { Clock, Tag, Flame, Activity } from 'lucide-react'
+import { Clock, Tag, Flame } from 'lucide-react'
 import { EmptyState } from '@/components/ui/EmptyState'
 import type { dictionaries } from '@/utils/dictionaries'
 

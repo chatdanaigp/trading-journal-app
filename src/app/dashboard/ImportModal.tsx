@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
-import { Upload, FileSpreadsheet, CheckCircle2, X } from 'lucide-react'
+import { Upload, FileSpreadsheet, X } from 'lucide-react'
 import { useSWRConfig } from 'swr'
 import { showSuccess, showError } from '@/components/ui/Toast'
 import type { Dictionary } from '@/utils/dictionaries'

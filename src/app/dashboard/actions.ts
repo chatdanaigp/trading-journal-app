@@ -4,12 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import type { TradeRecord } from '@/types/models'
 import { enrichTradesWithNet, calculateTradeStats } from '@/lib/trade-calculations'
 
-type ProfileCommissionSettings = {
-    commission_per_lot: number | null
-}
 
 type ProfileGoalUpdate = {
     port_size: number
@@ -423,48 +419,4 @@ export async function updatePortfolioGoals(portfolioId: string, portSize: number
 
     revalidatePath('/', 'layout')
     return { success: true }
-}
-export async function repairRecentTrades() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Not authenticated' }
-
-    // Fetch trades from the last 24 hours
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    
-    const { data: trades, error } = await supabase
-        .from('trades')
-        .select('id, profit, lot_size, portfolio_id')
-        .eq('user_id', user.id)
-        .gte('created_at', oneDayAgo)
-
-    if (error) return { error: error.message }
-    if (!trades || trades.length === 0) return { success: true, repaired: 0 }
-
-    // Fetch settings to know what was deducted
-    const { data: profile } = await supabase.from('profiles').select('commission_per_lot').eq('id', user.id).single<ProfileCommissionSettings>()
-    const { data: portfolios } = await supabase.from('portfolios').select('id, commission_per_lot').eq('user_id', user.id)
-
-    const commissionMap = new Map<string | null, number>()
-    commissionMap.set(null, profile?.commission_per_lot || 0)
-    portfolios?.forEach((portfolio) => commissionMap.set(portfolio.id, portfolio.commission_per_lot || profile?.commission_per_lot || 0))
-
-    let repairedCount = 0
-    for (const trade of trades as TradeRecord[]) {
-        const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
-        if (commission > 0) {
-            const deduction = (trade.lot_size || 0) * commission
-            // We assume it was deducted once. Restoring it to Gross.
-            const restoredProfit = (trade.profit || 0) + deduction
-            
-            await supabase
-                .from('trades')
-                .update({ profit: restoredProfit })
-                .eq('id', trade.id)
-            repairedCount++
-        }
-    }
-
-    revalidatePath('/', 'layout')
-    return { success: true, repaired: repairedCount }
 }
