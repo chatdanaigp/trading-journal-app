@@ -2,6 +2,9 @@ import { Sidebar } from '@/components/Sidebar'
 import { getDictionary } from '@/utils/dictionaries'
 import { getCurrentLanguage } from '@/utils/dictionaries-server'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function DashboardLayout({
     children,
 }: {
