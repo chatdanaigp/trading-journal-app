@@ -1,6 +1,8 @@
 'use client'
 
 import useSWR from 'swr'
+import useSWRInfinite from 'swr/infinite'
+import type { FilterState } from '@/components/ui/TradeFilters'
 import type { AnalyticsPageData, ChallengeApiResponse, DashboardPageData, HistoryApiResponse, JournalApiResponse, LeaderboardApiResponse } from '@/types/models'
 
 const fetcher = async <T>(url: string): Promise<T> => fetch(url).then(res => {
@@ -57,3 +59,28 @@ export function useHistoryData(month?: number, year?: number) {
         swrConfig
     )
 }
+
+export function useHistoryDataInfinite(month?: number, year?: number, filters?: FilterState) {
+    const getKey = (pageIndex: number, previousPageData: HistoryApiResponse | null) => {
+        if (previousPageData && (!previousPageData.trades || previousPageData.trades.length === 0)) return null
+        if (previousPageData && previousPageData.page >= previousPageData.totalPages) return null
+        
+        const params = new URLSearchParams()
+        if (month !== undefined) params.set('month', month.toString())
+        if (year !== undefined) params.set('year', year.toString())
+        
+        params.set('page', (pageIndex + 1).toString())
+        params.set('limit', '50')
+        
+        if (filters?.symbol) params.set('symbol', filters.symbol)
+        if (filters?.type) params.set('type', filters.type)
+        if (filters?.result) params.set('result', filters.result)
+        if (filters?.strategy) params.set('strategy', filters.strategy)
+        
+        const query = params.toString()
+        return `/api/history${query ? `?${query}` : ''}`
+    }
+
+    return useSWRInfinite<HistoryApiResponse>(getKey, fetcher, swrConfig)
+}
+

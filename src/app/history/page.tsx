@@ -1,6 +1,6 @@
 'use client'
 
-import { useHistoryData } from '@/hooks/usePageData'
+import { useHistoryDataInfinite } from '@/hooks/usePageData'
 import { TradeList } from '@/app/dashboard/TradeList'
 import { PageSkeleton } from '@/components/ui/Skeleton'
 import { useState } from 'react'
@@ -9,18 +9,23 @@ import { TopNavigation } from '@/components/TopNavigation'
 import { History, ChevronLeft, ChevronRight } from 'lucide-react'
 import { format, subMonths, addMonths, isThisMonth } from 'date-fns'
 import { useClientDictionary } from '@/hooks/useClientDictionary'
+import { TradeFilters, type FilterState } from '@/components/ui/TradeFilters'
 
 export default function HistoryPage() {
     const [currentDate, setCurrentDate] = useState(new Date())
     const month = currentDate.getMonth() + 1
     const year = currentDate.getFullYear()
+    const [filters, setFilters] = useState<FilterState>({ symbol: '', type: '', result: '', strategy: '' })
 
-    const { data, isLoading } = useHistoryData(month, year)
+    const { data, size, setSize, isLoading, isValidating } = useHistoryDataInfinite(month, year, filters)
     const dict = useClientDictionary()
 
-    if (isLoading || !data || !dict) return <PageSkeleton />
+    if (!dict) return <PageSkeleton />
 
-    const { trades, username } = data
+    const trades = data ? data.flatMap(p => p.trades) : []
+    const username = data?.[0]?.username || ''
+    const hasMore = data ? (data[data.length - 1]?.page < data[data.length - 1]?.totalPages) : false
+    const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined") || isValidating
 
     return (
         <StaggerContainer className="flex min-h-[calc(100vh-8rem)] flex-col gap-8">
@@ -60,16 +65,28 @@ export default function HistoryPage() {
                 <TopNavigation />
             </StaggerItem>
 
+            {/* Filter Bar */}
+            <StaggerItem>
+                <TradeFilters onFilterChange={setFilters} initialFilters={filters} />
+            </StaggerItem>
+
             {/* Full screen TradeList */}
             <StaggerItem className="flex flex-1 min-h-0 pb-4">
                 <div className="w-full h-full min-h-0">
-                    <TradeList 
-                        trades={trades} 
-                        username={username} 
-                        dict={dict} 
-                        hideHeader={true}
-                        className="h-full min-h-0"
-                    />
+                    {isLoading && !data ? (
+                        <div className="flex items-center justify-center p-12"><span className="text-gray-500">Loading trades...</span></div>
+                    ) : (
+                        <TradeList 
+                            trades={trades} 
+                            username={username} 
+                            dict={dict} 
+                            hideHeader={true}
+                            className="h-full min-h-0"
+                            hasMore={hasMore}
+                            isLoadingMore={isLoadingMore}
+                            onLoadMore={() => setSize(size + 1)}
+                        />
+                    )}
                 </div>
             </StaggerItem>
         </StaggerContainer>

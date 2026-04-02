@@ -14,6 +14,12 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const paramMonth = searchParams.get('month')
     const paramYear = searchParams.get('year')
+    const page = parseInt(searchParams.get('page') || '1', 10)
+    const limit = parseInt(searchParams.get('limit') || '50', 10)
+    const symbol = searchParams.get('symbol')
+    const type = searchParams.get('type')
+    const result = searchParams.get('result')
+    const strategy = searchParams.get('strategy')
 
     const now = new Date()
     let targetYear = paramYear ? parseInt(paramYear, 10) : now.getFullYear()
@@ -25,16 +31,38 @@ export async function GET(request: Request) {
     const start = new Date(targetYear, targetMonth, 1).toISOString()
     const end = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999).toISOString()
 
-    // Fetch up to 1000 trades for the history view, filtered by month
-    const { data: trades } = await supabase
+    // 1) Base query for trade fetching
+    let query = supabase
         .from('trades')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('user_id', user.id)
         .gte('created_at', start)
         .lte('created_at', end)
+
+    // 2) Apply filters
+    if (symbol) {
+        query = query.ilike('symbol', `%${symbol}%`)
+    }
+    if (type === 'BUY' || type === 'SELL') {
+        query = query.eq('type', type)
+    }
+    if (strategy) {
+        query = query.eq('strategy', strategy)
+    }
+    if (result === 'win') {
+        query = query.gt('profit', 0)
+    } else if (result === 'loss') {
+        query = query.lt('profit', 0)
+    } else if (result === 'be') {
+        query = query.eq('profit', 0)
+    }
+
+    // 3) Apply pagination and sorting
+    const offset = (page - 1) * limit
+    const { data: trades, count } = await query
         .order('created_at', { ascending: false })
         .order('id', { ascending: false })
-        .limit(1000)
+        .range(offset, offset + limit - 1)
 
     // Fetch profile and all portfolios to get commission settings
     const { data: profile } = await supabase
@@ -70,6 +98,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json<HistoryApiResponse>({
         trades: tradeList,
+        totalCount: count || 0,
+        page,
+        totalPages: count ? Math.ceil(count / limit) : 0,
         username,
     })
 }

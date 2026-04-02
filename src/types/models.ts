@@ -146,6 +146,9 @@ export type HistoryTradeRecord = TradeRecord & {
 
 export type HistoryApiResponse = {
     trades: HistoryTradeRecord[]
+    totalCount: number
+    page: number
+    totalPages: number
     username: string
 }
 
