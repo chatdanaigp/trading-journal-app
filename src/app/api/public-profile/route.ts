@@ -10,30 +10,21 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createClient()
 
-    // Get profile
+    // Get profile (single query for all needed fields)
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('username, avatar_url, bio, is_public')
+        .select('id, username, avatar_url, bio, is_public')
         .eq('username', username)
         .single()
 
     if (profileError || !profile) return NextResponse.json({ error: 'User not found' }, { status: 404 })
     if (!profile.is_public) return NextResponse.json({ error: 'Profile is private' }, { status: 403 })
 
-    // Get user id
-    const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', username)
-        .single()
-
-    if (!userProfile) return NextResponse.json({ error: 'User not found' }, { status: 404 })
-
     // Get trades (public stats only — no dollar amounts)
     const { data: trades } = await supabase
         .from('trades')
         .select('profit, type, symbol, strategy, created_at')
-        .eq('user_id', userProfile.id)
+        .eq('user_id', profile.id)
         .order('created_at', { ascending: true })
 
     const allTrades = trades || []

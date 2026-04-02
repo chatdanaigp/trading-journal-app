@@ -4,8 +4,6 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { enrichTradesWithNet, calculateTradeStats } from '@/lib/trade-calculations'
-
 
 type ProfileGoalUpdate = {
     port_size: number
@@ -290,84 +288,6 @@ export async function deleteTrade(tradeId: string) {
 
     revalidatePath('/', 'layout')
     return { success: true }
-}
-
-export async function getTrades(startDate?: string, endDate?: string) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) return []
-
-    let query = supabase
-        .from('trades')
-        .select('*')
-        .eq('user_id', user.id)
-
-    if (startDate) {
-        query = query.gte('created_at', startDate)
-    }
-    if (endDate) {
-        query = query.lte('created_at', endDate)
-    }
-
-    const { data, error } = await query
-        .order('created_at', { ascending: false })
-        .order('id', { ascending: false })
-        .limit(100) // Increased limit to ensure we get a full month's worth of typical trading activity
-
-    if (error) {
-        console.error('Error fetching trades:', error)
-        return []
-    }
-
-    return data
-}
-
-export async function getTradeStats(startDate?: string, endDate?: string) {
-    const trades = await getTrades(startDate, endDate)
-
-    if (!trades.length) return {
-        totalTrades: 0,
-        winRate: '0.0',
-        netProfit: '0.00',
-        profitFactor: '0.00',
-        averageWin: '0.00',
-        averageLoss: '0.00',
-        totalLots: '0.00',
-        longStats: { count: 0, winRate: '0.0', profit: '0.00' },
-        shortStats: { count: 0, winRate: '0.0', profit: '0.00' }
-    }
-
-    // Use shared library with 0 commission (getTradeStats uses gross profit)
-    const noCommission = new Map<string | null, number>([[null, 0]])
-    const enriched = enrichTradesWithNet(
-        trades.map(t => ({ profit: t.profit, lot_size: t.lot_size, type: t.type, portfolio_id: t.portfolio_id })),
-        noCommission
-    )
-
-    return calculateTradeStats(enriched)
-}
-
-
-
-export async function getProfileGoals() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) return null
-
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('port_size, profit_goal_percent, is_portfolio_quest_active, commission_per_lot, currency')
-        .eq('id', user.id)
-        .single()
-
-    if (error) {
-        console.error('Error fetching profile goals:', error)
-        return { port_size: 1000, profit_goal_percent: 10, is_portfolio_quest_active: false, commission_per_lot: 0 } // Default fallback
-    }
-
-    return data
 }
 
 export async function updateProfileGoals(portSize: number, profitGoalPercent: number, isQuestActive?: boolean, commissionPerLot?: number, currency?: string) {

@@ -1,16 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import type { HistoryApiResponse, HistoryTradeRecord } from '@/types/models'
-
-type HistoryProfile = {
-    username: string | null
-    commission_per_lot: number | null
-}
-
-type HistoryPortfolio = {
-    id: string
-    commission_per_lot: number | null
-}
+import { buildCommissionMap, getCommission } from '@/lib/trade-calculations'
 
 export async function GET(request: Request) {
     const supabase = await createClient()
@@ -57,14 +48,11 @@ export async function GET(request: Request) {
         .select('id, commission_per_lot')
         .eq('user_id', user.id)
 
-    // Create a map for quick commission lookup
-    const commissionMap = new Map<string | null, number>()
-    const typedProfile = profile as HistoryProfile | null
-    const typedPortfolios = (portfolios || []) as HistoryPortfolio[]
-    commissionMap.set(null, typedProfile?.commission_per_lot || 0)
-    typedPortfolios.forEach((portfolio) => {
-        commissionMap.set(portfolio.id, portfolio.commission_per_lot || typedProfile?.commission_per_lot || 0)
-    })
+    // Build commission map using shared library
+    const commissionMap = buildCommissionMap(
+        (profile as { commission_per_lot: number | null } | null)?.commission_per_lot || 0,
+        ((portfolios || []) as { id: string; commission_per_lot: number | null }[]).map(p => ({ id: p.id, commission_per_lot: p.commission_per_lot }))
+    )
 
     const username = (user.user_metadata?.full_name as string)
         || (user.user_metadata?.name as string)
@@ -74,7 +62,7 @@ export async function GET(request: Request) {
 
     // Calculate dynamic net profit
     const tradeList = ((trades || []) as HistoryTradeRecord[]).map((trade) => {
-        const commission = commissionMap.get(trade.portfolio_id) || commissionMap.get(null) || 0
+        const commission = getCommission(commissionMap, trade.portfolio_id)
         const netProfit = (trade.profit || 0) - ((trade.lot_size || 0) * commission)
         // Keep profit as Gross for display, store net_profit separately if needed or just return gross in 'profit'
         return { ...trade, profit: trade.profit, net_profit: netProfit, commission_applied: commission }
